@@ -8,5 +8,7 @@ namespace Cubes.Core.Commands
 
         public CommandHandlerResolveException(Type commandType, string message, Exception innerException) : base(message, innerException) 
             => CommandType = commandType;
+
+        public CommandHandlerResolveException(Type commandType, string message) : this(commandType, message, null) { }
     }
 }

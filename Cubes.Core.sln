@@ -5,16 +5,20 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1A676AAA-69D1-4200-BE90-7B37C283421E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cubes.Core", "src\Cubes.Core\Cubes.Core.csproj", "{0FDF6A57-CCC1-469E-BC7E-34ACD9921847}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Core", "src\Cubes.Core\Cubes.Core.csproj", "{0FDF6A57-CCC1-469E-BC7E-34ACD9921847}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{356E6292-C991-4133-9AD2-54A4A3FD5B66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cubes.Core", "tests\Cubes.Core.Tests\Cubes.Core.Tests.csproj", "{97BAA786-237F-4B17-A87B-F5A5047AE76C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Core.Tests", "tests\Cubes.Core.Tests\Cubes.Core.Tests.csproj", "{97BAA786-237F-4B17-A87B-F5A5047AE76C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{5C0907B4-9822-463E-921A-8512E6C69528}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cubes.Host", "src\Cubes.Host\Cubes.Host.csproj", "{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}"
 EndProject
 Global
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -48,9 +52,28 @@ Global
 		{97BAA786-237F-4B17-A87B-F5A5047AE76C}.Release|x64.Build.0 = Release|Any CPU
 		{97BAA786-237F-4B17-A87B-F5A5047AE76C}.Release|x86.ActiveCfg = Release|Any CPU
 		{97BAA786-237F-4B17-A87B-F5A5047AE76C}.Release|x86.Build.0 = Release|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Debug|x64.Build.0 = Debug|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Debug|x86.Build.0 = Debug|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Release|x64.ActiveCfg = Release|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Release|x64.Build.0 = Release|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Release|x86.ActiveCfg = Release|Any CPU
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0FDF6A57-CCC1-469E-BC7E-34ACD9921847} = {1A676AAA-69D1-4200-BE90-7B37C283421E}
 		{97BAA786-237F-4B17-A87B-F5A5047AE76C} = {356E6292-C991-4133-9AD2-54A4A3FD5B66}
+		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D} = {1A676AAA-69D1-4200-BE90-7B37C283421E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B76577B1-BE46-4AFD-9822-244124C362DB}
 	EndGlobalSection
 EndGlobal
