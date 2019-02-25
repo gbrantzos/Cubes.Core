@@ -59,6 +59,7 @@ namespace Cubes.Core.Environment
                 try
                 {
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
+                    logger.LogInformation($"Loaded assembly: {asm.FullName}");
                 }
                 catch (Exception x)
                 {

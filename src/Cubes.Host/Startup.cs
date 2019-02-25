@@ -1,4 +1,5 @@
 using Cubes.Core.Commands;
+using Cubes.Core.DataAccess;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
@@ -30,6 +31,10 @@ namespace Cubes.Host
 
             services.AddScoped(typeof(ICommandHandler<ACommnad, AResult>), typeof(AHandler));
             services.AddScoped(typeof(ICommandBusMiddleware<,>), typeof(LoggingMiddleware<,>));
+
+            services.AddScoped<IQueryExecutor, QueryExecutor>();
+            services.AddScoped<ISqlQueryManager, SqlQueryManager>();
+            services.AddScoped<IDatabaseConnectionManager, DatabaseConnectionManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

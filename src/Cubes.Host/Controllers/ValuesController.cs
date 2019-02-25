@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Cubes.Core.Commands;
+using Cubes.Core.DataAccess;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Mvc;
@@ -18,18 +19,20 @@ namespace Cubes.Host.Controllers
         private readonly ICommandBus bus;
         private readonly ICubesEnvironment cubes;
         private readonly ISettingsProvider settingsProvider;
+        private readonly IQueryExecutor queryExecutor;
 
-        public ValuesController(ICommandBus bus, ICubesEnvironment cubes, ISettingsProvider settingsProvider)
+        public ValuesController(ICommandBus bus, ICubesEnvironment cubes, ISettingsProvider settingsProvider, IQueryExecutor queryExecutor)
         {
             this.bus = bus;
             this.cubes = cubes;
             this.settingsProvider = settingsProvider;
+            this.queryExecutor = queryExecutor;
         }
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            var settings = settingsProvider.Load<ValuesSettings>();
+            var settings = settingsProvider.Load<ValuesSettings>();Console.WriteLine($"SettingsProvider hashcode: {settingsProvider.GetHashCode()}");
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 try
@@ -87,11 +90,22 @@ namespace Cubes.Host.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<IEnumerable<Fiy>> Get(int id)
         {
-            return "value";
-        }
+            var sqlQuery = new SqlQuery
+            {
+                Name = "",
+                Query = "select * from FIY"
+            };
+            var fiyList = queryExecutor.Query<Fiy>("Local.SEn", sqlQuery, null, new Dictionary<string, string> { { "ID", "FIYID" } });
 
+            return Ok(new { List = fiyList });
+        }
+        public class Fiy
+        {
+            public int ID { get; set; }
+            public string FiyTitle { get; set; }
+        }
         // POST api/values
         [HttpPost]
         public void Post([FromBody] string value)
