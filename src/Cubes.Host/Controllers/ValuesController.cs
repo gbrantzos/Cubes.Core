@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Cubes.Core.Commands;
 using Cubes.Core.Environment;
+using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cubes.Host.Controllers
@@ -16,16 +17,19 @@ namespace Cubes.Host.Controllers
     {
         private readonly ICommandBus bus;
         private readonly ICubesEnvironment cubes;
+        private readonly ISettingsProvider settingsProvider;
 
-        public ValuesController(ICommandBus bus, ICubesEnvironment cubes)
+        public ValuesController(ICommandBus bus, ICubesEnvironment cubes, ISettingsProvider settingsProvider)
         {
             this.bus = bus;
             this.cubes = cubes;
+            this.settingsProvider = settingsProvider;
         }
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            var settings = settingsProvider.Load<ValuesSettings>();
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 try
@@ -41,7 +45,7 @@ namespace Cubes.Host.Controllers
 
             }
             //return new string[] { "value1", "value2", cubes.GetFolder(FolderKind.Root) };
-
+            /*
             var types = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
@@ -76,9 +80,9 @@ namespace Cubes.Host.Controllers
             rd.Close();
             connection.Close();
 
-
+            */
             var res = bus.Submit(new ACommnad { });
-            return new string[] { "value1", "value2", cubes.GetFolder(CubesFolderKind.Root) };
+            return Ok(new { V1 = "value1", V2 = "value2", CubesRoot = cubes.GetFolder(CubesFolderKind.Root), Settings = settings });
         }
 
         // GET api/values/5
@@ -105,5 +109,12 @@ namespace Cubes.Host.Controllers
         public void Delete(int id)
         {
         }
+    }
+
+    [SettingsPrefix("Values")]
+    public class ValuesSettings
+    {
+        public int ID { get; set; }
+        public string Description { get; set; }
     }
 }
