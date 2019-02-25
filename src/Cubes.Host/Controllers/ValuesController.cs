@@ -78,7 +78,7 @@ namespace Cubes.Host.Controllers
 
 
             var res = bus.Submit(new ACommnad { });
-            return new string[] { "value1", "value2", cubes.GetFolder(FolderKind.Root) };
+            return new string[] { "value1", "value2", cubes.GetFolder(CubesFolderKind.Root) };
         }
 
         // GET api/values/5

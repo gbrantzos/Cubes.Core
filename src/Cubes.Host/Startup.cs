@@ -50,6 +50,8 @@ namespace Cubes.Host
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            app.UseFileServer();
         }
     }
 

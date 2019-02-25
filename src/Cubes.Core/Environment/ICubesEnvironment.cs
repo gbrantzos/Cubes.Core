@@ -2,11 +2,11 @@ namespace Cubes.Core.Environment
 {
     public interface ICubesEnvironment
     {
-        string GetFolder(FolderKind folderKind);
+        string GetFolder(CubesFolderKind folderKind);
         CubesEnvironmentInformation GetEnvironmentInformation();
     }
 
-    public enum FolderKind
+    public enum CubesFolderKind
     {
         Root,
         Apps,
@@ -20,12 +20,12 @@ namespace Cubes.Core.Environment
     public static class CubesEnvironmentExtentions
     {
         public static string GetRootFolder(this ICubesEnvironment cubesEnvironment)
-            => cubesEnvironment.GetFolder(FolderKind.Root);
+            => cubesEnvironment.GetFolder(CubesFolderKind.Root);
         public static string GetAppsFolder(this ICubesEnvironment cubesEnvironment)
-            => cubesEnvironment.GetFolder(FolderKind.Apps);
+            => cubesEnvironment.GetFolder(CubesFolderKind.Apps);
         public static string GetSettingsFolder(this ICubesEnvironment cubesEnvironment)
-            => cubesEnvironment.GetFolder(FolderKind.Settings);
+            => cubesEnvironment.GetFolder(CubesFolderKind.Settings);
         public static string GetStorageFolder(this ICubesEnvironment cubesEnvironment)
-            => cubesEnvironment.GetFolder(FolderKind.Storage);
+            => cubesEnvironment.GetFolder(CubesFolderKind.Storage);
     }
 }
