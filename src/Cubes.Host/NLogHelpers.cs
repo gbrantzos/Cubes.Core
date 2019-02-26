@@ -37,6 +37,8 @@ namespace Cubes.Host
                 loggingRule.Filters.Add(new WhenContainsFilter { Layout = consoleTarget.Layout, Substring = "Batch acquisition of", Action = FilterResult.Ignore });
                 config.LoggingRules.Add(loggingRule);
 
+                config.LoggingRules.Add(new LoggingRule("Microsoft.AspNetCore.*", LogLevel.Warn, LogLevel.Info, consoleTarget) { Final = true });
+
                 // Highlight important strings
                 consoleTarget.WordHighlightingRules.Add(
                     new ConsoleWordHighlightingRule

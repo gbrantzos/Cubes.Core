@@ -1,7 +1,5 @@
 using Cubes.Core.Commands;
-using Cubes.Core.DataAccess;
 using Cubes.Core.Environment;
-using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +12,7 @@ namespace Cubes.Host
     public class Startup
     {
         public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+            => Configuration = configuration;
 
         public IConfiguration Configuration { get; }
 
@@ -24,17 +20,7 @@ namespace Cubes.Host
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddSingleton<ISettingsProvider>(s => new JsonFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
-            services.AddScoped<ServiceFactory>(p => p.GetService);
-            services.AddScoped<ICommandBus, CommandBus>();
-
-            services.AddScoped(typeof(ICommandHandler<ACommnad, AResult>), typeof(AHandler));
-            services.AddScoped(typeof(ICommandBusMiddleware<,>), typeof(LoggingMiddleware<,>));
-
-            services.AddScoped<IQueryExecutor, QueryExecutor>();
-            services.AddScoped<ISqlQueryManager, SqlQueryManager>();
-            services.AddScoped<IDatabaseConnectionManager, DatabaseConnectionManager>();
+            services.AddCubes();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,8 +38,6 @@ namespace Cubes.Host
 
             app.UseHttpsRedirection();
             app.UseMvc();
-
-            app.UseFileServer();
         }
     }
 
