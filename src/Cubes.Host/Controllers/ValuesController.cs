@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Cubes.Core.DataAccess;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Cubes.Host.Controllers
 {
@@ -9,15 +10,19 @@ namespace Cubes.Host.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly IQueryExecutor queryExecutor;
+        private readonly ILogger<ValuesController> logger;
 
-        public ValuesController(IQueryExecutor queryExecutor)
+        public ValuesController(IQueryExecutor queryExecutor, ILogger<ValuesController> logger)
         {
+            this.logger = logger;
             this.queryExecutor = queryExecutor;
         }
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            logger.LogDebug("From ValuesController");
+            logger.LogWarning("From ValuesController");
             return new[] { "value1", "value2" };
         }
 

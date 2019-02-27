@@ -1,5 +1,6 @@
 using Cubes.Core.Environment;
 using NLog;
+using NLog.Common;
 using NLog.Config;
 using NLog.Filters;
 using NLog.Targets;
@@ -26,9 +27,13 @@ namespace Cubes.Host
             catch (Exception x) { Console.Write(x.Message); }
             finally
             { if (config == null) config = new LoggingConfiguration(); }
+            InternalLogger.LogFile = Path.Combine(rootPath, nameof(CubesFolderKind.Logs), "nlog-internal.log");
 
             if (config.FindTargetByName("console") == null)
             {
+                // Swallow Microsoft debug messages
+                config.LoggingRules.Add(new LoggingRule("Microsoft.AspNetCore.*", LogLevel.Trace, LogLevel.Warn, new NullTarget()) { Final = true });
+
                 var consoleTarget = new ColoredConsoleTarget("console");
                 consoleTarget.Layout = @"${time} | ${level:uppercase=true} | ${logger} :: ${message} ${onexception:${newline}${exception:format=Type,Message,Method,Data,StackTrace:maxInnerExceptionLevel=8:separator=\\r\\n:innerFormat=Type,Message,Method,StackTrace:innerExceptionSeparator=\\r\\n----  Inner Exception  ----\\r\\n}}";
                 config.AddTarget("console", consoleTarget);
@@ -36,8 +41,6 @@ namespace Cubes.Host
                 var loggingRule = new LoggingRule("*", NLog.LogLevel.Debug, consoleTarget);
                 loggingRule.Filters.Add(new WhenContainsFilter { Layout = consoleTarget.Layout, Substring = "Batch acquisition of", Action = FilterResult.Ignore });
                 config.LoggingRules.Add(loggingRule);
-
-                config.LoggingRules.Add(new LoggingRule("Microsoft.AspNetCore.*", LogLevel.Warn, LogLevel.Info, consoleTarget) { Final = true });
 
                 // Highlight important strings
                 consoleTarget.WordHighlightingRules.Add(
@@ -74,6 +77,7 @@ namespace Cubes.Host
 
             LogManager.Configuration = config;
             LogManager.ThrowExceptions = true;
+            LogManager.ThrowConfigExceptions = true;
         }
     }
 }
