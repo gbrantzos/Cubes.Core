@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
-using System.Text;
 
 namespace Cubes.Core.DataAccess
 {
@@ -20,46 +20,54 @@ namespace Cubes.Core.DataAccess
         public IEnumerable<TResult> Query<TResult>(
             string namedConnection,
             SqlQuery sqlQuery,
-            Dictionary<string, string> parameterValues,
+            Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null,
-            Action<TResult> onCreated = null) where TResult : class, new()
+            Action<TResult> afterPopulating = null) where TResult : class, new()
         {
             using (var cnx = connectionManager.GetConnection(namedConnection))
             {
                 var rd = ExecuteSqlQuery(cnx, sqlQuery, parameterValues);
-                return MapToObject<TResult>(rd, columnToProperty, onCreated);
+                return MapToObject<TResult>(rd, columnToProperty, afterPopulating);
             }
         }
 
         public IEnumerable<dynamic> Query(
             string namedConnection,
             SqlQuery sqlQuery,
-            Dictionary<string, string> parameterValues,
+            Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null)
         {
-            throw new NotImplementedException();
+            using (var cnx = connectionManager.GetConnection(namedConnection))
+            {
+                var rd = ExecuteSqlQuery(cnx, sqlQuery, parameterValues);
+                return MapToDynamic(rd, columnToProperty);
+            }
         }
 
         public IEnumerable<TResult> Query<TResult>(
             string namedConnection,
             string namedSqlQuery,
-            Dictionary<string, string> parameterValues,
+            Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null,
-            Action<TResult> onCreated = null) where TResult : class, new()
+            Action<TResult> afterPopulating = null) where TResult : class, new()
         {
-            throw new NotImplementedException();
+            var sqlQuery = queryManager.GetSqlQuery(namedSqlQuery);
+            return Query<TResult>(namedConnection, sqlQuery, parameterValues, columnToProperty, afterPopulating);
         }
 
         public IEnumerable<dynamic> Query(
             string namedConnection,
             string namedSqlQuery,
-            Dictionary<string, string> parameterValues,
+            Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null)
         {
-            throw new NotImplementedException();
+            var sqlQuery = queryManager.GetSqlQuery(namedSqlQuery);
+            return Query(namedConnection, sqlQuery, parameterValues, columnToProperty);
         }
 
-        private IDataReader ExecuteSqlQuery(IDbConnection connection, SqlQuery query, Dictionary<string, string> parameterValues)
+
+        // Helper methods
+        private IDataReader ExecuteSqlQuery(IDbConnection connection, SqlQuery query, Dictionary<string, object> parameterValues)
         {
             // Make sure connection is open
             if (connection.State == ConnectionState.Closed)
@@ -170,6 +178,11 @@ namespace Cubes.Core.DataAccess
             if (columnToProperty == null)
                 columnToProperty = new Dictionary<string, string>();
 
+            // Create tmp Dictionary to lookup by property name
+            var prop2column = columnToProperty
+                .ToList()
+                .ToDictionary(p => p.Value, p => p.Key);
+
             // Get DataReader columns
             var rdColumns = dataReader.
                 GetSchemaTable().
@@ -187,7 +200,7 @@ namespace Cubes.Core.DataAccess
 
                 foreach (var p in properties)
                 {
-                    if (!columnToProperty.TryGetValue(p.Name, out var columnName))
+                    if (!prop2column.TryGetValue(p.Name, out var columnName))
                         columnName = p.Name;
 
                     // Safety
@@ -221,9 +234,51 @@ namespace Cubes.Core.DataAccess
             return toReturn;
         }
 
-        private IEnumerable<TResult> MapToDynamic<TResult>(IDataReader dataReader)
+        private IEnumerable<dynamic> MapToDynamic(IDataReader dataReader, Dictionary<string, string> columnToProperty)
         {
-            return null;
+            var toReturn = new List<dynamic>();
+
+            // Get DataReader columns
+            var rdColumns = dataReader.
+                GetSchemaTable().
+                Rows.
+                Cast<DataRow>().
+                Select(i => i["ColumnName"].ToString().ToUpper()).
+                ToArray();
+
+            while (dataReader.Read())
+            {
+                var readerValues = new object[] { };
+                dataReader.GetValues(readerValues);
+
+                var dynamicObj = new ExpandoObject();
+
+                foreach (var column in rdColumns)
+                {
+                    // Safety
+                    if (dataReader[column] == DBNull.Value)
+                        continue;
+
+                    if (!columnToProperty.TryGetValue(column, out var propertyName))
+                        propertyName = column;
+
+                    AddProperty(dynamicObj, propertyName, dataReader[column]);
+                }
+                toReturn.Add(dynamicObj);
+                
+            }
+
+            return toReturn;
+        }
+
+        private static void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
+        {
+            // ExpandoObject supports IDictionary so we can extend it like this
+            var expandoDict = expando as IDictionary<string, object>;
+            if (expandoDict.ContainsKey(propertyName))
+                expandoDict[propertyName] = propertyValue;
+            else
+                expandoDict.Add(propertyName, propertyValue);
         }
     }
 }

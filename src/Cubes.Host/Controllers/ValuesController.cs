@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Data;
 using Cubes.Core.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -33,16 +35,36 @@ namespace Cubes.Host.Controllers
             var sqlQuery = new SqlQuery
             {
                 Name = "",
-                Query = "select * from FIY"
-            };
-            var fiyList = queryExecutor.Query<Fiy>("Local.SEn", sqlQuery, null, new Dictionary<string, string> { { "ID", "FIYID" } });
+                Query = "select * from FIY where FIYINITDATE >= :p_date",
+                Parameters = new List<SqlQueryParameter>
+                {
+                    new SqlQueryParameter
+                    {
+                        Name = "p_date",
+                        DbType = "DateTime"
+                    }
+                }
 
-            return Ok(new { List = fiyList });
+            };
+            var fiyList = queryExecutor.Query<Fiy>(
+                "Local.SEn",
+                sqlQuery,
+                new Dictionary<string, object> { { "p_date", new DateTime(2014, 1, 1) } },
+                new Dictionary<string, string> { { "FIYID", "ID" }, { "FIYINITDATE", "StartDate" }, { "FIYISCURRENT", "Current" } });
+            var fiy2List = queryExecutor.Query(
+                "Local.SEn",
+                sqlQuery,
+                new Dictionary<string, object> { { "p_date", new DateTime(2014, 1, 1) } },
+                new Dictionary<string, string> { { "FIYID", "ID" }, { "FIYINITDATE", "StartDate" } });
+
+            return Ok(new { List = fiyList, List2 = fiy2List });
         }
         public class Fiy
         {
             public int ID { get; set; }
             public string FiyTitle { get; set; }
+            public DateTime StartDate { get; set; }
+            public bool Current { get; set; }
         }
         // POST api/values
         [HttpPost]

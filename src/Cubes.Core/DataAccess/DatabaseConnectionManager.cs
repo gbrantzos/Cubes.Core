@@ -39,7 +39,7 @@ namespace Cubes.Core.DataAccess
                 return connection;
             }
             else
-                throw new Exception($"Could not find connection: {connectionName}");
+                throw new ArgumentException($"Could not find connection: {connectionName}");
         }
 
         // Get provider type
@@ -54,7 +54,7 @@ namespace Cubes.Core.DataAccess
                 .Where(t => t.FullName.Equals(providerName))
                 .FirstOrDefault();
             if (type == null)
-                throw new Exception($"Could not create DbProvider type for '{providerName}'");
+                throw new ArgumentException($"Could not create DbProvider type for '{providerName}'");
 
             return type;
         }

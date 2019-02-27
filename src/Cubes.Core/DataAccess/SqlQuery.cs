@@ -13,7 +13,7 @@ namespace Cubes.Core.DataAccess
     public class SqlQueryParameter
     {
         public string Name { get; set; }
-        public string DbType { get; set; }
+        public string DbType { get; set; } = "String";
         public object Default { get; set; }
     }
 }

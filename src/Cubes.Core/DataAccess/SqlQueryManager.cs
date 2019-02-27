@@ -16,7 +16,7 @@ namespace Cubes.Core.DataAccess
             var queries = settingsProvider.Load<DataAccessSettings>().Queries;
             var result = queries.FirstOrDefault(i => i.Name.Equals(queryName, StringComparison.CurrentCultureIgnoreCase));
             if (result == null)
-                throw new Exception($"Could not find query: {queryName}");
+                throw new ArgumentException($"Could not find query: {queryName}");
             return result;
         }
     }
