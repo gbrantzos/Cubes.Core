@@ -43,7 +43,7 @@ namespace Cubes.Host
 
 
     public class ACommnad : ICommand<AResult> { }
-    public class AResult { }
+    public class AResult : BaseCommandResult { }
     public class AHandler : ICommandHandler<ACommnad, AResult>
     {
         public AResult Handle(ACommnad command)
@@ -52,7 +52,7 @@ namespace Cubes.Host
         }
     }
 
-    public class LoggingMiddleware<TCommand, TResult> : ICommandBusMiddleware<TCommand, TResult>
+    public class LoggingMiddleware<TCommand, TResult> : ICommandBusMiddleware<TCommand, TResult> where TResult : ICommandResult
     {
         public TResult Execute(TCommand command, CommandHandlerDelegate<TResult> next)
         {

@@ -10,7 +10,7 @@ namespace Cubes.Core.Commands
         public CommandBus(ServiceFactory handlerFactory)
             => this.handlerFactory = handlerFactory;
 
-        public TResult Submit<TResult>(ICommand<TResult> command)
+        public TResult Submit<TResult>(ICommand<TResult> command) where TResult : ICommandResult
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
@@ -23,7 +23,7 @@ namespace Cubes.Core.Commands
     }
 
     #region Helper classes
-    internal abstract class CommandHandlerHelperBase<TResult>
+    internal abstract class CommandHandlerHelperBase<TResult> where TResult : ICommandResult
     {
         protected readonly ServiceFactory serviceFactory;
 
@@ -35,6 +35,7 @@ namespace Cubes.Core.Commands
 
     internal sealed class CommandHandlerHelper<TCommand, TResult> : CommandHandlerHelperBase<TResult>
         where TCommand : ICommand<TResult>
+        where TResult : ICommandResult
     {
         public CommandHandlerHelper(ServiceFactory handlerFactory) : base(handlerFactory) { }
 

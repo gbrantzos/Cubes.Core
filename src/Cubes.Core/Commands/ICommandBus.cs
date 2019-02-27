@@ -11,6 +11,6 @@ namespace Cubes.Core.Commands
         /// <param name="command">Command to execute</param>
         /// <typeparam name="TResult">Result type</typeparam>
         /// <returns></returns>
-        TResult Submit<TResult>(ICommand<TResult> command);
+        TResult Submit<TResult>(ICommand<TResult> command) where TResult : ICommandResult;
     }
 }

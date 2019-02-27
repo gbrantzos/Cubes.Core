@@ -4,5 +4,5 @@ namespace Cubes.Core.Commands
     /// Marker interface for Commands
     /// </summary>
     /// <typeparam name="TResult">Command result type</typeparam>
-    public interface ICommand<TResult>{ }
+    public interface ICommand<TResult> where TResult : ICommandResult { }
 }
