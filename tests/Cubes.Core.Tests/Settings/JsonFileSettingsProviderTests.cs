@@ -101,7 +101,7 @@ namespace Cubes.Core.Tests.Settings
         private MethodInfo GetPrivateMethod<T>(string methodName)
         {
             var type = typeof(T);
-            return type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(i => i.Name == "CreateFileName");
+            return type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy).FirstOrDefault(i => i.Name == "CreateFileName");
         }
     }
 
