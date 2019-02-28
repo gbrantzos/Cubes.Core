@@ -7,26 +7,28 @@ using Cubes.Core.Utilities;
 
 namespace Cubes.Core.Settings
 {
-    public abstract class BaseFileSettingsProvider : ISettingsProvider
+    public abstract class BaseFilesSettingsProvider : ISettingsProvider
     {
         private readonly ConcurrentDictionary<string, Tuple<DateTime, object>> cache;
         private readonly FileWatcherExtended fwe;
         private readonly string baseFolder;
+        private readonly string fileExtension;
 
         protected readonly IFileSystem fs;
 
-        protected BaseFileSettingsProvider(string baseFolder, IFileSystem fileSystem)
+        protected BaseFilesSettingsProvider(string baseFolder, string fileExtension, IFileSystem fileSystem)
         {
-            this.fs = fileSystem;
-            this.baseFolder = baseFolder ?? throw new ArgumentException("Settings base folder cannot be null");
-            fs.Directory.CreateDirectory(baseFolder);
+            this.fs            = fileSystem;
+            this.baseFolder    = baseFolder ?? throw new ArgumentException("Settings base folder cannot be null");
+            this.fileExtension = fileExtension;
 
+            fs.Directory.CreateDirectory(baseFolder);
             cache = new ConcurrentDictionary<string, Tuple<DateTime, object>>();
 
             // Nasty, but needed for testing
             // FileWatcher is is not covered by IO.Abstractions
             if (fs is FileSystem)
-                fwe = new FileWatcherExtended(baseFolder, "*.json");
+                fwe = new FileWatcherExtended(baseFolder, $"*.{fileExtension}");
         }
 
         #region Provider specific methods
@@ -91,9 +93,9 @@ namespace Cubes.Core.Settings
                 fileName = $"{settingsType.GenericTypeArguments.First().Name}List";
 
             if (!String.IsNullOrEmpty(key))
-                fileName += "." + key;
+                fileName += $".{key}";
 
-            fileName += ".json";
+            fileName += $".{fileExtension}";
 
             // Check for settings path
             var prefix = settingsType.IsGenericType && settingsType.GetInterfaces().Contains(typeof(IEnumerable)) ?

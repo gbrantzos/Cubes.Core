@@ -7,12 +7,12 @@ namespace Cubes.Core.Settings
     /// <summary>
     /// Setting provider based on Json files
     /// </summary>
-    public class JsonFilesSettingsProvider : BaseFileSettingsProvider
+    public class JsonFilesSettingsProvider : BaseFilesSettingsProvider
     {
         private readonly JsonSerializerSettings jsonSettings;
 
         public JsonFilesSettingsProvider(string baseFolder) : this(baseFolder, new FileSystem()) { }
-        public JsonFilesSettingsProvider(string baseFolder, IFileSystem fs) : base(baseFolder, fs)
+        public JsonFilesSettingsProvider(string baseFolder, IFileSystem fs) : base(baseFolder, "json", fs)
         {
             // Settings for specific provider, we should not share global settings
             jsonSettings = new JsonSerializerSettings

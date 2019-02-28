@@ -53,6 +53,6 @@ namespace Cubes.Core.Environment
         }
 
         public static void AddSettings(this IServiceCollection services)
-            => services.AddSingleton<ISettingsProvider>(s => new JsonFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
+            => services.AddSingleton<ISettingsProvider>(s => new YamlFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
     }
 }
