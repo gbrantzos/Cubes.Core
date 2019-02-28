@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using Cubes.Core.DataAccess;
+using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -13,10 +14,12 @@ namespace Cubes.Host.Controllers
     {
         private readonly IQueryExecutor queryExecutor;
         private readonly ILogger<ValuesController> logger;
+        private readonly ISettingsProvider settings;
 
-        public ValuesController(IQueryExecutor queryExecutor, ILogger<ValuesController> logger)
+        public ValuesController(IQueryExecutor queryExecutor, ILogger<ValuesController> logger, ISettingsProvider settings)
         {
             this.logger = logger;
+            this.settings = settings;
             this.queryExecutor = queryExecutor;
         }
         // GET api/values
@@ -25,6 +28,7 @@ namespace Cubes.Host.Controllers
         {
             logger.LogDebug("From ValuesController");
             logger.LogWarning("From ValuesController");
+            logger.LogInformation(settings.Load<SampleSettings>().Description);
             return new[] { "value1", "value2" };
         }
 
@@ -83,5 +87,11 @@ namespace Cubes.Host.Controllers
         public void Delete(int id)
         {
         }
+    }
+
+    public class SampleSettings
+    {
+        public int ID { get; set; }
+        public String Description { get; set; }
     }
 }

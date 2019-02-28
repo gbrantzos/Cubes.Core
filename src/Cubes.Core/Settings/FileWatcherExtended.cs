@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Cubes.Core.Settings
 {
-    internal sealed class FileWatcherExtended
+    public sealed class FileWatcherExtended
     {
         private ConcurrentDictionary<string, long> lastWrite = new ConcurrentDictionary<string, long>();
         private FileSystemWatcher watcher;
@@ -15,18 +15,14 @@ namespace Cubes.Core.Settings
             // Prepare watcher
             watcher = new FileSystemWatcher();
             watcher.Path = basePath;
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.NotifyFilter = NotifyFilters.LastAccess
+                                    | NotifyFilters.LastWrite
+                                    | NotifyFilters.FileName;
             watcher.Filter = fileFilter;
             watcher.IncludeSubdirectories = true;
 
-            watcher.Changed += (s, e) =>
-            {
-                var key = e.FullPath;
-                var lastWriteTime = File.GetLastWriteTime(e.FullPath);
-                lastWrite.AddOrUpdate(key,
-                    lastWriteTime.Ticks,
-                    (k, v) => lastWriteTime.Ticks);
-            };
+            watcher.Changed += OnChanged;
+            watcher.Created += OnChanged;
             watcher.Deleted += (s, e) =>
             {
                 if (!lastWrite.TryRemove(e.FullPath, out long ignore))
@@ -35,8 +31,20 @@ namespace Cubes.Core.Settings
                     lastWrite.TryRemove(e.FullPath, out ignore);
                 }
             };
+
             // Begin watching.
             watcher.EnableRaisingEvents = true;
+        }
+
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            // For debugging reasons only
+            // Console.WriteLine($"{e.Name} - {e.ChangeType}");
+            var key = e.FullPath;
+            var lastWriteTime = File.GetLastWriteTime(e.FullPath);
+            lastWrite.AddOrUpdate(key,
+                lastWriteTime.Ticks,
+                (k, v) => lastWriteTime.Ticks);
         }
 
         // Get last modified date for file

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 
 namespace Cubes.Core.Settings
@@ -17,14 +17,21 @@ namespace Cubes.Core.Settings
         private readonly JsonSerializerSettings jsonSettings;
         private ConcurrentDictionary<string, Tuple<DateTime, object>> cache;
         private FileWatcherExtended fwe;
+        private IFileSystem fs;
 
-        public JsonFilesSettingsProvider(string baseFolder)
+        public JsonFilesSettingsProvider(string baseFolder) : this(baseFolder, new FileSystem()) { }
+        public JsonFilesSettingsProvider(string baseFolder, IFileSystem fileSystem)
         {
+            this.fs = fileSystem;
             this.baseFolder = baseFolder ?? throw new ArgumentException("Settings base folder cannot be null");
-            Directory.CreateDirectory(baseFolder);
+            fs.Directory.CreateDirectory(baseFolder);
 
             cache = new ConcurrentDictionary<string, Tuple<DateTime, object>>();
-            fwe = new FileWatcherExtended(baseFolder, "*.json");
+
+            // Nasty, but needed for testing
+            // FileWatcher is is not covered by IO.Abstractions
+            if (fs is FileSystem)
+                fwe = new FileWatcherExtended(baseFolder, "*.json");
 
             // Settings for specific provider, we should not share global settings
             jsonSettings = new JsonSerializerSettings
@@ -38,8 +45,8 @@ namespace Cubes.Core.Settings
         public object Load(Type settingsType, string key)
         {
             var returnValue = Activator.CreateInstance(settingsType);
-            var configFile = Path.Combine(baseFolder, CreateFileName(settingsType, key));
-            if (!File.Exists(configFile))
+            var configFile = fs.Path.Combine(baseFolder, CreateFileName(settingsType, key));
+            if (!fs.File.Exists(configFile))
                 Save(settingsType, returnValue, key);
             returnValue = Convert.ChangeType(GetValue(settingsType, configFile), settingsType);
             return returnValue;
@@ -49,9 +56,9 @@ namespace Cubes.Core.Settings
 
         public void Save(Type settingsType, object settingsObj, string key)
         {
-            var configFile = Path.Combine(baseFolder, CreateFileName(settingsType, key));
-            new FileInfo(configFile).Directory.Create();
-            File.WriteAllText(configFile, JsonConvert.SerializeObject(settingsObj, Formatting.Indented, jsonSettings));
+            var configFile = fs.Path.Combine(baseFolder, CreateFileName(settingsType, key));
+            fs.FileInfo.FromFileName(configFile).Directory.Create();
+            fs.File.WriteAllText(configFile, JsonConvert.SerializeObject(settingsObj, Formatting.Indented, jsonSettings));
             cache.TryRemove(configFile, out var tmp);
         }
         public void Save<TSettings>(TSettings settingsObj, string key) where TSettings : class, new()
@@ -85,17 +92,21 @@ namespace Cubes.Core.Settings
         private object GetValue(Type settingsType, string fileName)
         {
             // Check in cache
-            if (cache.TryGetValue(fileName, out Tuple<DateTime, object> tmp))
+            if (fwe !=null && cache.TryGetValue(fileName, out Tuple<DateTime, object> tmp))
             {
                 // Get file's last modification
                 var lastModified = fwe.LastModified(fileName);
 
-                // If cache is older, keep it 
+                // If cache is older, keep it
                 if (tmp.Item1 >= lastModified && tmp.Item2.GetType().Equals(settingsType))
+                {
+                    // For debugging reasons only
+                    // Console.WriteLine("Cache hit!");
                     return tmp.Item2;
+                }
             }
 
-            var settings = JsonConvert.DeserializeObject(File.ReadAllText(fileName), settingsType, jsonSettings);
+            var settings = JsonConvert.DeserializeObject(fs.File.ReadAllText(fileName), settingsType, jsonSettings);
             var cacheEntry = new Tuple<DateTime, object>(DateTime.Now, settings);
             cache.AddOrUpdate(fileName, cacheEntry, (k, v) => cacheEntry);
             return settings;
