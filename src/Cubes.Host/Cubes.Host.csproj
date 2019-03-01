@@ -15,5 +15,9 @@
     <Content Update="NLog.Sample.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
   </ItemGroup>
 </Project>

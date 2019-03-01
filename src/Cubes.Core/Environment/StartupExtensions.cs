@@ -1,18 +1,22 @@
+using System;
 using System.Linq;
 using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cubes.Core.Environment
 {
     public static class StartupExtensions
     {
-        public static void AddCubes(this IServiceCollection services)
+        public static void AddCubes(this IServiceCollection services, IConfiguration configuration)
         {
+            var settingsFormat = configuration.GetValue<string>("settingsFormat", "json");
+
             // Add standard services
-            services.AddSettings();
+            services.AddSettings(settingsFormat);
             services.AddDataAccess();
             services.AddCommands();
             services.AddEmailDispatcher();
@@ -54,8 +58,17 @@ namespace Cubes.Core.Environment
              */
         }
 
-        public static void AddSettings(this IServiceCollection services)
-            => services.AddSingleton<ISettingsProvider>(s => new YamlFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
+        public static void AddSettings(this IServiceCollection services, string settingsFormat)
+        {
+            if (!(settingsFormat.Equals("json", StringComparison.CurrentCultureIgnoreCase)) &&
+                !(settingsFormat.Equals("yaml", StringComparison.CurrentCultureIgnoreCase)))
+                throw new ArgumentException($"Unsupported settings format: '{settingsFormat}");
+
+            if (settingsFormat.Equals("json", StringComparison.CurrentCultureIgnoreCase))
+                services.AddSingleton<ISettingsProvider>(s => new JsonFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
+            if (settingsFormat.Equals("yaml", StringComparison.CurrentCultureIgnoreCase))
+                services.AddSingleton<ISettingsProvider>(s => new YamlFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
+        }
 
         public static void AddEmailDispatcher(this IServiceCollection services)
             => services.AddScoped<IEmailDispatcher, EmailDispatcher>();

@@ -1,6 +1,7 @@
 using Cubes.Core.Environment;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
@@ -54,10 +55,19 @@ namespace Cubes.Host
             return String.IsNullOrEmpty(rootFolder) ? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) : rootFolder;
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args, ICubesEnvironment cubesEnvironment) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args, ICubesEnvironment cubesEnvironment)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(cubesEnvironment.GetRootFolder())
+                .AddJsonFile("host.json", optional: true);
+
+            var configuration = builder.Build();
+            var urls = configuration.GetValue<string>("urls", "http://localhost:3001");
+
+            return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseContentRoot(cubesEnvironment.GetFolder(CubesFolderKind.StaticContent))
+                .UseUrls(urls)
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton<ICubesEnvironment>(cubesEnvironment);
@@ -67,7 +77,8 @@ namespace Cubes.Host
                     logging.ClearProviders();
                     logging.SetMinimumLevel(LogLevel.Trace);
                 })
+                .UseConfiguration(configuration)
                 .UseNLog();
-
+        }
     }
 }
