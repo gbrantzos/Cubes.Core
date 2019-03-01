@@ -9,12 +9,12 @@ namespace Cubes.Core.DataAccess
     public interface IQueryExecutor
     {
         /// <summary>
-        /// Execute query and convert results to TResult 
+        /// Execute query and convert results to TResult
         /// </summary>
         /// <typeparam name="TResult">Return object type</typeparam>
         /// <param name="namedConnection">Name of connection</param>
         /// <param name="sqlQuery"><see cref="SqlQuery"/> to execute</param>
-        /// <param name="parameterValues">Paramter values</param>
+        /// <param name="parameterValues">Parameter values</param>
         /// <param name="columnToProperty">Column to parameters mappings</param>
         /// <param name="afterPopulating">Action to execute after object is populated</param>
         /// <returns></returns>
@@ -26,11 +26,11 @@ namespace Cubes.Core.DataAccess
             Action<TResult> afterPopulating = null) where TResult : class, new();
 
         /// <summary>
-        /// Execute query and convert results to dynamic  
+        /// Execute query and convert results to dynamic
         /// </summary>
         /// <param name="namedConnection">Name of connection</param>
         /// <param name="sqlQuery"><see cref="SqlQuery"/> to execute</param>
-        /// <param name="parameterValues">Paramter values</param>
+        /// <param name="parameterValues">Parameter values</param>
         /// <param name="columnToProperty">Column to parameters mappings</param>
         /// <returns></returns>
         IEnumerable<dynamic> Query(
@@ -45,7 +45,7 @@ namespace Cubes.Core.DataAccess
         /// <typeparam name="TResult"></typeparam>
         /// <param name="namedConnection">Name of connection</param>
         /// <param name="namedSqlQuery"></param>
-        /// <param name="parameterValues">Paramter values</param>
+        /// <param name="parameterValues">Parameter values</param>
         /// <param name="columnToProperty">Column to parameters mappings</param>
         /// <param name="afterPopulating">Action to execute after object is populated</param>
         /// <returns></returns>
@@ -61,7 +61,7 @@ namespace Cubes.Core.DataAccess
         /// </summary>
         /// <param name="namedConnection">Name of connection</param>
         /// <param name="namedSqlQuery"><see cref="SqlQuery"/> to execute</param>
-        /// <param name="parameterValues">Paramter values</param>
+        /// <param name="parameterValues">Parameter values</param>
         /// <param name="columnToProperty">Column to parameters mappings</param>
         /// <returns></returns>
         IEnumerable<dynamic> Query(

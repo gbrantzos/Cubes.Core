@@ -42,5 +42,32 @@ namespace Cubes.Core.Utilities
 
             return returnValue;
         }
+
+        /// <summary>
+        /// If <see cref="String"/> s is null or empty return retValue.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="retValue"></param>
+        /// <returns></returns>
+        public static string IfNullOrEmpty(this string s, string retValue) => String.IsNullOrEmpty(s) ? retValue : s;
+
+        /// <summary>
+        /// Get a list of all inner exceptions
+        /// </summary>
+        /// <param name="ex">Original exception</param>
+        /// <returns>IEnumerable&lt;Exception&gt;</returns>
+        public static IEnumerable<Exception> GetInnerExceptions(this Exception ex)
+        {
+            var toReturn = new List<Exception>();
+            var current = ex;
+
+            while (current != null)
+            {
+                if (!toReturn.Contains(current))
+                    toReturn.Add(current);
+                current = current.InnerException;
+            }
+            return toReturn;
+        }
     }
 }
