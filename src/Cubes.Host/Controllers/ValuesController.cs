@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using Cubes.Core.Commands;
+using Cubes.Core.Commands.Basic;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +17,11 @@ namespace Cubes.Host.Controllers
         private readonly IQueryExecutor queryExecutor;
         private readonly ILogger<ValuesController> logger;
         private readonly ISettingsProvider settings;
+        private readonly ICommandBus bus;
 
-        public ValuesController(IQueryExecutor queryExecutor, ILogger<ValuesController> logger, ISettingsProvider settings)
+        public ValuesController(IQueryExecutor queryExecutor, ILogger<ValuesController> logger, ISettingsProvider settings, ICommandBus bus)
         {
+            this.bus = bus;
             this.logger = logger;
             this.settings = settings;
             this.queryExecutor = queryExecutor;
@@ -29,7 +33,16 @@ namespace Cubes.Host.Controllers
             logger.LogDebug("From ValuesController");
             logger.LogWarning("From ValuesController");
             logger.LogInformation(settings.Load<SampleSettings>().Description);
-            return new[] { "value1", "value2" };
+
+            var cmd = new RunOsProcessCommand
+            {
+                Command = "git",
+                Arguments = "log -10",
+                StartIn = "/Users/georgebrantzos/Projects/ibe"
+            };
+            var res = bus.Submit(cmd);
+
+            return new[] { "value1", "value2", res.Output, res.Message };
         }
 
         // GET api/values/5

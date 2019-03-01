@@ -3,6 +3,7 @@ using Cubes.Core.Utilities;
 
 namespace Cubes.Core.Commands.Basic
 {
+    [Display("Run OS process")]
     public class RunOsProcessCommand : ICommand<RunOsProcessResult>
     {
         /// <summary>

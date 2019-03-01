@@ -1,6 +1,7 @@
 using System.Linq;
 using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
+using Cubes.Core.Email;
 using Cubes.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,7 @@ namespace Cubes.Core.Environment
             services.AddSettings();
             services.AddDataAccess();
             services.AddCommands();
+            services.AddEmailDispatcher();
         }
 
         public static void AddDataAccess(this IServiceCollection services)
@@ -54,5 +56,8 @@ namespace Cubes.Core.Environment
 
         public static void AddSettings(this IServiceCollection services)
             => services.AddSingleton<ISettingsProvider>(s => new YamlFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
+
+        public static void AddEmailDispatcher(this IServiceCollection services)
+            => services.AddScoped<IEmailDispatcher, EmailDispatcher>();
     }
 }
