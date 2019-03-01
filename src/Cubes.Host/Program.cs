@@ -21,11 +21,12 @@ namespace Cubes.Host
                 var rootFolder = GetRootFolder();
                 NLogHelpers.PrepareNLog(rootFolder);
 
-                var cubesEnvironment = new CubesEnvironment(rootFolder, new NLogLoggerProvider().CreateLogger(typeof(CubesEnvironment).FullName));
+                var logger = new NLogLoggerProvider().CreateLogger(typeof(CubesEnvironment).FullName);
+                var cubesEnvironment = new CubesEnvironment(rootFolder, logger);
                 cubesEnvironment.PrepareEnvironmentFolders();
                 cubesEnvironment.LoadAppsAssemblies();
 
-                CreateWebHostBuilder(args, cubesEnvironment)
+                CreateWebHostBuilder(args, cubesEnvironment, logger)
                     .Build()
                     .Run();
             }
@@ -55,7 +56,7 @@ namespace Cubes.Host
             return String.IsNullOrEmpty(rootFolder) ? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) : rootFolder;
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args, ICubesEnvironment cubesEnvironment)
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args, ICubesEnvironment cubesEnvironment, ILogger logger)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(cubesEnvironment.GetRootFolder())
@@ -63,6 +64,7 @@ namespace Cubes.Host
 
             var configuration = builder.Build();
             var urls = configuration.GetValue<string>("urls", "http://localhost:3001");
+            logger.LogInformation($"Cubes listening at {urls}");
 
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
