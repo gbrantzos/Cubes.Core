@@ -46,7 +46,7 @@ namespace Cubes.Host
                 consoleTarget.WordHighlightingRules.Add(
                     new ConsoleWordHighlightingRule
                     {
-                        Regex = @"Cubes, version (\d|\.)+",
+                        Regex = @"Cubes, version (\d|\.|-|[a-f])+",
                         ForegroundColor = ConsoleOutputColor.Green
                     });
                 consoleTarget.WordHighlightingRules.Add(

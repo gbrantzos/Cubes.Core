@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using System;
+using System.IO;
 
 namespace Cubes.Host
 {
@@ -40,7 +42,30 @@ namespace Cubes.Host
 
             if (useSSL)
                 app.UseHttpsRedirection();
+
+            app.Map("/wms",
+                builder =>
+                {
+                    var path = @"C:\Code\CubesNext\Core\src\Cubes.Host\bin\Debug\netcoreapp2.2\StaticContent";
+                    builder.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(Path.Combine(path, "wms")) });
+                    builder.UseDefaultFiles(new DefaultFilesOptions { DefaultFileNames = new[] { "index.html" } });
+                    builder.Use(async (context, next) =>
+                    {
+                        await next();
+                        var fullRequest = context.Request.PathBase.Value + context.Request.Path.Value;
+                        if (context.Response.StatusCode == 404 && !Path.HasExtension(fullRequest))
+                        {
+                            context.Request.Path = "/wms/index.html";
+                            await next();
+                        }
+                    });
+                });
+
             app.UseMvc();
+
+            // Default home content
+            // var re = new EmbeddedResourceFileSystem();
+            app.UseFileServer();
         }
     }
 

@@ -21,9 +21,10 @@ namespace Cubes.Core.Environment
             RootFolder  = rootFolder;
             Hostname    = Dns.GetHostName();
             LiveSince   = DateTime.Now;
-            Version     = FileVersionInfo
-                .GetVersionInfo(Assembly.GetExecutingAssembly().Location)
-                .ProductVersion;
+            Version     = Assembly
+                .GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                .InformationalVersion;
             #if DEBUG
             IsDebug = true;
             #else

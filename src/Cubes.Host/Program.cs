@@ -64,7 +64,7 @@ namespace Cubes.Host
 
             var configuration = builder.Build();
             var urls = configuration.GetValue<string>("urls", "http://localhost:3001");
-            logger.LogInformation($"Cubes listening at {urls}");
+            logger.LogInformation($"Cubes listening at {urls.Replace(';' ,',')}");
 
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
