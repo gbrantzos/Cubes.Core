@@ -1,3 +1,4 @@
+using System;
 using Cubes.AspNetCore.StaticContent;
 using Cubes.Core.Commands;
 using Cubes.Core.Environment;
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace Cubes.Host
 {
@@ -49,12 +49,11 @@ namespace Cubes.Host
             if (useSSL)
                 app.UseHttpsRedirection();
 
-            app.UseStaticContent(settingsProvider, cubesEnvironment, loggerFactory.CreateLogger<Content>());
+            app.UseStaticContent(settingsProvider,
+                cubesEnvironment,
+                loggerFactory.CreateLogger<Content>());
             app.UseMvc();
 
-            // Default home content
-            // var re = new EmbeddedResourceFileSystem();
-            app.UseFileServer();
         }
     }
 

@@ -1,5 +1,5 @@
-using Cubes.Core.Settings;
 using System.Collections.Generic;
+using Cubes.Core.Settings;
 
 namespace Cubes.AspNetCore.StaticContent
 {
