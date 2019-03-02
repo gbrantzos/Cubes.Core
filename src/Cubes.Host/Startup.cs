@@ -1,13 +1,14 @@
+using Cubes.AspNetCore.StaticContent;
 using Cubes.Core.Commands;
 using Cubes.Core.Environment;
+using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 
 namespace Cubes.Host
 {
@@ -26,7 +27,12 @@ namespace Cubes.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IHostingEnvironment env,
+            ISettingsProvider settingsProvider,
+            ICubesEnvironment cubesEnvironment,
+            ILoggerFactory loggerFactory)
         {
             var useSSL = Configuration.GetValue<bool>("useSSL", false);
             if (env.IsDevelopment())
@@ -43,24 +49,7 @@ namespace Cubes.Host
             if (useSSL)
                 app.UseHttpsRedirection();
 
-            app.Map("/wms",
-                builder =>
-                {
-                    var path = @"C:\Code\CubesNext\Core\src\Cubes.Host\bin\Debug\netcoreapp2.2\StaticContent";
-                    builder.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(Path.Combine(path, "wms")) });
-                    builder.UseDefaultFiles(new DefaultFilesOptions { DefaultFileNames = new[] { "index.html" } });
-                    builder.Use(async (context, next) =>
-                    {
-                        await next();
-                        var fullRequest = context.Request.PathBase.Value + context.Request.Path.Value;
-                        if (context.Response.StatusCode == 404 && !Path.HasExtension(fullRequest))
-                        {
-                            context.Request.Path = "/wms/index.html";
-                            await next();
-                        }
-                    });
-                });
-
+            app.UseStaticContent(settingsProvider, cubesEnvironment, loggerFactory.CreateLogger<Content>());
             app.UseMvc();
 
             // Default home content
@@ -69,16 +58,6 @@ namespace Cubes.Host
         }
     }
 
-
-    public class ACommnad : ICommand<AResult> { }
-    public class AResult : BaseCommandResult { }
-    public class AHandler : ICommandHandler<ACommnad, AResult>
-    {
-        public AResult Handle(ACommnad command)
-        {
-            return new AResult();
-        }
-    }
 
     public class LoggingMiddleware<TCommand, TResult> : ICommandBusMiddleware<TCommand, TResult> where TResult : ICommandResult
     {

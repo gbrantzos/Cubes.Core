@@ -18,6 +18,9 @@ namespace Cubes.Host
             const string CONFIG_FILE = "NLog.config";
 
             LoggingConfiguration config = null;
+            InternalLogger.LogFile = Path.Combine(rootPath, nameof(CubesFolderKind.Logs), "nlog-internal.log");
+            InternalLogger.LogLevel = LogLevel.Off;
+
             try
             {
                 var configFile = Path.Combine(rootPath, nameof(CubesFolderKind.Settings), CONFIG_FILE);
@@ -27,7 +30,6 @@ namespace Cubes.Host
             catch (Exception x) { Console.Write(x.Message); }
             finally
             { if (config == null) config = new LoggingConfiguration(); }
-            InternalLogger.LogFile = Path.Combine(rootPath, nameof(CubesFolderKind.Logs), "nlog-internal.log");
 
             if (config.FindTargetByName("console") == null)
             {
