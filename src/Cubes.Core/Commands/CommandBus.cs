@@ -69,7 +69,6 @@ namespace Cubes.Core.Commands
                     });
             return combinedHandler();
         }
-
     }
     #endregion
 }

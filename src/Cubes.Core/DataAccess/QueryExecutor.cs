@@ -79,7 +79,7 @@ namespace Cubes.Core.DataAccess
 
             // Oracle hack...
             if (command.GetType().Name.Equals("OracleCommand"))
-                command.GetType().GetProperty("BindByName").SetValue(command, true, null); ;
+                command.GetType().GetProperty("BindByName").SetValue(command, true, null);
 
             // Add parameters
             if (query.Parameters != null && query.Parameters.Count > 0)
@@ -237,6 +237,9 @@ namespace Cubes.Core.DataAccess
         private IEnumerable<dynamic> MapToDynamic(IDataReader dataReader, Dictionary<string, string> columnToProperty)
         {
             var toReturn = new List<dynamic>();
+
+            if (columnToProperty == null)
+                columnToProperty = new Dictionary<string, string>();
 
             // Get DataReader columns
             var rdColumns = dataReader.
