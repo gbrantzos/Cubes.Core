@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.Loader;
@@ -12,6 +14,7 @@ namespace Cubes.Core.Environment
         private readonly ILogger logger;
         private readonly CubesEnvironmentInformation environmentInformation;
         private readonly IFileSystem fileSystem;
+        private readonly List<CubesLoadedApp> loadedApps;
 
         /// <summary>
         /// Constructor that accepts <see cref="IFileSystem"/> to support unit testing.
@@ -25,6 +28,7 @@ namespace Cubes.Core.Environment
             this.logger                 = logger;
             this.fileSystem             = fileSystem;
             this.environmentInformation = new CubesEnvironmentInformation(rootFolder);
+            this.loadedApps             = new List<CubesLoadedApp>();
 
             logger.LogInformation($"Starting Cubes, version {environmentInformation.Version}, {environmentInformation.Mode} build...");
             logger.LogInformation($"Cubes root folder: {rootFolder}");
@@ -37,6 +41,8 @@ namespace Cubes.Core.Environment
             => folderKind == CubesFolderKind.Root ? rootFolder : fileSystem.Path.Combine(rootFolder, folderKind.ToString());
 
         public CubesEnvironmentInformation GetEnvironmentInformation() => this.environmentInformation;
+
+        public IEnumerable<CubesLoadedApp> GetLoadedApps() => this.loadedApps;
         #endregion
 
         // The following methods are use for environment - server setup
@@ -60,6 +66,13 @@ namespace Cubes.Core.Environment
                 {
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
                     logger.LogInformation($"Loaded assembly: {asm.FullName}");
+
+                    loadedApps.Add(new CubesLoadedApp
+                    {
+                        File            = Path.GetFileName(file),
+                        AssemlbyName    = asm.GetName().Name,
+                        AssemblyVersion = asm.GetName().Version.ToString()
+                    });
                 }
                 catch (Exception x)
                 {

@@ -1,9 +1,20 @@
+using System.Collections.Generic;
+
 namespace Cubes.Core.Environment
 {
     public interface ICubesEnvironment
     {
         string GetFolder(CubesFolderKind folderKind);
         CubesEnvironmentInformation GetEnvironmentInformation();
+        IEnumerable<CubesLoadedApp> GetLoadedApps();
+    }
+
+    public class CubesLoadedApp
+    {
+        public string File { get; set; }
+        public string AssemlbyName { get; set; }
+        public string AssemblyVersion { get; set; }
+
     }
 
     public enum CubesFolderKind
