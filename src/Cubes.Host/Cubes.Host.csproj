@@ -19,7 +19,7 @@
     <Content Update="NLog.Sample.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="host.json">
+    <Content Update="host.Sample.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

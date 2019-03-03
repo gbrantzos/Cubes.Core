@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Cubes.Core.Environment;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -6,9 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
-using System;
-using System.IO;
-using System.Reflection;
 
 namespace Cubes.Host
 {
@@ -59,14 +59,14 @@ namespace Cubes.Host
         public static IWebHostBuilder CreateWebHostBuilder(string[] args, ICubesEnvironment cubesEnvironment, ILogger logger)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(cubesEnvironment.GetRootFolder())
+                .SetBasePath(cubesEnvironment.GetSettingsFolder())
                 .AddJsonFile("host.json", optional: true);
 
             var configuration = builder.Build();
             var urls = configuration.GetValue<string>("urls", "http://localhost:3001");
             logger.LogInformation($"Cubes listening at {urls.Replace(';' ,',')}");
 
-            return WebHost.CreateDefaultBuilder(args)
+            var hostBuilder = WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseContentRoot(cubesEnvironment.GetFolder(CubesFolderKind.StaticContent))
                 .UseUrls(urls)
@@ -81,6 +81,8 @@ namespace Cubes.Host
                 })
                 .UseConfiguration(configuration)
                 .UseNLog();
+
+            return hostBuilder;
         }
     }
 }
