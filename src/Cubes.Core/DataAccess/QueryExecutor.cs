@@ -81,6 +81,9 @@ namespace Cubes.Core.DataAccess
             if (command.GetType().Name.Equals("OracleCommand"))
                 command.GetType().GetProperty("BindByName").SetValue(command, true, null);
 
+            if (parameterValues == null)
+                parameterValues = new Dictionary<string, object>();
+
             // Add parameters
             if (query.Parameters != null && query.Parameters.Count > 0)
             {
@@ -90,7 +93,7 @@ namespace Cubes.Core.DataAccess
                     command.Parameters.Add(commandParam);
 
                     commandParam.ParameterName = queryParam.Name;
-                    commandParam.DbType = (DbType)Enum.Parse(typeof(DbType), queryParam.DbType);
+                    commandParam.DbType = (DbType)Enum.Parse(typeof(DbType), queryParam.DbType, ignoreCase: true);
 
                     if (parameterValues.ContainsKey(queryParam.Name))
                         commandParam.Value = ConvertParamValue(parameterValues[queryParam.Name], queryParam.DbType);
@@ -106,7 +109,7 @@ namespace Cubes.Core.DataAccess
         private static object ConvertParamValue(object value, string dbTypeName)
         {
             object retValue = null;
-            DbType dbType = (DbType)Enum.Parse(typeof(DbType), dbTypeName);
+            DbType dbType = (DbType)Enum.Parse(typeof(DbType), dbTypeName, ignoreCase: true);
             switch (dbType)
             {
                 case DbType.AnsiString:

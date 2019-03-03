@@ -23,5 +23,16 @@ namespace Cubes.AspNetCore.Controllers
             var results = queryExecutor.Query(connection, query, parameters);
             return Ok(results);
         }
+
+        [HttpPost("{connection}")]
+        public ActionResult ExecuteQuery(string connection, [FromBody]SqlQuery query)
+        {
+            var parameters = Request
+                .Query
+                .ToDictionary(q => q.Key, q => (Object)q.Value.ToString());
+
+            var results = queryExecutor.Query(connection, query, parameters);
+            return Ok(results);
+        }
     }
 }

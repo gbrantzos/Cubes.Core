@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Cubes.Host
+namespace Cubes.Host.Helpers
 {
     public class Startup
     {

@@ -10,7 +10,10 @@ namespace Cubes.AspNetCore.StaticContent
 {
     public static class StartupExtensions
     {
-        public static void UseStaticContent(this IApplicationBuilder app, ISettingsProvider settingsProvider, ICubesEnvironment environment, ILogger<Content> logger)
+        public static void UseStaticContent(this IApplicationBuilder app,
+            ISettingsProvider settingsProvider,
+            ICubesEnvironment environment,
+            ILogger<Content> logger)
         {
             var staticContent = settingsProvider.Load<StaticContentSettings>();
             var rootPath = environment.GetFolder(CubesFolderKind.StaticContent);

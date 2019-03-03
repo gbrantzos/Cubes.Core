@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
@@ -13,7 +12,7 @@ namespace Cubes.Core.Environment
     {
         public static void AddCubes(this IServiceCollection services, IConfiguration configuration)
         {
-            var settingsFormat = configuration.GetValue<string>("settingsFormat", "json");
+            var settingsFormat = configuration.GetValue<string>("settingsFormat", "yaml");
 
             // Add standard services
             services.AddSettings(settingsFormat);

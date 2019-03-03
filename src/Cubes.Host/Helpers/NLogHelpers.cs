@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 
 
-namespace Cubes.Host
+namespace Cubes.Host.Helpers
 {
     public class NLogHelpers
     {

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Cubes.Core.Environment;
+using Cubes.Host.Helpers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,12 +17,13 @@ namespace Cubes.Host
     {
         public static void Main(string[] args)
         {
+            ILogger logger = null;
             try
             {
                 var rootFolder = GetRootFolder();
                 NLogHelpers.PrepareNLog(rootFolder);
+                logger = new NLogLoggerProvider().CreateLogger(typeof(CubesEnvironment).FullName);
 
-                var logger = new NLogLoggerProvider().CreateLogger(typeof(CubesEnvironment).FullName);
                 var cubesEnvironment = new CubesEnvironment(rootFolder, logger);
                 cubesEnvironment.PrepareEnvironmentFolders();
                 cubesEnvironment.LoadAppsAssemblies();
@@ -43,6 +45,7 @@ namespace Cubes.Host
             {
                 // Ensure to flush and stop internal timers/threads
                 // before application-exit (Avoid segmentation fault on Linux)
+                logger.LogInformation("Cubes server shutdown!");
                 NLog.LogManager.Shutdown();
             }
         }
