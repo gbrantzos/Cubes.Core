@@ -70,6 +70,6 @@ namespace Cubes.Core.Environment
         }
 
         public static void AddEmailDispatcher(this IServiceCollection services)
-            => services.AddScoped<IEmailDispatcher, EmailDispatcher>();
+            => services.AddScoped<IEmailDispatcher>(c => new EmailDispatcher(new SmtpClientWrapper()));
     }
 }
