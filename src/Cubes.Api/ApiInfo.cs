@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cubes.AspNetCore
+namespace Cubes.Api
 {
-    public class AspNetCoreInfo
+    public class ApiInfo
     {
     }
 }

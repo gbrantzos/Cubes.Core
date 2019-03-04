@@ -1,6 +1,6 @@
 using System;
-using Cubes.AspNetCore;
-using Cubes.AspNetCore.StaticContent;
+using Cubes.Api;
+using Cubes.Api.StaticContent;
 using Cubes.Core.Commands;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
@@ -25,7 +25,7 @@ namespace Cubes.Host.Helpers
         {
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddApplicationPart(typeof(AspNetCoreInfo).Assembly);
+                .AddApplicationPart(typeof(ApiInfo).Assembly);
             services.AddCubes(Configuration);
         }
 

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using YamlDotNet.Serialization;
 
-namespace Cubes.AspNetCore.Settings
+namespace Cubes.Api.Settings
 {
     [ApiController, Route("api/[controller]")]
     public class SettingsController : ControllerBase
@@ -16,7 +16,7 @@ namespace Cubes.AspNetCore.Settings
         {
             var r = new StringReader(raw);
             var deserializer = new Deserializer().Deserialize(r);
-            
+
             //var yamlObject = deserializer.Deserialize<dynamic>(r)["TestPaySignService"].Values;
 
             // just to print the json

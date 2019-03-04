@@ -3,7 +3,7 @@ using System.Linq;
 using Cubes.Core.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Cubes.AspNetCore.Controllers
+namespace Cubes.Api.Controllers
 {
     [ApiController, Route("api/[controller]")]
     public class QueryExecutorController : ControllerBase

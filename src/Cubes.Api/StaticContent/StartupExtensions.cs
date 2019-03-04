@@ -6,7 +6,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using System.IO;
 
-namespace Cubes.AspNetCore.StaticContent
+namespace Cubes.Api.StaticContent
 {
     public static class StartupExtensions
     {

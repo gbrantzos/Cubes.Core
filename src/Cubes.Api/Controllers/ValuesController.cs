@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Logging;
 
-namespace Cubes.Host.Controllers
+namespace Cubes.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +20,7 @@ namespace Cubes.Host.Controllers
         private readonly ILogger<ValuesController> logger;
         private readonly ISettingsProvider settings;
         private readonly ICommandBus bus;
-        
+
         public ValuesController(IQueryExecutor queryExecutor, ILogger<ValuesController> logger, ISettingsProvider settings, ICommandBus bus)
         {
             this.bus = bus;
