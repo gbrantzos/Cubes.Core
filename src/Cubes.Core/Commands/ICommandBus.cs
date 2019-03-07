@@ -6,11 +6,11 @@ namespace Cubes.Core.Commands
     public interface ICommandBus
     {
         /// <summary>
-        /// Submit a Command for execution 
+        /// Submit a Command for execution
         /// </summary>
         /// <param name="command">Command to execute</param>
         /// <typeparam name="TResult">Result type</typeparam>
         /// <returns></returns>
-        TResult Submit<TResult>(ICommand<TResult> command) where TResult : ICommandResult;
+        TResult Submit<TResult>(ICommand<TResult> command) where TResult : ICommandResult, new();
     }
 }
