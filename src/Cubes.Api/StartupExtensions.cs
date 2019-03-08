@@ -1,9 +1,11 @@
 using System.IO;
+using Cubes.Api.RequestContext;
 using Cubes.Api.StaticContent;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
@@ -11,7 +13,7 @@ namespace Cubes.Api
 {
     public static class StartupExtensions
     {
-        public static IApplicationBuilder UseStaticContent(this IApplicationBuilder app,
+        public static IApplicationBuilder UseCubesStaticContent(this IApplicationBuilder app,
             ISettingsProvider settingsProvider,
             ICubesEnvironment environment,
             ILogger<Content> logger)
@@ -37,8 +39,8 @@ namespace Cubes.Api
                         logger.LogInformation($"Preparing static content '{item.RequestPath}'");
                         var fsOptions = new FileServerOptions
                         {
-                            FileProvider       = new PhysicalFileProvider(contentPath),
-                            RequestPath        = "",
+                            FileProvider = new PhysicalFileProvider(contentPath),
+                            RequestPath = "",
                             EnableDefaultFiles = true
                         };
                         fsOptions.DefaultFilesOptions.DefaultFileNames.Add(item.DefaultFile);
@@ -71,6 +73,24 @@ namespace Cubes.Api
             fsOptions.DefaultFilesOptions.DefaultFileNames.Add("index.html");
             app.UseFileServer(fsOptions);
 
+            return app;
+        }
+
+        public static void AddCubesApiServices(this IServiceCollection services)
+        {
+            services.AddScoped<IContextProvider, ContextProvider>();
+            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        }
+
+        public static IApplicationBuilder UseCubesContextProvider(this IApplicationBuilder app)
+        {
+            app.Use(async (context, next) =>
+            {
+                var ctxProvider = context.RequestServices.GetService<IContextProvider>();
+                ctxProvider.Current = Context.FromHttpContext(context);
+
+                await next.Invoke();
+            });
             return app;
         }
     }

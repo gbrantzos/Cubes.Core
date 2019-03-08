@@ -6,7 +6,6 @@ using System.Reflection;
 using Cubes.Core.Environment;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cubes.Api.Controllers
 {

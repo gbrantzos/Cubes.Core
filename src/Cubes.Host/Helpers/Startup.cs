@@ -30,8 +30,9 @@ namespace Cubes.Host.Helpers
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddApplicationPart(typeof(SwaggerHelpers).Assembly);
+            services.AddCubesSwaggerServices(CubesEnvironment);
             services.AddCubesCoreServices(Configuration);
-            services.AddCubesApiServices(CubesEnvironment);
+            services.AddCubesApiServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,9 +55,11 @@ namespace Cubes.Host.Helpers
             if (useSSL)
                 app.UseHttpsRedirection();
 
+            app.UseCubesContextProvider();
+
             app.UseMvc();
-            app.UseCubesApiDocs();
-            app.UseStaticContent(settingsProvider,
+            app.UseCubesSwagger();
+            app.UseCubesStaticContent(settingsProvider,
                 cubesEnvironment,
                 loggerFactory.CreateLogger<Content>());
             app.UseCubesHomePage();

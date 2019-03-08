@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cubes.Api.RequestContext;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cubes.Host.Helpers
@@ -7,12 +8,18 @@ namespace Cubes.Host.Helpers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-      
+        private readonly IContextProvider contextProvider;
+
+        public ValuesController(IContextProvider contextProvider)
+        {
+            this.contextProvider = contextProvider;
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new[] { "value1", "value2" };
+            return new[] { "value1", "value2", contextProvider.Current.ID, contextProvider.Current.Url, contextProvider.Current.IP, contextProvider.Current.QueryString };
         }
 
         // GET api/values/5

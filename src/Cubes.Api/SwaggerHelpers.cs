@@ -17,7 +17,7 @@ namespace Cubes.Api
 {
     public static class SwaggerHelpers
     {
-        public static void AddCubesApiServices(this IServiceCollection services, ICubesEnvironment cubesEnvironment)
+        public static void AddCubesSwaggerServices(this IServiceCollection services, ICubesEnvironment cubesEnvironment)
         {
             services.AddSwaggerGen(c =>
             {
@@ -39,7 +39,7 @@ namespace Cubes.Api
             });
         }
 
-        public static IApplicationBuilder UseCubesApiDocs(this IApplicationBuilder app)
+        public static IApplicationBuilder UseCubesSwagger(this IApplicationBuilder app)
         {
             app.UseSwagger(c => c.RouteTemplate = "docs/{documentName}/swagger.json");
             app.UseSwaggerUI(c =>
