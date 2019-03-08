@@ -1,32 +1,23 @@
+using System.IO;
+using Cubes.Api.StaticContent;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
-namespace Cubes.Api.StaticContent
+namespace Cubes.Api
 {
     public static class StartupExtensions
     {
-        public static void UseStaticContent(this IApplicationBuilder app,
+        public static IApplicationBuilder UseStaticContent(this IApplicationBuilder app,
             ISettingsProvider settingsProvider,
             ICubesEnvironment environment,
             ILogger<Content> logger)
         {
             var staticContent = settingsProvider.Load<StaticContentSettings>();
             var rootPath = environment.GetFolder(CubesFolderKind.StaticContent);
-
-            var fsOptions1 = new FileServerOptions
-                {
-                    FileProvider       = new ManifestEmbeddedFileProvider(typeof(StartupExtensions).Assembly),
-                    RequestPath        = "",
-                    EnableDefaultFiles = true
-                };
-                fsOptions1.DefaultFilesOptions.DefaultFileNames.Add("index.html");
-                app.UseFileServer(fsOptions1);
-
 
             foreach (var item in staticContent.Content)
             {
@@ -37,7 +28,7 @@ namespace Cubes.Api.StaticContent
                 if (!Directory.Exists(contentPath))
                 {
                     logger.LogError($"Cannot load Static Content on relative URL '{item.RequestPath}', path does not exist >> {contentPath}!");
-                    return;
+                    return app;
                 }
 
                 app.Map($"/{item.RequestPath}",
@@ -66,6 +57,21 @@ namespace Cubes.Api.StaticContent
                         });
                     });
             }
+            return app;
+        }
+
+        public static IApplicationBuilder UseCubesHomePage(this IApplicationBuilder app)
+        {
+            var fsOptions = new FileServerOptions
+            {
+                FileProvider = new ManifestEmbeddedFileProvider(typeof(StartupExtensions).Assembly, "Resources"),
+                RequestPath = "",
+                EnableDefaultFiles = true
+            };
+            fsOptions.DefaultFilesOptions.DefaultFileNames.Add("index.html");
+            app.UseFileServer(fsOptions);
+
+            return app;
         }
     }
 }

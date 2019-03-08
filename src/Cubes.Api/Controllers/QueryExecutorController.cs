@@ -36,3 +36,32 @@ namespace Cubes.Api.Controllers
         }
     }
 }
+
+
+    /*
+        var sqlQuery = new SqlQuery
+        {
+            Name = "",
+            Query = "select * from FIY where FIYINITDATE >= :p_date",
+            Parameters = new List<SqlQueryParameter>
+            {
+                new SqlQueryParameter
+                {
+                    Name = "p_date",
+                    DbType = "DateTime"
+                }
+            }
+
+        };
+        var fiyList = queryExecutor.Query<Fiy>(
+            "Local.SEn",
+            sqlQuery,
+            new Dictionary<string, object> { { "p_date", new DateTime(2014, 1, 1) } },
+            new Dictionary<string, string> { { "FIYID", "ID" }, { "FIYINITDATE", "StartDate" }, { "FIYISCURRENT", "Current" } });
+        var fiy2List = queryExecutor.Query(
+            "Local.SEn",
+            sqlQuery,
+            new Dictionary<string, object> { { "p_date", new DateTime(2014, 1, 1) } },
+            new Dictionary<string, string> { { "FIYID", "ID" }, { "FIYINITDATE", "StartDate" } });
+
+     */

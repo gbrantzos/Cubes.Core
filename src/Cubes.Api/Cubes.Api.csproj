@@ -1,22 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.2.0"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0-beta"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.0.0-beta"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.0.0-beta"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-beta"/>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0-beta" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.0.0-beta" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.0.0-beta" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cubes.Core\Cubes.Core.csproj"/>
+    <ProjectReference Include="..\Cubes.Core\Cubes.Core.csproj" />
     <EmbeddedResource Include="Resources/*" />
   </ItemGroup>
 </Project>

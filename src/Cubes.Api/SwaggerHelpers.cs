@@ -15,14 +15,13 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace Cubes.Api
 {
-    public static class ApiHelpers
+    public static class SwaggerHelpers
     {
         public static void AddCubesApiServices(this IServiceCollection services, ICubesEnvironment cubesEnvironment)
         {
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CubesNext API", Version = "v1" });
-                c.EnableAnnotations();
                 c.OperationFilter<SwaggerCategoryAsTagFilter>();
 
                 c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetRootFolder(), "Cubes.Api.xml"));

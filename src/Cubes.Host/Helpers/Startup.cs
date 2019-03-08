@@ -15,21 +15,21 @@ namespace Cubes.Host.Helpers
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        public ICubesEnvironment CubesEnvironment { get; }
+
         public Startup(IConfiguration configuration, ICubesEnvironment cubesEnvironment)
         {
             Configuration = configuration;
             CubesEnvironment = cubesEnvironment;
         }
 
-        public IConfiguration Configuration { get; }
-        public ICubesEnvironment CubesEnvironment { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddApplicationPart(typeof(ApiHelpers).Assembly);
+                .AddApplicationPart(typeof(SwaggerHelpers).Assembly);
             services.AddCubesCoreServices(Configuration);
             services.AddCubesApiServices(CubesEnvironment);
         }
@@ -44,16 +44,13 @@ namespace Cubes.Host.Helpers
         {
             var useSSL = Configuration.GetValue<bool>("useSSL", false);
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 if (useSSL)
+                    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                     app.UseHsts();
             }
-
             if (useSSL)
                 app.UseHttpsRedirection();
 
@@ -62,6 +59,7 @@ namespace Cubes.Host.Helpers
             app.UseStaticContent(settingsProvider,
                 cubesEnvironment,
                 loggerFactory.CreateLogger<Content>());
+            app.UseCubesHomePage();
         }
     }
 
