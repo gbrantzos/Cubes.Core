@@ -3,6 +3,7 @@ using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Settings;
+using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,7 @@ namespace Cubes.Core.Environment
 {
     public static class StartupExtensions
     {
-        public static void AddCubes(this IServiceCollection services, IConfiguration configuration)
+        public static void AddCubesCoreServices(this IServiceCollection services, IConfiguration configuration)
         {
             var settingsFormat = configuration.GetValue<string>("settingsFormat", "yaml");
 
@@ -19,6 +20,8 @@ namespace Cubes.Core.Environment
             services.AddDataAccess();
             services.AddCommands();
             services.AddEmailDispatcher();
+
+            services.AddScoped<ITypeResolver, TypeResolver>();
         }
 
         public static void AddDataAccess(this IServiceCollection services)
@@ -70,6 +73,6 @@ namespace Cubes.Core.Environment
         }
 
         public static void AddEmailDispatcher(this IServiceCollection services)
-            => services.AddScoped<IEmailDispatcher, EmailDispatcher>();
+            => services.AddScoped<IEmailDispatcher>(c => new EmailDispatcher(new SmtpClientWrapper()));
     }
 }

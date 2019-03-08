@@ -1,6 +1,6 @@
 using System;
-using Cubes.AspNetCore;
-using Cubes.AspNetCore.StaticContent;
+using Cubes.Api;
+using Cubes.Api.StaticContent;
 using Cubes.Core.Commands;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
@@ -15,18 +15,23 @@ namespace Cubes.Host.Helpers
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-            => Configuration = configuration;
+        public Startup(IConfiguration configuration, ICubesEnvironment cubesEnvironment)
+        {
+            Configuration = configuration;
+            CubesEnvironment = cubesEnvironment;
+        }
 
         public IConfiguration Configuration { get; }
+        public ICubesEnvironment CubesEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddApplicationPart(typeof(AspNetCoreInfo).Assembly);
-            services.AddCubes(Configuration);
+                .AddApplicationPart(typeof(ApiHelpers).Assembly);
+            services.AddCubesCoreServices(Configuration);
+            services.AddCubesApiServices(CubesEnvironment);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,11 +57,11 @@ namespace Cubes.Host.Helpers
             if (useSSL)
                 app.UseHttpsRedirection();
 
+            app.UseMvc();
+            app.UseCubesApiDocs();
             app.UseStaticContent(settingsProvider,
                 cubesEnvironment,
                 loggerFactory.CreateLogger<Content>());
-            app.UseMvc();
-
         }
     }
 

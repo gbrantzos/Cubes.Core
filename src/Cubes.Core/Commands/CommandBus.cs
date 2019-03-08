@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Cubes.Core.Utilities;
 
 namespace Cubes.Core.Commands
 {
@@ -10,7 +11,7 @@ namespace Cubes.Core.Commands
         public CommandBus(ServiceFactory handlerFactory)
             => this.handlerFactory = handlerFactory;
 
-        public TResult Submit<TResult>(ICommand<TResult> command) where TResult : ICommandResult
+        public TResult Submit<TResult>(ICommand<TResult> command) where TResult : ICommandResult, new()
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
@@ -18,7 +19,38 @@ namespace Cubes.Core.Commands
             var handler = (CommandHandlerHelperBase<TResult>)Activator
                 .CreateInstance(typeof(CommandHandlerHelper<,>).MakeGenericType(command.GetType(), typeof(TResult)), handlerFactory);
 
-            return handler.Handle(command);
+            try
+            {
+                return handler.Handle(command);
+            }
+            catch (Exception ex)
+            {
+                // If no handler found just throw (it's definetelly internal error)
+                if (ex is CommandHandlerResolveException)
+                    throw;
+
+                var toReturn = new TResult();
+
+                // Try to be as nice as possible to caller
+                if (ex.GetType().IsSubclassOf(typeof(CommandExecutionException<>)))
+                {
+                    // It would be nice for handlers to throw CommandExecutionException to signal a LOGICAL error
+                    toReturn.ExecutionResult = CommandExecutionResult.Error;
+                    toReturn.Message = ex.Message;
+                }
+                else
+                {
+                    // Gather messages
+                    var messages = ex.GetInnerExceptions()
+                        .Select(x => $"{x.GetType().Name}: {x.Message}")
+                        .Aggregate((res, val) => $"{res}{System.Environment.NewLine}{val}");
+
+                    toReturn.ExecutionResult = CommandExecutionResult.Failure;
+                    toReturn.Message = messages;
+                }
+
+                return toReturn;
+            }
         }
     }
 

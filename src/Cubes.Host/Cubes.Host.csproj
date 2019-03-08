@@ -12,7 +12,7 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cubes.AspNetCore\Cubes.AspNetCore.csproj" />
+    <ProjectReference Include="..\Cubes.Api\Cubes.Api.csproj" />
     <ProjectReference Include="..\Cubes.Core\Cubes.Core.csproj" />
   </ItemGroup>
   <ItemGroup>

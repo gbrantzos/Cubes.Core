@@ -1,50 +1,26 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Cubes.Core.Commands;
-using Cubes.Core.Commands.Basic;
 using Cubes.Core.DataAccess;
-using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Logging;
 
-namespace Cubes.Host.Controllers
+namespace Cubes.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
         private readonly IQueryExecutor queryExecutor;
-        private readonly ILogger<ValuesController> logger;
-        private readonly ISettingsProvider settings;
-        private readonly ICommandBus bus;
-        
-        public ValuesController(IQueryExecutor queryExecutor, ILogger<ValuesController> logger, ISettingsProvider settings, ICommandBus bus)
+
+
+        public ValuesController(IQueryExecutor queryExecutor)
         {
-            this.bus = bus;
-            this.logger = logger;
-            this.settings = settings;
             this.queryExecutor = queryExecutor;
         }
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            logger.LogDebug("From ValuesController");
-            logger.LogWarning("From ValuesController");
-            logger.LogInformation(settings.Load<SampleSettings>().Description);
-
-            //var cmd = new RunOsProcessCommand
-            //{
-            //    Command = "git",
-            //    Arguments = "log -10",
-            //    StartIn = "/Users/georgebrantzos/Projects/ibe"
-            //};
-            //var res = bus.Submit(cmd);
-
-            return new[] { "value1", "value2"};
+            return new[] { "value1", "value2" };
         }
 
         // GET api/values/5

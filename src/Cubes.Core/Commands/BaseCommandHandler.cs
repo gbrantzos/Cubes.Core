@@ -16,17 +16,16 @@ namespace Cubes.Core.Commands
             }
             catch (Exception ex)
             {
-                // Gather messages
-                var messages = ex.GetInnerExceptions()
-                    .Select(x => $"{x.GetType().Name}: {x.Message}")
-                    .Aggregate((res, val) => $"{res}{System.Environment.NewLine}{val}");
+                // CommandExecutionException should signal a LOGICAL error
+                if (ex.GetType().IsSubclassOf(typeof(CommandExecutionException<>)))
+                    throw;
 
                 // Handle exception
                 throw new CommandExecutionException<TCommand>("Command execution failed!", ex)
                 {
                     Command            = command,
                     CommandHandlerType = this.GetType(),
-                    ErrorMessage       = messages
+                    ErrorMessage       = ex.Message
                 };
             }
         }
