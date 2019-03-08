@@ -30,21 +30,21 @@ namespace Cubes.Api.Controllers
         }
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult Get()
         {
             logger.LogDebug("From ValuesController");
             logger.LogWarning("From ValuesController");
             logger.LogInformation(settings.Load<SampleSettings>().Description);
 
-            //var cmd = new RunOsProcessCommand
-            //{
-            //    Command = "git",
-            //    Arguments = "log -10",
-            //    StartIn = "/Users/georgebrantzos/Projects/ibe"
-            //};
-            //var res = bus.Submit(cmd);
-
-            return new[] { "value1", "value2"};
+            var cmd = new RunOsProcessCommand
+            {
+               Command = "git",
+               Arguments = "log -10",
+               StartIn = "/Users/georgebrantzos/Projects/ibe"
+            };
+            var res = bus.Submit((object)cmd);
+            return Ok(res);
+            //return new[] { "value1", "value2", res.Message, res.ExecutionResult.ToString() };
         }
 
         // GET api/values/5
