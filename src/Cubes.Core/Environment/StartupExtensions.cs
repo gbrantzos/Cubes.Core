@@ -3,6 +3,7 @@ using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Settings;
+using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,8 @@ namespace Cubes.Core.Environment
             services.AddDataAccess();
             services.AddCommands();
             services.AddEmailDispatcher();
+
+            services.AddScoped<ITypeResolver, TypeResolver>();
         }
 
         public static void AddDataAccess(this IServiceCollection services)
