@@ -1,58 +1,74 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using Cubes.Api.Controllers;
-using Cubes.Core.Utilities;
+using Cubes.Core.Environment;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
+[assembly: SwaggerCategory("Core")]
+
 namespace Cubes.Api
 {
     public static class ApiHelpers
     {
-        public static void AddCubesApiServices(this IServiceCollection services, IConfiguration configuration)
+        public static void AddCubesApiServices(this IServiceCollection services, ICubesEnvironment cubesEnvironment)
         {
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CubesNext API", Version = "v1" });
                 c.EnableAnnotations();
-                c.OperationFilter<CustomFilter>();
-                //c.
-                //c.IncludeXmlComments
-                //c.TagActionsBy(api => new List<string> { api.GroupName });
+                c.OperationFilter<SwaggerCategoryAsTagFilter>();
+
+                c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetRootFolder(), "Cubes.Api.xml"));
+                var xmlFiles = cubesEnvironment
+                    .GetLoadedApps()
+                    .Select(i =>
+                    {
+                        var file = Path.Combine(cubesEnvironment.GetAppsFolder(), $"{Path.GetFileNameWithoutExtension(i.File)}.xml");
+                        return File.Exists(file) ? file : String.Empty;
+                    })
+                    .Where(i => !String.IsNullOrEmpty(i))
+                    .ToList();
+                foreach (var file in xmlFiles)
+                    c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetAppsFolder(), file));
             });
         }
 
-        public static IApplicationBuilder UseCubes(this IApplicationBuilder app)
+        public static IApplicationBuilder UseCubesApiDocs(this IApplicationBuilder app)
         {
             app.UseSwagger(c => c.RouteTemplate = "docs/{documentName}/swagger.json");
             app.UseSwaggerUI(c =>
             {
-                c.DocExpansion(DocExpansion.None);
+                c.DocExpansion(DocExpansion.List);
                 c.SwaggerEndpoint("/docs/v1/swagger.json", "CubesNext API V1");
                 c.RoutePrefix = "docs/api";
 
-                //c.GroupActionsBy()
+                c.DisplayRequestDuration();
+                c.DocumentTitle = "CubesNext API";
             });
 
             return app;
         }
     }
 
-    public class CustomFilter : IOperationFilter
+    public class SwaggerCategoryAsTagFilter : IOperationFilter
     {
-
-
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var attr = context.MethodInfo.DeclaringType.GetAttribute<SwaggerCategoryAttribute>();
-            var tag = attr?.Prefix;
+            var attr = context
+                .MethodInfo
+                .DeclaringType
+                .Assembly
+                .GetCustomAttribute(typeof(SwaggerCategoryAttribute)) as SwaggerCategoryAttribute;
+            var tag = attr?.Category;
             if (!String.IsNullOrEmpty(tag))
-                operation.Tags = new List<OpenApiTag> {new OpenApiTag { Name = tag, Description = "Core operations" }};
+                operation.Tags = new List<OpenApiTag> {new OpenApiTag { Name = tag }};
         }
     }
 }

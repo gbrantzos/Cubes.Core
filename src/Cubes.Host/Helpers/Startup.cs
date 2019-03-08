@@ -15,10 +15,14 @@ namespace Cubes.Host.Helpers
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-            => Configuration = configuration;
+        public Startup(IConfiguration configuration, ICubesEnvironment cubesEnvironment)
+        {
+            Configuration = configuration;
+            CubesEnvironment = cubesEnvironment;
+        }
 
         public IConfiguration Configuration { get; }
+        public ICubesEnvironment CubesEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -27,7 +31,7 @@ namespace Cubes.Host.Helpers
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddApplicationPart(typeof(ApiHelpers).Assembly);
             services.AddCubesCoreServices(Configuration);
-            services.AddCubesApiServices(Configuration);
+            services.AddCubesApiServices(CubesEnvironment);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,7 +58,7 @@ namespace Cubes.Host.Helpers
                 app.UseHttpsRedirection();
 
             app.UseMvc();
-            app.UseCubes();
+            app.UseCubesApiDocs();
             app.UseStaticContent(settingsProvider,
                 cubesEnvironment,
                 loggerFactory.CreateLogger<Content>());

@@ -2,12 +2,12 @@ using System;
 
 namespace Cubes.Api.Controllers
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
     public class SwaggerCategoryAttribute : Attribute
     {
-        public SwaggerCategoryAttribute(string prefix)
-            => Prefix = prefix;
+        public SwaggerCategoryAttribute(string category)
+            => Category = category;
 
-        public string Prefix { get; }
+        public string Category { get; }
     }
 }

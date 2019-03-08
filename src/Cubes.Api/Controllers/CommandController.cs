@@ -7,8 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Cubes.Api.Controllers
 {
-    [ApiController, Route("api/[controller]")][SwaggerCategory("Core")]
-
+    [ApiController, Route("api/[controller]")]
     public class CommandController : ControllerBase
     {
         private readonly ICommandBus commandBus;

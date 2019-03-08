@@ -18,6 +18,16 @@ namespace Cubes.Api.StaticContent
             var staticContent = settingsProvider.Load<StaticContentSettings>();
             var rootPath = environment.GetFolder(CubesFolderKind.StaticContent);
 
+            var fsOptions1 = new FileServerOptions
+                {
+                    FileProvider       = new ManifestEmbeddedFileProvider(typeof(StartupExtensions).Assembly),
+                    RequestPath        = "",
+                    EnableDefaultFiles = true
+                };
+                fsOptions1.DefaultFilesOptions.DefaultFileNames.Add("index.html");
+                app.UseFileServer(fsOptions1);
+
+
             foreach (var item in staticContent.Content)
             {
                 var contentPath = item.PathIsAbsolute ?

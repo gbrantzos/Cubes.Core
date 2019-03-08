@@ -9,8 +9,7 @@ using YamlDotNet.Serialization;
 namespace Cubes.Api.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    [SwaggerCategory("Core")]
-    public class SettingsController : ControllerBase
+        public class SettingsController : ControllerBase
     {
         [HttpPost]
         public ActionResult Parse([FromBody]string raw)

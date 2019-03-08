@@ -10,8 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cubes.Api.Controllers
 {
-    [SwaggerCategory("Core")]
-    [ApiController, Route("api/[controller]")]//[SwaggerTag("Core")]
+    [ApiController, Route("api/[controller]")]
     public class SystemController : ControllerBase
     {
         private readonly ICubesEnvironment cubesEnvironment;
