@@ -22,6 +22,9 @@ namespace Cubes.Api.Controllers
         /// <summary>
         /// Get all available commands
         /// </summary>
+        /// <remarks>
+        /// List of all available commands with sample empty command instance as JSON.
+        /// </remarks>
         /// <returns></returns>
         [HttpGet]
         public ActionResult Get()
@@ -49,8 +52,11 @@ namespace Cubes.Api.Controllers
         }
 
         /// <summary>
-        /// Execute given command
+        /// Execute command
         /// </summary>
+        /// <remarks>
+        /// Execute given command using and capture results.
+        /// </remarks>
         /// <param name="commandType"></param>
         /// <param name="commandInst"></param>
         /// <returns></returns>

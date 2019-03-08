@@ -13,6 +13,16 @@ namespace Cubes.Api.Controllers
         public QueryExecutorController(IQueryExecutor queryExecutor)
             => this.queryExecutor = queryExecutor;
 
+        /// <summary>
+        /// Execute known query
+        /// </summary>
+        /// <remarks>
+        /// Execute query stored on DataAccessSettings file using a known database connection.
+        /// Query string contains values for query parameters.
+        /// </remarks>
+        /// <param name="connection">Connection name</param>
+        /// <param name="query">Query name</param>
+        /// <returns></returns>
         [HttpGet("{connection}/{query}")]
         public ActionResult ExecuteQuery(string connection, string query)
         {
@@ -24,6 +34,16 @@ namespace Cubes.Api.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Execute query provided
+        /// </summary>
+        /// <remarks>
+        /// Execute query provided on request body using a known database connection.
+        /// Query string contains values for query parameters.
+        /// /// </remarks>
+        /// <param name="connection"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpPost("{connection}")]
         public ActionResult ExecuteQuery(string connection, [FromBody]SqlQuery query)
         {

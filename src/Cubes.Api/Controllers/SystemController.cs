@@ -57,7 +57,7 @@ namespace Cubes.Api.Controllers
         /// Cubes server routes
         /// </summary>
         /// <remarks>
-        /// Lists all available routes with parameters detsails.
+        /// Lists all available routes with parameters details.
         /// </remarks>
         [HttpGet("routes")]
         public ActionResult Routes()
