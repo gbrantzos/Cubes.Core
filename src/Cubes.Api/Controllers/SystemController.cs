@@ -6,10 +6,12 @@ using System.Reflection;
 using Cubes.Core.Environment;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cubes.Api.Controllers
 {
-    [ApiController, Route("api/[controller]")]
+    [SwaggerCategory("Core")]
+    [ApiController, Route("api/[controller]")]//[SwaggerTag("Core")]
     public class SystemController : ControllerBase
     {
         private readonly ICubesEnvironment cubesEnvironment;

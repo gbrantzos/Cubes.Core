@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using YamlDotNet.Serialization;
 
-namespace Cubes.Api.Settings
+namespace Cubes.Api.Controllers
 {
     [ApiController, Route("api/[controller]")]
+    [SwaggerCategory("Core")]
     public class SettingsController : ControllerBase
     {
         [HttpPost]

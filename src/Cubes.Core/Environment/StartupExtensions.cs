@@ -11,7 +11,7 @@ namespace Cubes.Core.Environment
 {
     public static class StartupExtensions
     {
-        public static void AddCubes(this IServiceCollection services, IConfiguration configuration)
+        public static void AddCubesCoreServices(this IServiceCollection services, IConfiguration configuration)
         {
             var settingsFormat = configuration.GetValue<string>("settingsFormat", "yaml");
 

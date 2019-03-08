@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cubes.Api.Controllers
 {
+    [SwaggerCategory("Core")]
     [ApiController, Route("api/[controller]")]
     public class QueryExecutorController : ControllerBase
     {
