@@ -3,6 +3,7 @@ using Cubes.Api;
 using Cubes.Api.StaticContent;
 using Cubes.Core.Commands;
 using Cubes.Core.Environment;
+using Cubes.Core.Jobs;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,13 +16,15 @@ namespace Cubes.Host.Helpers
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
-        public ICubesEnvironment CubesEnvironment { get; }
+        private readonly ILoggerFactory loggerFactory;
+        private readonly IConfiguration configuration;
+        private readonly ICubesEnvironment cubesEnvironment;
 
-        public Startup(IConfiguration configuration, ICubesEnvironment cubesEnvironment)
+        public Startup(IConfiguration configuration, ICubesEnvironment cubesEnvironment, ILoggerFactory loggerFactory)
         {
-            Configuration = configuration;
-            CubesEnvironment = cubesEnvironment;
+            this.configuration    = configuration;
+            this.cubesEnvironment = cubesEnvironment;
+            this.loggerFactory    = loggerFactory;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -30,8 +33,8 @@ namespace Cubes.Host.Helpers
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddApplicationPart(typeof(SwaggerHelpers).Assembly);
-            services.AddCubesSwaggerServices(CubesEnvironment);
-            services.AddCubesCoreServices(Configuration);
+            services.AddCubesSwaggerServices(cubesEnvironment);
+            services.AddCubesCoreServices(configuration);
             services.AddCubesApiServices();
         }
 
@@ -41,9 +44,10 @@ namespace Cubes.Host.Helpers
             IHostingEnvironment env,
             ISettingsProvider settingsProvider,
             ICubesEnvironment cubesEnvironment,
-            ILoggerFactory loggerFactory)
+            IJobScheduler jobScheduler,
+            IApplicationLifetime applicationLifetime)
         {
-            var useSSL = Configuration.GetValue<bool>("useSSL", false);
+            var useSSL = configuration.GetValue<bool>("useSSL", false);
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
@@ -63,6 +67,9 @@ namespace Cubes.Host.Helpers
                 cubesEnvironment,
                 loggerFactory.CreateLogger<Content>());
             app.UseCubesHomePage();
+
+            jobScheduler.StartScheduler();
+            applicationLifetime.ApplicationStopping.Register(() => jobScheduler.StopScheduler());
         }
     }
 

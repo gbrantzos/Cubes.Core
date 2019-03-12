@@ -2,6 +2,7 @@ using System;
 using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
+using Cubes.Core.Jobs;
 using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,7 @@ namespace Cubes.Core.Environment
             services.AddEmailDispatcher();
 
             services.AddScoped<ITypeResolver, TypeResolver>();
+            services.AddJobScheduler();
         }
 
         public static void AddDataAccess(this IServiceCollection services)

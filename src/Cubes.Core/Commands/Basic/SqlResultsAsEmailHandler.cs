@@ -25,7 +25,7 @@ namespace Cubes.Core.Commands.Basic
 
             var results = GetQueryResults(command.DbConnection, command.SqlQueries);
 
-            // Prepare email and attachements...
+            // Prepare email and attachments...
             var email = new EmailContent
             {
                 Subject = command.Subject,

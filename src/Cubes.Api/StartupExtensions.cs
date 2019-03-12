@@ -79,7 +79,7 @@ namespace Cubes.Api
         public static void AddCubesApiServices(this IServiceCollection services)
         {
             services.AddScoped<IContextProvider, ContextProvider>();
-            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         public static IApplicationBuilder UseCubesContextProvider(this IApplicationBuilder app)
