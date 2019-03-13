@@ -20,8 +20,9 @@ namespace Cubes.Core
             services.AddDataAccess();
             services.AddCommands();
             services.AddEmailDispatcher();
-            services.AddScoped<ITypeResolver, TypeResolver>();
             services.AddJobScheduler();
+            services.AddTransient<ITypeResolver, TypeResolver>();
+            services.AddTransient<ISerializer, JsonSerializer>();
         }
     }
 }

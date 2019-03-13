@@ -28,6 +28,9 @@ namespace Cubes.Core.Jobs
                 return scheduler;
             });
             services.AddSingleton<IJobScheduler, JobScheduler>();
+
+            // Register jobs
+            services.AddScoped<ExecuteCommandJob>();
         }
     }
 }

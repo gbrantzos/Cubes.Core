@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace Cubes.Core.Utilities
@@ -68,6 +69,46 @@ namespace Cubes.Core.Utilities
                 current = current.InnerException;
             }
             return toReturn;
+        }
+
+        /// <summary>
+        /// Get property of object with type TProperty. Object must be nullable.
+        /// </summary>
+        /// <typeparam name="TProperty">Type of property to find</typeparam>
+        /// <param name="obj">Object to search for property</param>
+        /// <returns></returns>
+        public static TProperty GetPropertyByType<TProperty>(this object obj) where TProperty : class
+        {
+            if (obj == null) return null;
+            if (obj is TProperty)
+                return (TProperty)obj;
+
+            var props = obj.GetType().GetProperties().Where(p => p.GetIndexParameters().Length == 0).ToArray();
+            if (props.Length == 0) return null;
+
+            foreach (var prop in props)
+            {
+                var propType = prop.PropertyType;
+                var propValue = prop.GetValue(obj);
+
+                if (propValue == null) continue;
+                if (propType.Equals(typeof(TProperty)))
+                    return (TProperty)propValue;
+
+                var stopRecursion = propType.IsPrimitive ||
+                    propType.Equals(typeof(string)) ||
+                    propType.Equals(typeof(DataTable)) ||
+                    (propType.IsGenericType && propType.GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>))) ||
+                    (propType.IsGenericType && propType.GetGenericTypeDefinition().IsAssignableFrom(typeof(IEnumerable<>)));
+
+                if (!stopRecursion && propValue != null)
+                {
+                    var retValue = propValue.GetPropertyByType<TProperty>();
+                    if (retValue != null) return retValue;
+                }
+            }
+
+            return null;
         }
     }
 }

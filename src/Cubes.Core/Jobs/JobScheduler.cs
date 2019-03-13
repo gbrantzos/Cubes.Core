@@ -17,14 +17,17 @@ namespace Cubes.Core.Jobs
         private readonly List<(JobDefinition definition, JobExecution execution)> jobDetails;
         private readonly IScheduler quartzScheduler;
         private readonly ILogger<JobScheduler> logger;
-        private readonly ITypeResolver typeResolver;
+        private readonly ISerializer serializer;
 
-        public JobScheduler(ISettingsProvider settingsProvider, IScheduler quartzScheduler, ILogger<JobScheduler> logger, ITypeResolver typeResolver)
+        public JobScheduler(ISettingsProvider settingsProvider,
+            IScheduler quartzScheduler,
+            ILogger<JobScheduler> logger,
+            ISerializer serializer)
         {
             this.settingsProvider = settingsProvider;
             this.quartzScheduler = quartzScheduler;
             this.logger = logger;
-            this.typeResolver = typeResolver;
+            this.serializer = serializer;
             this.jobDetails = new List<(JobDefinition definition, JobExecution execution)>();
             this.LoadJobs();
         }
@@ -35,6 +38,7 @@ namespace Cubes.Core.Jobs
             {
                 State = quartzScheduler.InStandbyMode ? SchedulerState.Stopped : SchedulerState.Started,
                 ServerTime = DateTime.Now,
+                // TODO: Add jobs details!
             };
             return schedulerStatus;
         }
@@ -68,6 +72,7 @@ namespace Cubes.Core.Jobs
             }
             else
             {
+                quartzScheduler.Clear();
                 foreach (var job in activeJobs)
                 {
                     var trigger = TriggerBuilder
@@ -81,18 +86,18 @@ namespace Cubes.Core.Jobs
                             })
                         .StartNow();
                     var jobBuilder = JobBuilder
-                        .Create(typeResolver.GetByName("job.JobTypeName"))
+                        .Create<ExecuteCommandJob>()
                         .WithIdentity(job.definition.ID.ToString(), "Cubes")
                         .WithDescription(job.definition.Description);
-                    if (!String.IsNullOrEmpty(job.definition.ExecutionParameters))
-                        jobBuilder.UsingJobData(PARAMETERS_KEY, job.definition.ExecutionParameters);
+                    if (job.definition.ExecutionParameters != null)
+                        jobBuilder.UsingJobData(PARAMETERS_KEY, job.definition.ExecutionParameters.ToJson());
 
                     var scheduledJob = jobBuilder.Build();
                     quartzScheduler.ScheduleJob(scheduledJob, trigger.Build());
                     if (!job.definition.IsActive)
                         quartzScheduler.PauseJob(scheduledJob.Key);
                 }
-                quartzScheduler.Clear();
+                logger.LogInformation($"Starting job scheduler with {activeJobs.Count} active jobs.");
                 quartzScheduler.Start();
             }
             return GetStatus();
@@ -107,7 +112,6 @@ namespace Cubes.Core.Jobs
             }
             return GetStatus();
         }
-
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
