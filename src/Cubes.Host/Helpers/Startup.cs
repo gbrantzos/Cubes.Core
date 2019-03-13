@@ -1,6 +1,6 @@
 using System;
 using Cubes.Api;
-using Cubes.Api.StaticContent;
+using Cubes.Core;
 using Cubes.Core.Commands;
 using Cubes.Core.Environment;
 using Cubes.Core.Jobs;
@@ -32,10 +32,10 @@ namespace Cubes.Host.Helpers
         {
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddApplicationPart(typeof(SwaggerHelpers).Assembly);
-            services.AddCubesSwaggerServices(cubesEnvironment);
-            services.AddCubesCoreServices(configuration);
-            services.AddCubesApiServices();
+                .AddApplicationPart(typeof(CubesApiModule).Assembly);
+
+            services.AddCubesCore(configuration);
+            services.AddCubesApi(cubesEnvironment);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,17 +59,17 @@ namespace Cubes.Host.Helpers
             if (useSSL)
                 app.UseHttpsRedirection();
 
-            app.UseCubesContextProvider();
+            app.UseCubesApi(settingsProvider,
+                cubesEnvironment,
+                loggerFactory);
 
             app.UseMvc();
-            app.UseCubesSwagger();
-            app.UseCubesStaticContent(settingsProvider,
-                cubesEnvironment,
-                loggerFactory.CreateLogger<Content>());
-            app.UseCubesHomePage();
+
 
             jobScheduler.StartScheduler();
-            applicationLifetime.ApplicationStopping.Register(() => jobScheduler.StopScheduler());
+            applicationLifetime
+                .ApplicationStopping
+                .Register(() => jobScheduler.StopScheduler());
         }
     }
 

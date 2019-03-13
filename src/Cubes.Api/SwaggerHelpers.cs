@@ -11,7 +11,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-[assembly: SwaggerCategory("Core")]
+
 
 namespace Cubes.Api
 {
