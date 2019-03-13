@@ -13,6 +13,12 @@ namespace Cubes.Core.Jobs
     {
         public SchedulerState State { get; set; }
         public DateTime ServerTime { get; set; }
-        public IEnumerable<(JobDefinition Definition, JobExecution Execution)> JobDetails { get; set; }
+        public IEnumerable<JobStatus> Jobs { get; set; }
+    }
+
+    public class JobStatus
+    {
+        public JobDefinition Definition { get; set; }
+        public JobExecution Execution { get; set; }
     }
 }

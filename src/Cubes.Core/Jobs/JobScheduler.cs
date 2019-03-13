@@ -5,6 +5,7 @@ using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Logging;
 using Quartz;
+using Quartz.Impl.Matchers;
 
 namespace Cubes.Core.Jobs
 {
@@ -25,20 +26,39 @@ namespace Cubes.Core.Jobs
             ISerializer serializer)
         {
             this.settingsProvider = settingsProvider;
-            this.quartzScheduler = quartzScheduler;
-            this.logger = logger;
-            this.serializer = serializer;
-            this.jobDetails = new List<(JobDefinition definition, JobExecution execution)>();
-            this.LoadJobs();
+            this.quartzScheduler  = quartzScheduler;
+            this.logger           = logger;
+            this.serializer       = serializer;
+            this.jobDetails       = new List<(JobDefinition definition, JobExecution execution)>();
         }
 
         public SchedulerStatus GetStatus()
         {
+            var jobKeys = quartzScheduler
+                .GetJobKeys(GroupMatcher<Quartz.JobKey>.AnyGroup())
+                .Result
+                .Select(i => quartzScheduler.GetJobDetail(i).Result.Key.Name)
+                .ToList();
             var schedulerStatus = new SchedulerStatus
             {
                 State = quartzScheduler.InStandbyMode ? SchedulerState.Stopped : SchedulerState.Started,
                 ServerTime = DateTime.Now,
-                // TODO: Add jobs details!
+                Jobs = jobDetails
+                    .Where(i => jobKeys.Contains(i.definition.ID)) // Make sure defintion is loaded
+                    .Select(i => new JobStatus
+                    {
+                        Definition = i.definition,
+                        Execution = i.execution ?? new JobExecution
+                        {
+                            NextExecution = quartzScheduler.GetTriggersOfJob(new JobKey(i.definition.ID, "Cubes"))
+                                .Result
+                                .FirstOrDefault()?
+                                .GetNextFireTimeUtc()?
+                                .ToLocalTime()
+                                .DateTime
+                        }
+                    })
+                    .ToList()
             };
             return schedulerStatus;
         }
@@ -50,16 +70,11 @@ namespace Cubes.Core.Jobs
                 throw new ArgumentNullException("JobScheduler settings must define jobs!");
 
             if (jobs.Count == 0)
-            {
-                logger.LogWarning("No jobs defined, will not start JobScheduler!");
                 return;
-            }
-
+            
             jobDetails.Clear();
             foreach (var job in jobs)
-            {
                 jobDetails.Add((job, null));
-            }
         }
 
         public SchedulerStatus StartScheduler()

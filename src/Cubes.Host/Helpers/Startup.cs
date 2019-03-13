@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace Cubes.Host.Helpers
 {
@@ -31,8 +34,14 @@ namespace Cubes.Host.Helpers
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddApplicationPart(typeof(CubesApiModule).Assembly);
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
+                })
+                .AddApplicationPart(typeof(CubesApiModule).Assembly)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddCubesCore(configuration);
             services.AddCubesApi(cubesEnvironment);
