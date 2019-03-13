@@ -17,25 +17,5 @@ namespace Cubes.Core.Jobs
     {
         public string CommandType { get; set; }
         public object CommandInstance { get; set; }
-
-        public string ToJson()
-        {
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Include,
-                TypeNameHandling = TypeNameHandling.All
-            };
-            return JsonConvert.SerializeObject(this, settings);
-        }
-
-        public static JobParameter FromJson(string json)
-        {
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Include,
-                TypeNameHandling = TypeNameHandling.All
-            };
-            return JsonConvert.DeserializeObject<JobParameter>(json, settings);
-        }
     }
 }

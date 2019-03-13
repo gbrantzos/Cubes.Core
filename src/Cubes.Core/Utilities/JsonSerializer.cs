@@ -7,8 +7,7 @@ namespace Cubes.Core.Utilities
     {
         private JsonSerializerSettings settings = new JsonSerializerSettings
             {
-                NullValueHandling = NullValueHandling.Include,
-                TypeNameHandling = TypeNameHandling.All
+                NullValueHandling = NullValueHandling.Include
             };
 
         public object Deserialize(string objAsString, Type targetType)

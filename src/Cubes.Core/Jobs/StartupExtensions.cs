@@ -6,7 +6,7 @@ using Quartz.Simpl;
 
 namespace Cubes.Core.Jobs
 {
-    public static class Extensions
+    public static class StartupExtensions
     {
         public static void AddJobScheduler(this IServiceCollection services)
         {

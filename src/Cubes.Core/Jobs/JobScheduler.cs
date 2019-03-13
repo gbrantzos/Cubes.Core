@@ -90,7 +90,7 @@ namespace Cubes.Core.Jobs
                         .WithIdentity(job.definition.ID.ToString(), "Cubes")
                         .WithDescription(job.definition.Description);
                     if (job.definition.ExecutionParameters != null)
-                        jobBuilder.UsingJobData(PARAMETERS_KEY, job.definition.ExecutionParameters.ToJson());
+                        jobBuilder.UsingJobData(PARAMETERS_KEY, serializer.Serialize(job.definition.ExecutionParameters));
 
                     var scheduledJob = jobBuilder.Build();
                     quartzScheduler.ScheduleJob(scheduledJob, trigger.Build());

@@ -6,19 +6,19 @@ using Quartz.Spi;
 
 namespace Cubes.Core.Jobs
 {
-    public class CubesJobFactory : SimpleJobFactory
+    public class CubesJobFactory : SimpleJobFactory, IDisposable
     {
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceScope scope;
         public CubesJobFactory(IServiceProvider serviceProvider)
-            => this.serviceProvider = serviceProvider;
+            => this.scope = serviceProvider.CreateScope();
+
+        public void Dispose()
+            => scope.Dispose();
 
         public override IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
-        {
-            using(var scope = serviceProvider.CreateScope())
-            {
-                var job = scope.ServiceProvider.GetRequiredService(bundle.JobDetail.JobType);
-                return job as IJob;
-            }
-        }
+            => scope.ServiceProvider.GetService(bundle.JobDetail.JobType) as IJob;
+
+        public override void ReturnJob(IJob job)
+            => (job as IDisposable)?.Dispose();
     }
 }

@@ -5,6 +5,7 @@ using Cubes.Core.Email;
 using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Quartz;
 
@@ -12,22 +13,25 @@ namespace Cubes.Core.Jobs
 {
     public class ExecuteCommandJob : BaseQuartzJob
     {
+        class JobParameterInternal
+        {
+            public string CommandType { get; set; }
+            public string CommandInstance { get; set; }
+        }
+
         private readonly ILogger<ExecuteCommandJob> logger;
-        private readonly ISerializer serializer;
         private readonly ITypeResolver typeResolver;
         private readonly ICommandBus commandBus;
         private readonly ISettingsProvider settingsProvider;
         private readonly IEmailDispatcher emailDispatcher;
 
         public ExecuteCommandJob(ILogger<ExecuteCommandJob> logger,
-            ISerializer serializer,
             ITypeResolver typeResolver,
             ICommandBus commandBus,
             ISettingsProvider settingsProvider,
             IEmailDispatcher emailDispatcher)
         {
             this.logger = logger;
-            this.serializer = serializer;
             this.typeResolver = typeResolver;
             this.commandBus = commandBus;
             this.settingsProvider = settingsProvider;
@@ -35,11 +39,16 @@ namespace Cubes.Core.Jobs
         }
         public override Task ExecuteInternal(IJobExecutionContext context)
         {
-            JobParameter jobParameter = null;
+            JobParameterInternal jobParameter = null;
             try
             {
                 var prmAsString = context.JobDetail.JobDataMap.GetString(JobScheduler.PARAMETERS_KEY);
-                jobParameter = JobParameter.FromJson(prmAsString);
+                var jObject = JObject.Parse(prmAsString);
+                jobParameter = new JobParameterInternal
+                {
+                    CommandType     = jObject.GetValue("CommandType").ToString(),
+                    CommandInstance = jObject.GetValue("CommandInstance").ToString()
+                };
             }
             catch (Exception x)
             {
@@ -49,11 +58,11 @@ namespace Cubes.Core.Jobs
 
             try
             {
-                var commandType = typeResolver.GetByName(jobParameter.CommandType);
-                var command     = ((JObject)jobParameter.CommandInstance).ToObject(commandType);
+                var type    = typeResolver.GetByName(jobParameter.CommandType);
+                var command = JsonConvert.DeserializeObject(jobParameter.CommandInstance, type);
 
-                logger.LogInformation($"Executing '{commandType.Name}' ...");
-                var result = commandBus.Submit(jobParameter.CommandInstance);
+                logger.LogInformation($"Executing '{command.GetType().Name}' ...");
+                var result = commandBus.Submit(command);
                 if (result.ExecutionResult != CommandExecutionResult.Success)
                 {
                     logger.LogWarning(result.Message);
