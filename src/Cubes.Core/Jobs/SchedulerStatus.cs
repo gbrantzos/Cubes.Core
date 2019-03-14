@@ -19,6 +19,7 @@ namespace Cubes.Core.Jobs
     public class JobStatus
     {
         public JobDefinition Definition { get; set; }
-        public JobExecution Execution { get; set; }
+        public JobExecution LastExecution { get; set; }
+        public DateTime? NextExecutionAt { get; set; }
     }
 }

@@ -6,8 +6,7 @@ namespace Cubes.Core.Jobs
 {
     public abstract class BaseQuartzJob: IJob
     {
-        public const string MESSAGE_KEY = "ResultMessage";
-        public const string HASERRORS_KEY = "ResultHasErrors";
+
 
         private string resultMessage;
         private bool resultHasErrors;
@@ -19,15 +18,13 @@ namespace Cubes.Core.Jobs
                 var result = ExecuteInternal(context);
 
                 if (!String.IsNullOrEmpty(resultMessage))
-                    context.JobDetail.JobDataMap.Add(MESSAGE_KEY, resultMessage);
-                context.JobDetail.JobDataMap.Add(HASERRORS_KEY, false.ToString());
+                    context.JobDetail.JobDataMap.Add(QuartzJobDataParameters.MESSAGE_KEY, resultMessage);
 
                 return result;
             }
             catch (Exception x)
             {
-                context.JobDetail.JobDataMap.Add(HASERRORS_KEY, true.ToString());
-                context.JobDetail.JobDataMap.Add(MESSAGE_KEY, x.Message);
+                context.JobDetail.JobDataMap.Add(QuartzJobDataParameters.MESSAGE_KEY, x.Message);
                 throw new JobExecutionException(x);
             }
         }

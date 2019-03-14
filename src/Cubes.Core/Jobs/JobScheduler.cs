@@ -11,25 +11,25 @@ namespace Cubes.Core.Jobs
 {
     public class JobScheduler : IJobScheduler, IDisposable
     {
-        public const string PARAMETERS_KEY = "ExecutionParameters";
-
-
         private readonly ISettingsProvider settingsProvider;
-        private readonly List<(JobDefinition definition, JobExecution execution)> jobDetails;
+        private readonly List<JobDefinition> loadedJobs;
         private readonly IScheduler quartzScheduler;
+        private readonly IJobExecutionHistory jobExecutionHistory;
         private readonly ILogger<JobScheduler> logger;
         private readonly ISerializer serializer;
 
         public JobScheduler(ISettingsProvider settingsProvider,
             IScheduler quartzScheduler,
+            IJobExecutionHistory jobExecutionHistory,
             ILogger<JobScheduler> logger,
             ISerializer serializer)
         {
-            this.settingsProvider = settingsProvider;
-            this.quartzScheduler  = quartzScheduler;
-            this.logger           = logger;
-            this.serializer       = serializer;
-            this.jobDetails       = new List<(JobDefinition definition, JobExecution execution)>();
+            this.settingsProvider    = settingsProvider;
+            this.quartzScheduler     = quartzScheduler;
+            this.jobExecutionHistory = jobExecutionHistory;
+            this.logger              = logger;
+            this.serializer          = serializer;
+            this.loadedJobs          = new List<JobDefinition>();
         }
 
         public SchedulerStatus GetStatus()
@@ -43,20 +43,18 @@ namespace Cubes.Core.Jobs
             {
                 State = quartzScheduler.InStandbyMode ? SchedulerState.Stopped : SchedulerState.Started,
                 ServerTime = DateTime.Now,
-                Jobs = jobDetails
-                    .Where(i => jobKeys.Contains(i.definition.ID)) // Make sure defintion is loaded
+                Jobs = loadedJobs
+                    .Where(i => jobKeys.Contains(i.ID)) // Make sure defintion is loaded
                     .Select(i => new JobStatus
                     {
-                        Definition = i.definition,
-                        Execution = i.execution ?? new JobExecution
-                        {
-                            NextExecution = quartzScheduler.GetTriggersOfJob(new JobKey(i.definition.ID, "Cubes"))
+                        Definition      = i,
+                        LastExecution   = jobExecutionHistory.GetLast(i.ID),
+                        NextExecutionAt = quartzScheduler.GetTriggersOfJob(new JobKey(i.ID, "Cubes"))
                                 .Result
                                 .FirstOrDefault()?
                                 .GetNextFireTimeUtc()?
                                 .ToLocalTime()
                                 .DateTime
-                        }
                     })
                     .ToList()
             };
@@ -71,16 +69,16 @@ namespace Cubes.Core.Jobs
 
             if (jobs.Count == 0)
                 return;
-            
-            jobDetails.Clear();
+
+            loadedJobs.Clear();
             foreach (var job in jobs)
-                jobDetails.Add((job, null));
+                loadedJobs.Add(job);
         }
 
         public SchedulerStatus StartScheduler()
         {
             LoadJobs();
-            var activeJobs = jobDetails.Where(i => i.definition.IsActive).ToList();
+            var activeJobs = loadedJobs.Where(i => i.IsActive).ToList();
             if (activeJobs.Count == 0)
             {
                 logger.LogWarning("No active jobs defined, JobScheduler has nothing to do!");
@@ -92,9 +90,9 @@ namespace Cubes.Core.Jobs
                 {
                     var trigger = TriggerBuilder
                         .Create()
-                        .WithCronSchedule(job.definition.CronExpression, i =>
+                        .WithCronSchedule(job.CronExpression, i =>
                             {
-                                if (job.definition.FireIfMissed)
+                                if (job.FireIfMissed)
                                     i.WithMisfireHandlingInstructionFireAndProceed();
                                 else
                                     i.WithMisfireHandlingInstructionDoNothing();
@@ -102,14 +100,14 @@ namespace Cubes.Core.Jobs
                         .StartNow();
                     var jobBuilder = JobBuilder
                         .Create<ExecuteCommandJob>()
-                        .WithIdentity(job.definition.ID.ToString(), "Cubes")
-                        .WithDescription(job.definition.Description);
-                    if (job.definition.ExecutionParameters != null)
-                        jobBuilder.UsingJobData(PARAMETERS_KEY, serializer.Serialize(job.definition.ExecutionParameters));
+                        .WithIdentity(job.ID.ToString(), "Cubes")
+                        .WithDescription(job.Description);
+                    if (job.ExecutionParameters != null)
+                        jobBuilder.UsingJobData(QuartzJobDataParameters.PARAMETERS_KEY, serializer.Serialize(job.ExecutionParameters));
 
                     var scheduledJob = jobBuilder.Build();
                     quartzScheduler.ScheduleJob(scheduledJob, trigger.Build());
-                    if (!job.definition.IsActive)
+                    if (!job.IsActive)
                         quartzScheduler.PauseJob(scheduledJob.Key);
                 }
                 logger.LogInformation($"Starting job scheduler with {activeJobs.Count} active jobs.");

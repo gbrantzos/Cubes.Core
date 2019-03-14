@@ -42,7 +42,7 @@ namespace Cubes.Core.Jobs
             JobParameterInternal jobParameter = null;
             try
             {
-                var prmAsString = context.JobDetail.JobDataMap.GetString(JobScheduler.PARAMETERS_KEY);
+                var prmAsString = context.JobDetail.JobDataMap.GetString(QuartzJobDataParameters.PARAMETERS_KEY);
                 var jObject = JObject.Parse(prmAsString);
                 jobParameter = new JobParameterInternal
                 {
