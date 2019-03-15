@@ -53,8 +53,7 @@ namespace Cubes.Host.Helpers
             IHostingEnvironment env,
             ISettingsProvider settingsProvider,
             ICubesEnvironment cubesEnvironment,
-            IJobScheduler jobScheduler,
-            IApplicationLifetime applicationLifetime)
+            IJobScheduler jobScheduler)
         {
             var useSSL = configuration.GetValue<bool>("useSSL", false);
             if (env.IsDevelopment())
@@ -74,11 +73,8 @@ namespace Cubes.Host.Helpers
 
             app.UseMvc();
 
-
+            // Should we delegate this somewhere else ???
             jobScheduler.StartScheduler();
-            applicationLifetime
-                .ApplicationStopping
-                .Register(() => jobScheduler.StopScheduler());
         }
     }
 

@@ -29,6 +29,8 @@ namespace Cubes.Core.Jobs
             };
             if (context.JobDetail.JobDataMap.ContainsKey(QuartzJobDataParameters.MESSAGE_KEY))
                 jobExecution.ExecutionResult.Message = context.JobDetail.JobDataMap.GetString(QuartzJobDataParameters.MESSAGE_KEY);
+            if (jobException != null)
+                jobExecution.ExecutionResult.ExceptionThrown = jobException;
 
             executionHistory.Add(jobExecution);
             return Task.CompletedTask;

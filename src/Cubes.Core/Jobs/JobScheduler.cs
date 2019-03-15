@@ -126,6 +126,15 @@ namespace Cubes.Core.Jobs
             return GetStatus();
         }
 
+        public void ExecuteJob(string jobID)
+        {
+            var job = this.loadedJobs.FirstOrDefault(i => i.ID.Equals(jobID));
+            if (job == null)
+                throw new ArgumentException($"Job with ID {jobID} not found!");
+
+            var jobData = new JobDataMap();
+            this.quartzScheduler.TriggerJob(new JobKey(jobID, "Cubes"));
+        }
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

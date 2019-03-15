@@ -6,5 +6,6 @@ namespace Cubes.Core.Jobs
          SchedulerStatus GetStatus();
          SchedulerStatus StartScheduler();
          SchedulerStatus StopScheduler();
+         void ExecuteJob(string jobID);
     }
 }

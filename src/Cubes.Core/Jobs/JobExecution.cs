@@ -4,6 +4,7 @@ namespace Cubes.Core.Jobs
 {
     public class JobExecution
     {
+        public Guid ID { get; set; } = Guid.NewGuid();
         public string JobID { get; set; }
         public DateTime? ExecutedAt { get; set; }
         public TimeSpan Duration { get; set; }
