@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
-using Quartz.Simpl;
 
 namespace Cubes.Core.Jobs
 {
@@ -12,7 +11,6 @@ namespace Cubes.Core.Jobs
         public static void AddJobScheduler(this IServiceCollection services)
         {
             services.AddTransient<CubesJobFactory>();
-            services.AddSingleton<IJobExecutionHistory, JobExecutionHistory>();
             services.AddSingleton<IScheduler>(s =>
             {
                 var properties = new NameValueCollection
@@ -35,7 +33,7 @@ namespace Cubes.Core.Jobs
                 return scheduler;
             });
             services.AddSingleton<IJobScheduler, JobScheduler>();
-
+            services.AddSingleton<IJobExecutionHistory, JobExecutionHistory>();
 
             // Register jobs
             services.AddScoped<ExecuteCommandJob>();

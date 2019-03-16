@@ -28,7 +28,7 @@ namespace Cubes.Core.Commands
 
             try
             {
-                logger.LogDebug($"Command submitted => {command.ToString()}");
+                logger.LogInformation($"Command submitted => {command.ToString()}");
                 var result = handler.Handle(command);
                 logger.LogInformation($"Command result => {result.Message}");
 
