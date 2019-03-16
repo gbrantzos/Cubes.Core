@@ -135,6 +135,7 @@ namespace Cubes.Core.Jobs
             var jobData = new JobDataMap();
             this.quartzScheduler.TriggerJob(new JobKey(jobID, "Cubes"));
         }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

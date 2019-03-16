@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Cubes.Api.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class SchedulerController : ControllerBase
+    public class JobsController : ControllerBase
     {
         private readonly IJobScheduler jobScheduler;
         private readonly IJobExecutionHistory executionHistory;
 
-        public SchedulerController(IJobScheduler jobScheduler, IJobExecutionHistory executionHistory)
+        public JobsController(IJobScheduler jobScheduler, IJobExecutionHistory executionHistory)
         {
             this.jobScheduler = jobScheduler;
             this.executionHistory = executionHistory;

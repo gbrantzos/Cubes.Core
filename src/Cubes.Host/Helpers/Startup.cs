@@ -1,7 +1,5 @@
-using System;
 using Cubes.Api;
 using Cubes.Core;
-using Cubes.Core.Commands;
 using Cubes.Core.Environment;
 using Cubes.Core.Jobs;
 using Cubes.Core.Settings;
@@ -53,7 +51,8 @@ namespace Cubes.Host.Helpers
             IHostingEnvironment env,
             ISettingsProvider settingsProvider,
             ICubesEnvironment cubesEnvironment,
-            IJobScheduler jobScheduler)
+            IJobScheduler jobScheduler,
+            IApplicationLifetime applicationLifetime)
         {
             var useSSL = configuration.GetValue<bool>("useSSL", false);
             if (env.IsDevelopment())
@@ -75,19 +74,6 @@ namespace Cubes.Host.Helpers
 
             // Should we delegate this somewhere else ???
             jobScheduler.StartScheduler();
-        }
-    }
-
-
-    public class LoggingMiddleware<TCommand, TResult> : ICommandBusMiddleware<TCommand, TResult> where TResult : ICommandResult
-    {
-        public TResult Execute(TCommand command, CommandHandlerDelegate<TResult> next)
-        {
-            Console.WriteLine("Before execution");
-            var res = next();
-            Console.WriteLine("After execution");
-
-            return res;
         }
     }
 }

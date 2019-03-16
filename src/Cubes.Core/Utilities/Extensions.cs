@@ -110,5 +110,19 @@ namespace Cubes.Core.Utilities
 
             return null;
         }
+
+        /// <summary>
+        /// Remove suffix from end
+        /// </summary>
+        /// <param name="str">Source string</param>
+        /// <param name="suffix">Suffix to remove</param>
+        /// <returns></returns>
+        public static string RemoveSuffix(this string str, string suffix)
+        {
+            if (str.EndsWith(suffix, StringComparison.CurrentCultureIgnoreCase))
+                return str.Substring(0, str.Length - suffix.Length);
+            else
+                return str;
+        }
     }
 }
