@@ -81,7 +81,7 @@ namespace Cubes.Core.Jobs
             var activeJobs = loadedJobs.Where(i => i.IsActive).ToList();
             if (activeJobs.Count == 0)
             {
-                logger.LogWarning("No active jobs defined, JobScheduler has nothing to do!");
+                logger.LogWarning("No active jobs defined, Job Scheduler has nothing to do!");
             }
             else
             {
@@ -120,7 +120,7 @@ namespace Cubes.Core.Jobs
         {
             if (quartzScheduler.IsStarted)
             {
-                logger.LogInformation("Stoping JobScheduler.");
+                logger.LogInformation("Stoping Job Scheduler.");
                 quartzScheduler.Standby();
             }
             return GetStatus();

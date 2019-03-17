@@ -4,20 +4,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cubes.Core.Environment;
+using Cubes.Core.Settings;
 using LiteDB;
 
 namespace Cubes.Core.Jobs
 {
     public class JobExecutionHistory : IJobExecutionHistory, IDisposable
     {
-        // TODO: Cleanhistory should be run on schedule
-        // TODO: Clean history of deleted jobs ???
+        // TODO Cleanhistory should be run on schedule
 
         private readonly LiteDatabase liteDb;
-        public JobExecutionHistory(ICubesEnvironment environment)
+        public JobExecutionHistory(ICubesEnvironment environment, ISettingsProvider settingsProvider)
         {
             this.environment = environment;
-
+            this.settingsProvider = settingsProvider;
             var path = Path.Combine(environment.GetStorageFolder(), "Core.JobExecutionHistory.db");
             var connectionString = $"Filename={path};Mode=Exclusive";
             this.liteDb = new LiteDatabase(connectionString);
@@ -25,6 +25,7 @@ namespace Cubes.Core.Jobs
 
         private ConcurrentDictionary<string, JobExecution> lastExecution = new ConcurrentDictionary<string, JobExecution>();
         private readonly ICubesEnvironment environment;
+        private readonly ISettingsProvider settingsProvider;
 
         public void Add(JobExecution jobExecution)
         {
@@ -76,6 +77,26 @@ namespace Cubes.Core.Jobs
             return entriesDeleted;
         }
 
+        private void RemoveOrphans()
+        {
+            var col = liteDb.GetCollection<JobExecution>();
+            var settings = settingsProvider.Load<JobSchedulerSettings>();
+            var existing = settings
+                .Jobs
+                .Select(i => i.ID)
+                .Distinct()
+                .ToList();
+            var orphans = col
+                .FindAll()
+                .Select(i => i.JobID)
+                .Distinct()
+                .Where(i => !existing.Contains(i))
+                .ToList();
+
+            foreach (var item in orphans)
+                ClearHistory(item, new HistoryRetentionOptions { KeepLastTimes = 0 });
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
@@ -85,7 +106,9 @@ namespace Cubes.Core.Jobs
             {
                 if (disposing)
                 {
-                    // liteDb?.Shrink(); // TODO: Seems to crash on macOS, is it a bug???
+                    RemoveOrphans();
+                    // TODO Seems to crash on macOS, is it a bug???
+                    // liteDb?.Shrink(); 
                     liteDb?.Dispose();
                 }
                 disposedValue = true;

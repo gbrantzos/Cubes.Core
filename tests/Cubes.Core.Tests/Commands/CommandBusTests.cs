@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cubes.Core.Commands;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -15,6 +16,7 @@ namespace Cubes.Core.Tests.Commands
         [Fact]
         public void When_SampleCommandSubmitted_SampleResultReturned()
         {
+            var loggerFactoryMock = GetMockLoggerFactory();
             var factoryMock = mockRepository.Create<ServiceFactory>(MockBehavior.Strict);
             factoryMock
                 .Setup(f => f(typeof(ICommandHandler<SampleCommand, SampleResult>)))
@@ -23,7 +25,7 @@ namespace Cubes.Core.Tests.Commands
                 .Setup(f => f(typeof(IEnumerable<ICommandBusMiddleware<SampleCommand, SampleResult>>)))
                 .Returns(new ICommandBusMiddleware<SampleCommand, SampleResult>[] { });
 
-            var bus = new CommandBus(factoryMock.Object);
+            var bus = new CommandBus(factoryMock.Object, loggerFactoryMock);
             var command = new SampleCommand { ID = 1 };
             
             var result = bus.Submit(command);
@@ -35,7 +37,8 @@ namespace Cubes.Core.Tests.Commands
         [Fact]
         public void When_NullSubmitted_ArgumentNullExceptionRaised()
         {
-            var bus = new CommandBus(mockRepository.Create<ServiceFactory>().Object);
+            var loggerFactoryMock = GetMockLoggerFactory(setup: false);
+            var bus = new CommandBus(mockRepository.Create<ServiceFactory>().Object, loggerFactoryMock);
             Assert.Throws<ArgumentNullException>(() =>
             {
                 bus.Submit((SampleCommand)null);
@@ -45,12 +48,13 @@ namespace Cubes.Core.Tests.Commands
         [Fact]
         public void When_UnregisteredCommandSubmitted_CommandHandlerResolveExceptionRaised()
         {
+            var loggerFactoryMock = GetMockLoggerFactory();
             var factoryMock = mockRepository.Create<ServiceFactory>(MockBehavior.Strict);
             
             factoryMock
                 .Setup(f => f(typeof(IEnumerable<ICommandBusMiddleware<SampleCommand, SampleResult>>)))
                 .Returns(new ICommandBusMiddleware<SampleCommand, SampleResult>[] { });
-            var bus = new CommandBus(factoryMock.Object);
+            var bus = new CommandBus(factoryMock.Object, loggerFactoryMock);
             Action act = () => bus.Submit(new SampleCommand());
 
             var exc = Record.Exception(act);
@@ -63,6 +67,7 @@ namespace Cubes.Core.Tests.Commands
         [Fact]
         public void When_MiddlewareIsRegistered_ResultCanBeMutated()
         {
+            var loggerFactoryMock = GetMockLoggerFactory();
             var factoryMock = mockRepository.Create<ServiceFactory>(MockBehavior.Strict);
             factoryMock
                 .Setup(f => f(typeof(ICommandHandler<SampleCommand, SampleResult>)))
@@ -71,7 +76,7 @@ namespace Cubes.Core.Tests.Commands
                 .Setup(f => f(typeof(IEnumerable<ICommandBusMiddleware<SampleCommand, SampleResult>>)))
                 .Returns(new ICommandBusMiddleware<SampleCommand, SampleResult>[] { new SampleMiddleware() });
 
-            var bus = new CommandBus(factoryMock.Object);
+            var bus = new CommandBus(factoryMock.Object, loggerFactoryMock);
             var command = new SampleCommand { ID = 1 };
             var result = bus.Submit(command);
 
@@ -79,6 +84,25 @@ namespace Cubes.Core.Tests.Commands
             Assert.Equal("Mutated by middleware", result.Message);
         }
 
+        public ILoggerFactory GetMockLoggerFactory(bool setup = true)
+        {
+            var loggerMock = mockRepository.Create<ILogger<CommandBus>>();
+            var loggerFactoryMock = mockRepository.Create<ILoggerFactory>();
+            loggerFactoryMock
+                  .Setup(l => l.CreateLogger(It.IsAny<string>()))
+                  .Returns(loggerMock.Object);
+            if (setup)
+            {
+                loggerMock
+                .Setup(i => i.Log(
+                    It.IsAny<LogLevel>(),
+                    0,
+                    It.IsAny<object>(),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<object, Exception, string>>()));
+            }
+            return loggerFactoryMock.Object;
+        }
     }
 
     class SampleMiddleware : ICommandBusMiddleware<SampleCommand, SampleResult>

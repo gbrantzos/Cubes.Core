@@ -111,13 +111,15 @@ namespace Cubes.Core.Commands
                 .Reverse()
                 .Aggregate((CommandHandlerDelegate<TResult>)baseHandler, (next, middleware) => () =>
                     {
+                        var middlewareType = middleware.GetType();
                         var ti = new TrackInfo
                         {
-                            MiddlewareType = middleware
-                                .GetType()
-                                .GetGenericTypeDefinition()
-                                .FullName
-                                .RemoveSuffix("`2"),
+                            MiddlewareType = middlewareType.IsGenericType ?
+                                middlewareType
+                                    .GetGenericTypeDefinition()
+                                    .FullName
+                                    .RemoveSuffix("`2") :
+                                middlewareType.GetType().FullName,
                             StartedAt      = DateTime.Now
                         };
                         tracking.Add(ti);
