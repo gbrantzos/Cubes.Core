@@ -98,6 +98,23 @@ namespace Cubes.Core.Tests.Settings
 
             Assert.True(result.AreEqual, result.DifferencesString);
         }
+
+        [Fact]
+        public void When_KeyEqualsDefault_KeyIsSetToEmpty()
+        {
+            var fsMock = new MockFileSystem();
+            var rootPath = "C:/Cubes/Settings";
+            fsMock.AddDirectory(rootPath);
+            var provider = new JsonFilesSettingsProvider(rootPath, fsMock);
+
+            var expected = "Sample.SampleSettingsWithAttribute.json";
+            var actual = (string)GetPrivateMethod<JsonFilesSettingsProvider>("CreateFileName")
+                .Invoke(provider, new object[] { typeof(SampleSettingsWithAttribute), "default" });
+            var settingsFullPath = $"{rootPath}/{expected}";
+
+            Assert.Equal(expected, actual);
+        }
+
         private MethodInfo GetPrivateMethod<T>(string methodName)
         {
             var type = typeof(T);

@@ -39,6 +39,7 @@ namespace Cubes.Core.Settings
         #region ISettingsProvider implementation
         public object Load(Type settingsType, string key)
         {
+            if (key.Equals("default", StringComparison.CurrentCultureIgnoreCase)) key = String.Empty;
             var returnValue = Activator.CreateInstance(settingsType);
             var configFile = fs.Path.Combine(baseFolder, CreateFileName(settingsType, key));
             if (!fs.File.Exists(configFile))
@@ -51,6 +52,7 @@ namespace Cubes.Core.Settings
 
         public void Save(Type settingsType, object settingsObj, string key)
         {
+            if (key.Equals("default", StringComparison.CurrentCultureIgnoreCase)) key = String.Empty;
             var configFile = fs.Path.Combine(baseFolder, CreateFileName(settingsType, key));
             fs.FileInfo.FromFileName(configFile).Directory.Create();
             fs.File.WriteAllText(configFile, ProviderSpecificSerialize(settingsObj));
@@ -86,6 +88,8 @@ namespace Cubes.Core.Settings
 
         protected string CreateFileName(Type settingsType, string key)
         {
+            if (key.Equals("default", StringComparison.CurrentCultureIgnoreCase)) key = String.Empty;
+
             // Get name parts
             var fileName = settingsType.Name;
 

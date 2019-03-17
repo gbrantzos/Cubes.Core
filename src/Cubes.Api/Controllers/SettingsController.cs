@@ -1,29 +1,40 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using Cubes.Core.Settings;
+using Cubes.Core.Utilities;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using YamlDotNet.Serialization;
 
 namespace Cubes.Api.Controllers
 {
     [ApiController, Route("api/[controller]")]
-        public class SettingsController : ControllerBase
+    public class SettingsController : ControllerBase
     {
-        [HttpPost]
-        public ActionResult Parse([FromBody]string raw)
+        private readonly ITypeResolver typeResolver;
+        private readonly ISettingsProvider settingsProvider;
+
+        public SettingsController(ITypeResolver typeResolver, ISettingsProvider settingsProvider)
         {
-            var r = new StringReader(raw);
-            var deserializer = new Deserializer().Deserialize(r);
+            this.typeResolver = typeResolver;
+            this.settingsProvider = settingsProvider;
+        }
 
-            //var yamlObject = deserializer.Deserialize<dynamic>(r)["TestPaySignService"].Values;
+        /// <summary>
+        /// Get settings using <see cref="ISettingsProvider"/>.
+        /// </summary>
+        /// <remarks>
+        /// Provides access to settings 
+        /// </remarks>
+        /// <param name="settingsType">Settings type</param>
+        /// <param name="profile">Settings profile. Default profile returned if profile equals "default".</param>
+        /// <returns></returns>
+        [HttpGet, Route("{settingsType}/{profile=default}")]
+        public ActionResult Get(string settingsType, string profile = "default")
+        {
+            var type = typeResolver.GetByName(settingsType);
+            if (type == null)
+                return BadRequest($"Could not resolve setting type: {settingsType}");
 
-            // just to print the json
-            //var serializer = new JsonSerializer();
-            //serializer.Serialize(Console.Out, yamlObject);
-
-            return Ok(raw);
+            var settings = settingsProvider.Load(type, profile.Equals("default", StringComparison.CurrentCultureIgnoreCase) ? String.Empty : profile);
+            return Ok(settings);
         }
     }
 }
