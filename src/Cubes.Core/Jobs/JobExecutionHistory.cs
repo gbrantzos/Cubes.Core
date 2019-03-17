@@ -11,8 +11,6 @@ namespace Cubes.Core.Jobs
 {
     public class JobExecutionHistory : IJobExecutionHistory, IDisposable
     {
-        // TODO Cleanhistory should be run on schedule
-
         private readonly LiteDatabase liteDb;
         public JobExecutionHistory(ICubesEnvironment environment, ISettingsProvider settingsProvider)
         {
@@ -107,8 +105,7 @@ namespace Cubes.Core.Jobs
                 if (disposing)
                 {
                     RemoveOrphans();
-                    // TODO Seems to crash on macOS, is it a bug???
-                    // liteDb?.Shrink(); 
+                    liteDb?.Shrink(); 
                     liteDb?.Dispose();
                 }
                 disposedValue = true;
