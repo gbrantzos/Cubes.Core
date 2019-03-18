@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,70 +8,51 @@ using Cubes.Core.Settings;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 
-namespace Cubes.Core.Jobs
+namespace Cubes.Core.Commands.Middleware.ExecutionHistory
 {
-    public class JobExecutionHistory : IJobExecutionHistory, IDisposable
+    public class CommandExecutionHistory : ICommandExecutionHistory, IDisposable
     {
         private readonly LiteDatabase liteDb;
-        private readonly ILogger<JobExecutionHistory> logger;
+        private readonly ICubesEnvironment environment;
+        private readonly ISettingsProvider settingsProvider;
+        private readonly ILogger<CommandExecutionHistory> logger;
         private Timer timer;
 
-        public JobExecutionHistory(ICubesEnvironment environment, ISettingsProvider settingsProvider, ILogger<JobExecutionHistory> logger)
+        public CommandExecutionHistory(ICubesEnvironment environment, ISettingsProvider settingsProvider, ILogger<CommandExecutionHistory> logger)
         {
-            var path = Path.Combine(environment.GetStorageFolder(), "Core.JobExecutionHistory.db");
+            var path = Path.Combine(environment.GetStorageFolder(), "Core.CommandExecutionHistory.db");
             var connectionString = $"Filename={path};Mode=Exclusive";
 
-            this.logger           = logger;
             this.environment      = environment;
             this.settingsProvider = settingsProvider;
+            this.logger           = logger;
             this.liteDb           = new LiteDatabase(connectionString);
 
             // Setup clean up timer
-            var settings = settingsProvider.Load<JobSchedulerSettings>();
+            var settings = settingsProvider.Load<CommandExecutionHistorySettings>();
             var interval = 1000 * settings.MonitoringIntervalSecs;
             if (interval > 0)
-                this.timer = new Timer((t) => ClearHistoryForAllJobs(), null, interval, interval);
+                this.timer = new Timer((t) => ClearHistory(), null, interval, interval);
         }
 
-        private ConcurrentDictionary<string, JobExecution> lastExecution = new ConcurrentDictionary<string, JobExecution>();
-        private readonly ICubesEnvironment environment;
-        private readonly ISettingsProvider settingsProvider;
-
-        public void Add(JobExecution jobExecution)
+        #region interface implementation
+        public void Add(CommandExecution commandExecution)
         {
-            lastExecution.AddOrUpdate(jobExecution.JobID,
-                jobExecution,
-                (key, value) => value = jobExecution);
-
-            var col = liteDb.GetCollection<JobExecution>();
-            col.Insert(jobExecution);
-            col.EnsureIndex(j => j.JobID);
-            col.EnsureIndex(j => j.ExecutedAt);
+            var col = liteDb.GetCollection<CommandExecution>();
+            col.Insert(commandExecution);
+            col.EnsureIndex(c => c.CommandType);
+            col.EnsureIndex(c => c.ExecutedAt);
         }
 
-        public IEnumerable<JobExecution> GetAll(string jobID)
-        {
-            var col = liteDb.GetCollection<JobExecution>();
-            return col.Find(j => j.JobID == jobID);
-        }
-
-        public JobExecution GetLast(string jobID)
-        {
-            if (lastExecution.TryGetValue(jobID, out JobExecution jobExecution))
-                return jobExecution;
-            else
-                return null;
-        }
-
-        public int ClearHistory(string jobID, HistoryRetentionOptions options)
+        public int Delete(string commandType, HistoryRetentionOptions options)
         {
             int entriesDeleted = 0;
-            var col = liteDb.GetCollection<JobExecution>();
+            var col = liteDb.GetCollection<CommandExecution>();
             if (options.KeepLastDays.HasValue && options.KeepLastDays.Value >= 0)
             {
                 var untilDate = DateTime.Now.Date.AddDays(-1 * options.KeepLastDays.Value);
                 if (untilDate > DateTime.Now.Date) untilDate = DateTime.Now.Date;
-                entriesDeleted = col.Delete(x => x.JobID == jobID && x.ExecutedAt < untilDate);
+                entriesDeleted = col.Delete(x => x.CommandType.Equals(commandType, StringComparison.CurrentCultureIgnoreCase) && x.ExecutedAt < untilDate);
 
                 return entriesDeleted;
             }
@@ -80,7 +60,7 @@ namespace Cubes.Core.Jobs
             if (options.KeepLastTimes.HasValue && options.KeepLastTimes.Value >= 0)
             {
                 var toDelete = col
-                    .Find(x => x.JobID == jobID)
+                    .Find(x => x.CommandType.Equals(commandType, StringComparison.CurrentCultureIgnoreCase))
                     .OrderByDescending(x => x.ExecutedAt)
                     .Skip(options.KeepLastTimes.Value)
                     .Select(x => x.ID)
@@ -92,26 +72,34 @@ namespace Cubes.Core.Jobs
             return entriesDeleted;
         }
 
-        private void ClearHistoryForAllJobs()
+        public IEnumerable<CommandExecution> Get(string commandType)
         {
-            var settings = settingsProvider.Load<JobSchedulerSettings>();
+            var col = liteDb.GetCollection<CommandExecution>();
+            return col.Find(c => c.CommandType.Equals(commandType, StringComparison.CurrentCultureIgnoreCase));
+        }
+        #endregion
+
+        #region Helpers
+        private void ClearHistory()
+        {
+            var settings = settingsProvider.Load<CommandExecutionHistorySettings>();
             if (this.timer != null)
                 timer.Change(Timeout.Infinite, Timeout.Infinite);
 
             logger.LogDebug("House keeping ...");
-            ClearHistoryForAllJobsInternal(settings);
+            ClearHistoryInternal(settings);
 
             var interval = 1000 * settings.MonitoringIntervalSecs;
             if (interval > 0)
                 timer.Change(interval, interval);
         }
 
-        private void ClearHistoryForAllJobsInternal(JobSchedulerSettings settings)
+        private void ClearHistoryInternal(CommandExecutionHistorySettings settings)
         {
             var options = settings.RetentionOptions;
             if (options == null)
                 return;
-            var col = liteDb.GetCollection<JobExecution>();
+            var col = liteDb.GetCollection<CommandExecution>();
             if (options.KeepLastDays.HasValue && options.KeepLastDays.Value >= 0)
             {
                 var untilDate = DateTime.Now.Date.AddDays(-1 * options.KeepLastDays.Value);
@@ -123,15 +111,11 @@ namespace Cubes.Core.Jobs
 
             if (options.KeepLastTimes.HasValue && options.KeepLastTimes.Value >= 0)
             {
-                var allIDs = settings
-                    .Jobs
-                    .Select(i => i.ID)
-                    .Distinct()
-                    .ToList();
-                foreach (var jobID in allIDs)
+                var allCommandTypes = GetAvailableCommands();
+                foreach (var commandType in allCommandTypes)
                 {
                     var toDelete = col
-                        .Find(x => x.JobID == jobID)
+                        .Find(x => x.CommandType.Equals(commandType, StringComparison.CurrentCultureIgnoreCase))
                         .OrderByDescending(x => x.ExecutedAt)
                         .Skip(options.KeepLastTimes.Value)
                         .Select(x => x.ID)
@@ -142,25 +126,19 @@ namespace Cubes.Core.Jobs
             }
         }
 
-        private void RemoveOrphans()
+        private IEnumerable<string> GetAvailableCommands()
         {
-            var col = liteDb.GetCollection<JobExecution>();
-            var settings = settingsProvider.Load<JobSchedulerSettings>();
-            var existing = settings
-                .Jobs
-                .Select(i => i.ID)
-                .Distinct()
+            var commandType = typeof(ICommand<>);
+            var commandTypes = AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.IsCommand())
+                .Select(t => t.FullName)
                 .ToList();
-            var orphans = col
-                .FindAll()
-                .Select(i => i.JobID)
-                .Distinct()
-                .Where(i => !existing.Contains(i))
-                .ToList();
-
-            foreach (var item in orphans)
-                ClearHistory(item, new HistoryRetentionOptions { KeepLastTimes = 0 });
+            return commandTypes;
         }
+        #endregion
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
@@ -171,8 +149,7 @@ namespace Cubes.Core.Jobs
             {
                 if (disposing)
                 {
-                    RemoveOrphans();
-                    ClearHistoryForAllJobs();
+                    ClearHistory();
 
                     liteDb?.Shrink();
                     liteDb?.Dispose();
@@ -182,7 +159,6 @@ namespace Cubes.Core.Jobs
                 disposedValue = true;
             }
         }
-
         public void Dispose() => Dispose(true);
         #endregion
     }

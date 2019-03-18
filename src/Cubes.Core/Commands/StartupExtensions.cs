@@ -1,3 +1,4 @@
+using Cubes.Core.Commands.Middleware.ExecutionHistory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cubes.Core.Commands
@@ -8,6 +9,7 @@ namespace Cubes.Core.Commands
         {
             services.AddScoped<ServiceFactory>(p => p.GetService);
             services.AddScoped<ICommandBus, CommandBus>();
+            services.AddSingleton<ICommandExecutionHistory, CommandExecutionHistory>();
 
             // Add command handlers
             services.Scan(s => s
@@ -17,10 +19,14 @@ namespace Cubes.Core.Commands
                 .WithScopedLifetime());
 
             // Add command middleware
+            /*
             services.Scan(s => s
                 .FromApplicationDependencies()
                 .AddClasses(c => c.AssignableTo(typeof(ICommandBusMiddleware<,>)))
                 .AsImplementedInterfaces());
+            */
+
+            services.AddTransient(typeof(ICommandBusMiddleware<,>), typeof(CommandExecutionHistoryMiddleware<,>));
 
             /*
             var types = System.AppDomain
