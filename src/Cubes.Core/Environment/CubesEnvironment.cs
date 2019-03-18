@@ -1,4 +1,6 @@
+using Cubes.Core.Jobs;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,6 +45,12 @@ namespace Cubes.Core.Environment
         public CubesEnvironmentInformation GetEnvironmentInformation() => this.environmentInformation;
 
         public IEnumerable<CubesLoadedApp> GetLoadedApps() => this.loadedApps;
+
+        public void Start(IServiceProvider serviceProvider)
+        {
+            var jobScheduler = serviceProvider.GetService<IJobScheduler>();
+            jobScheduler.StartScheduler();
+        }
         #endregion
 
         // The following methods are use for environment - server setup
@@ -70,7 +78,7 @@ namespace Cubes.Core.Environment
                     loadedApps.Add(new CubesLoadedApp
                     {
                         File            = Path.GetFileName(file),
-                        AssemlbyName    = asm.GetName().Name,
+                        AssemblyName    = asm.GetName().Name,
                         AssemblyVersion = asm.GetName().Version.ToString()
                     });
                 }

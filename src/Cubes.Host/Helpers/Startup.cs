@@ -1,7 +1,6 @@
 using Cubes.Api;
 using Cubes.Core;
 using Cubes.Core.Environment;
-using Cubes.Core.Jobs;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,9 +22,9 @@ namespace Cubes.Host.Helpers
 
         public Startup(IConfiguration configuration, ICubesEnvironment cubesEnvironment, ILoggerFactory loggerFactory)
         {
-            this.configuration    = configuration;
+            this.configuration = configuration;
             this.cubesEnvironment = cubesEnvironment;
-            this.loggerFactory    = loggerFactory;
+            this.loggerFactory = loggerFactory;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -49,31 +48,25 @@ namespace Cubes.Host.Helpers
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
-            ISettingsProvider settingsProvider,
-            ICubesEnvironment cubesEnvironment,
-            IJobScheduler jobScheduler,
-            IApplicationLifetime applicationLifetime)
+            ISettingsProvider settingsProvider)
         {
             var useSSL = configuration.GetValue<bool>("useSSL", false);
-            if (env.IsDevelopment())
-                app.UseDeveloperExceptionPage();
-            else
-            {
-                if (useSSL)
-                    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                    app.UseHsts();
-            }
             if (useSSL)
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
                 app.UseHttpsRedirection();
+            }
 
+            // Should be called as soon as possible.
             app.UseCubesApi(settingsProvider,
                 cubesEnvironment,
                 loggerFactory);
 
             app.UseMvc();
 
-            // Should we delegate this somewhere else ???
-            jobScheduler.StartScheduler();
+            // Finally start Cubes
+            cubesEnvironment.Start(serviceProvider: app.ApplicationServices);
         }
     }
 }

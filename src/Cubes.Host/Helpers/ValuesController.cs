@@ -41,7 +41,7 @@ namespace Cubes.Host.Helpers
         {
             return "value";
         }
-        
+
         // POST api/values
         [HttpPost]
         public void Post([FromBody] string value)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Cubes.Core.Environment
@@ -7,12 +8,14 @@ namespace Cubes.Core.Environment
         string GetFolder(CubesFolderKind folderKind);
         CubesEnvironmentInformation GetEnvironmentInformation();
         IEnumerable<CubesLoadedApp> GetLoadedApps();
+
+        void Start(IServiceProvider serviceProvider);
     }
 
     public class CubesLoadedApp
     {
         public string File { get; set; }
-        public string AssemlbyName { get; set; }
+        public string AssemblyName { get; set; }
         public string AssemblyVersion { get; set; }
 
     }
