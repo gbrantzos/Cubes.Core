@@ -3,22 +3,35 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
 using LiteDB;
+using Microsoft.Extensions.Logging;
 
 namespace Cubes.Core.Jobs
 {
     public class JobExecutionHistory : IJobExecutionHistory, IDisposable
     {
         private readonly LiteDatabase liteDb;
-        public JobExecutionHistory(ICubesEnvironment environment, ISettingsProvider settingsProvider)
+        private readonly ILogger<JobExecutionHistory> logger;
+        private Timer timer;
+
+        public JobExecutionHistory(ICubesEnvironment environment, ISettingsProvider settingsProvider, ILogger<JobExecutionHistory> logger)
         {
-            this.environment = environment;
-            this.settingsProvider = settingsProvider;
             var path = Path.Combine(environment.GetStorageFolder(), "Core.JobExecutionHistory.db");
             var connectionString = $"Filename={path};Mode=Exclusive";
-            this.liteDb = new LiteDatabase(connectionString);
+
+            this.logger           = logger;
+            this.environment      = environment;
+            this.settingsProvider = settingsProvider;
+            this.liteDb           = new LiteDatabase(connectionString);
+
+            // Setup clean up timer
+            var settings = settingsProvider.Load<JobSchedulerSettings>();
+            var interval = 1000 * settings.MonitoringIntervalSecs;
+            if (interval > 0)
+                this.timer = new Timer((t) => ClearHistoryForAllJobs(), null, interval, interval);
         }
 
         private ConcurrentDictionary<string, JobExecution> lastExecution = new ConcurrentDictionary<string, JobExecution>();
@@ -54,18 +67,21 @@ namespace Cubes.Core.Jobs
         {
             int entriesDeleted = 0;
             var col = liteDb.GetCollection<JobExecution>();
-            if (options.KeepUntil.HasValue)
+            if (options.KeepLastDays.HasValue && options.KeepLastDays.Value >= 0)
             {
-                var untilDate = options.KeepUntil.Value;
+                var untilDate = DateTime.Now.Date.AddDays(-1 * options.KeepLastDays.Value);
                 if (untilDate > DateTime.Now.Date) untilDate = DateTime.Now.Date;
                 entriesDeleted = col.Delete(x => x.JobID == jobID && x.ExecutedAt < untilDate);
+
+                return entriesDeleted;
             }
-            else
+
+            if (options.KeepLastTimes.HasValue && options.KeepLastTimes.Value >= 0)
             {
                 var toDelete = col
                     .Find(x => x.JobID == jobID)
                     .OrderByDescending(x => x.ExecutedAt)
-                    .Skip(options.KeepLastTimes)
+                    .Skip(options.KeepLastTimes.Value)
                     .Select(x => x.ID)
                     .ToList();
                 foreach (var item in toDelete)
@@ -73,6 +89,56 @@ namespace Cubes.Core.Jobs
                 entriesDeleted = toDelete.Count;
             }
             return entriesDeleted;
+        }
+
+        private void ClearHistoryForAllJobs()
+        {
+            var settings = settingsProvider.Load<JobSchedulerSettings>();
+            if (this.timer != null)
+                timer.Change(Timeout.Infinite, Timeout.Infinite);
+
+            logger.LogDebug("House keeping ...");
+            ClearHistoryForAllJobsInternal(settings);
+
+            var interval = 1000 * settings.MonitoringIntervalSecs;
+            if (interval > 0)
+                timer.Change(interval, interval);
+        }
+
+        private void ClearHistoryForAllJobsInternal(JobSchedulerSettings settings)
+        {
+            var options = settings.RetentionOptions;
+            if (options == null)
+                return;
+            var col = liteDb.GetCollection<JobExecution>();
+            if (options.KeepLastDays.HasValue && options.KeepLastDays.Value >= 0)
+            {
+                var untilDate = DateTime.Now.Date.AddDays(-1 * options.KeepLastDays.Value);
+                if (untilDate > DateTime.Now.Date) untilDate = DateTime.Now.Date;
+                col.Delete(x => x.ExecutedAt < untilDate);
+
+                return;
+            }
+
+            if (options.KeepLastTimes.HasValue && options.KeepLastTimes.Value >= 0)
+            {
+                var allIDs = settings
+                    .Jobs
+                    .Select(i => i.ID)
+                    .Distinct()
+                    .ToList();
+                foreach (var jobID in allIDs)
+                {
+                    var toDelete = col
+                        .Find(x => x.JobID == jobID)
+                        .OrderByDescending(x => x.ExecutedAt)
+                        .Skip(options.KeepLastTimes.Value)
+                        .Select(x => x.ID)
+                        .ToList();
+                    foreach (var item in toDelete)
+                        col.Delete(new BsonValue(item));
+                }
+            }
         }
 
         private void RemoveOrphans()
@@ -105,8 +171,12 @@ namespace Cubes.Core.Jobs
                 if (disposing)
                 {
                     RemoveOrphans();
-                    liteDb?.Shrink(); 
+                    ClearHistoryForAllJobs();
+
+                    liteDb?.Shrink();
                     liteDb?.Dispose();
+
+                    timer = null;
                 }
                 disposedValue = true;
             }

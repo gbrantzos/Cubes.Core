@@ -13,7 +13,7 @@ namespace Cubes.Core.Jobs
 
     public class HistoryRetentionOptions
     {
-        public DateTime? KeepUntil { get; set; }
-        public int KeepLastTimes { get; set; }
+        public int? KeepLastDays { get; set; } = 7;
+        public int? KeepLastTimes { get; set; }
     }
 }
