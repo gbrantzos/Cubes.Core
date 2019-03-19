@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
@@ -151,7 +152,8 @@ namespace Cubes.Core.Commands.Middleware.ExecutionHistory
                 {
                     ClearHistory();
 
-                    liteDb?.Shrink();
+                    if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                        liteDb?.Shrink();
                     liteDb?.Dispose();
 
                     timer = null;
