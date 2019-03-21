@@ -29,8 +29,8 @@ rm -rf *
 dotnet publish --no-build ../src/Cubes.Host/Cubes.Host.csproj -o $DIRECTORY/../tmp/Cubes-$HASH -c release -p:VersionPrefix=$VERSION --version-suffix "$HASH"
 
 # Create zip
-zip -r Cubes-$HASH.zip .
-mv Cubes-$HASH.zip ../deploy
+tar -czvf Cubes-$HASH.tar.gz Cubes-$HASH/*
+mv Cubes-$HASH.tar.gz ../deploy
 
 # Cleanup
 rm -rf ../tmp
