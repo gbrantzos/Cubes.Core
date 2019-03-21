@@ -3,7 +3,6 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AssemblyVersion>5.0.1.0</AssemblyVersion>
     <FileVersion>5.0.1.0</FileVersion>
-    <InformationalVersion>5.0.1</InformationalVersion>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
   <ItemGroup>
