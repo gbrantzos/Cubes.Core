@@ -38,7 +38,7 @@ namespace Cubes.Api.Controllers
                 ProcessName    = proc.ProcessName,
                 Executable     = Path.GetFileName(proc.MainModule.FileName),
                 Assembly       = Assembly.GetEntryAssembly().GetName().Name,
-                WorkingFolder  = Path.GetDirectoryName(proc.MainModule.FileName),
+                WorkingFolder  = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 Machine        = proc.MachineName,
                 Hostname       = envInfo.Hostname,
                 KernelVersion  = envInfo.Version,

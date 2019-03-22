@@ -45,7 +45,7 @@ namespace Cubes.Host
             {
                 // Ensure to flush and stop internal timers/threads
                 // before application-exit (Avoid segmentation fault on Linux)
-                logger.LogInformation("Cubes server shutdown!");
+                logger.LogInformation("Cubes shutdown complete.");
                 NLog.LogManager.Shutdown();
             }
         }
