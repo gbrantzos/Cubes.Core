@@ -32,12 +32,14 @@ dotnet build -c release ../src/Cubes.Host/Cubes.Host.csproj -p:VersionPrefix=$VE
 mkdir ../tmp
 cd ../tmp
 rm -rf *
-dotnet publish --no-build ../src/Cubes.Host/Cubes.Host.csproj -o $DIRECTORY/../tmp/Cubes-$HASH -c release -p:VersionPrefix=$VERSION --version-suffix "$HASH"
+dotnet publish --no-build ../src/Cubes.Host/Cubes.Host.csproj -o $DIRECTORY/../tmp/Cubes-$HASH -c release
 
 # Create zip
 tar -czvf Cubes-$HASH.tar.gz Cubes-$HASH/*
-mv Cubes-$HASH.tar.gz ../deploy
+cd ..
+mkdir -p deploy
+mv tmp/Cubes-$HASH.tar.gz deploy
 
 # Cleanup
-rm -rf ../tmp
+rm -rf tmp
 exit 0
