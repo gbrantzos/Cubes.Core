@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Calculate needed variables
+# Populate needed variables
 HASH=`git rev-parse HEAD`
 HASH=${HASH:0:10}
 
@@ -12,6 +12,12 @@ VERSION=5.0.1
 echo "Preparing deploy for Git commit: $HASH"
 echo "Working directory: $DIRECTORY"
 cd $DIRECTORY
+
+# Check for uncommited files
+if ! [ -z "$(git status --porcelain)" ]; then
+    echo There are uncommited files on workspace, aborting!
+    exit 1
+fi
 
 # Build
 dotnet clean -c release ../src/Cubes.Core/Cubes.Core.csproj
@@ -34,3 +40,4 @@ mv Cubes-$HASH.tar.gz ../deploy
 
 # Cleanup
 rm -rf ../tmp
+exit 0
