@@ -13,11 +13,13 @@ echo "Preparing deploy for Git commit: $HASH"
 echo "Working directory: $DIRECTORY"
 cd $DIRECTORY
 
+
 # Check for uncommited files
 if ! [ -z "$(git status --porcelain)" ]; then
     echo There are uncommited files on workspace, aborting!
     exit 1
 fi
+
 
 # Build
 dotnet clean -c release ../src/Cubes.Core/Cubes.Core.csproj
@@ -34,11 +36,13 @@ cd ../tmp
 rm -rf *
 dotnet publish --no-build ../src/Cubes.Host/Cubes.Host.csproj -o $DIRECTORY/../tmp/Cubes-$HASH -c release
 
+
 # Create zip
 tar -czvf Cubes-$HASH.tar.gz Cubes-$HASH/*
 cd ..
 mkdir -p deploy
 mv tmp/Cubes-$HASH.tar.gz deploy
+
 
 # Cleanup
 rm -rf tmp
