@@ -19,12 +19,15 @@ namespace Cubes.Host.Helpers
         private readonly ILoggerFactory loggerFactory;
         private readonly IConfiguration configuration;
         private readonly ICubesEnvironment cubesEnvironment;
+        private readonly bool enableCompression;
 
         public Startup(IConfiguration configuration, ICubesEnvironment cubesEnvironment, ILoggerFactory loggerFactory)
         {
             this.configuration = configuration;
             this.cubesEnvironment = cubesEnvironment;
             this.loggerFactory = loggerFactory;
+
+            this.enableCompression = configuration.GetValue<bool>("enableCompression", true);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -41,7 +44,7 @@ namespace Cubes.Host.Helpers
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddCubesCore(configuration);
-            services.AddCubesApi(cubesEnvironment);
+            services.AddCubesApi(cubesEnvironment, enableCompression);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,7 +64,8 @@ namespace Cubes.Host.Helpers
             // Should be called as soon as possible.
             app.UseCubesApi(settingsProvider,
                 cubesEnvironment,
-                loggerFactory);
+                loggerFactory,
+                enableCompression);
 
             app.UseMvc();
 

@@ -17,19 +17,24 @@ namespace Cubes.Api
 {
     public static class StartupExtensions
     {
-        public static void AddCubesApi(this IServiceCollection services, ICubesEnvironment cubesEnvironment)
+        public static void AddCubesApi(this IServiceCollection services, ICubesEnvironment cubesEnvironment, bool enableCompression)
         {
             services.AddScoped<IContextProvider, ContextProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            if (enableCompression)
+                services.AddResponseCompression();
             services.AddCubesSwaggerServices(cubesEnvironment);
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
             ISettingsProvider settingsProvider,
             ICubesEnvironment environment,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            bool enableCompression)
         {
+            if (enableCompression)
+                app.UseResponseCompression();
             return app
                 .UseCustomExceptionHandler(loggerFactory)
                 .UseStaticContent(settingsProvider, environment, loggerFactory)
