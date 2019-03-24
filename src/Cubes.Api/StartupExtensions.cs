@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using Cubes.Api.Filters;
 using Cubes.Api.RequestContext;
 using Cubes.Api.StaticContent;
 using Cubes.Core.Environment;
@@ -9,6 +10,7 @@ using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -80,6 +82,12 @@ namespace Cubes.Api
                 });
             });
             return app;
+        }
+
+        public static MvcOptions AddCubesApiMvcOptions(this MvcOptions options)
+        {
+            options.Filters.Add(typeof(ValidateModelFilterAttribute));
+            return options;
         }
 
         private sealed class ErrorDetails

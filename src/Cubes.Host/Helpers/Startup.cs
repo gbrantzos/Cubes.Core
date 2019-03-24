@@ -33,7 +33,11 @@ namespace Cubes.Host.Helpers
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
+            services
+                .AddMvc(options =>
+                {
+                    options.AddCubesApiMvcOptions();
+                })
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.Converters.Add(new StringEnumConverter());
