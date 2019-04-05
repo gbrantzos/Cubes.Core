@@ -6,6 +6,7 @@ The main parts of this architecture are the following
 - Result object
 - Command Bus
 - Handler
+- Middleware
 
 
 ## Command
@@ -103,3 +104,32 @@ public class SampleHandler : BaseCommandHandler<SampleCommand, SampleResult>
 ```
 <br/><br/>
 
+## Middleware
+Command bus can be extended using middleware. Middleware classes implement interface `ICommandBusMiddleware<TCommand, TResult>` which defines a method named `Execute`. This method accepts as parameters the command to be executed and a delegate to the next middleware in the pipeline. Finally it returns the result of the command:
+```
+public class LoggingMiddleware<TCommand, TResult> : ICommandBusMiddleware<TCommand, TResult> 
+    where TResult : ICommandResult
+{
+    private readonly ISettingsProvider settings;
+
+    public LoggingMiddleware(ISettingsProvider settings)
+    {
+        this.settings = settings;
+    }
+
+    public TResult Execute(TCommand command, CommandHandlerDelegate<TResult> next)
+    {
+        Console.WriteLine("Before execution");
+        var res = next();
+        Console.WriteLine("After execution");
+
+        return res;
+    }
+}
+```
+
+Middleware classes are added in the pipeline by registering them in the DI container, for example on .NET Core:
+```
+services.AddTransient(typeof(ILoggingMiddleware<,>), typeof(LoggingMiddleware<,>));
+```
+<br/><br/>
