@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{5C0907B4-9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Host", "src\Cubes.Host\Cubes.Host.csproj", "{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Api", "src\Cubes.Api\Cubes.Api.csproj", "{D308A043-7119-4CBD-AFDD-6BAF77607826}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Web", "src\Cubes.Web\Cubes.Web.csproj", "{D308A043-7119-4CBD-AFDD-6BAF77607826}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{21A91696-000F-4B49-BDC9-D3A24896BFCA}"
 	ProjectSection(SolutionItems) = preProject

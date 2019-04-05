@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
-namespace Cubes.Api.RequestContext
+namespace Cubes.Web.RequestContext
 {
     public class Context
     {

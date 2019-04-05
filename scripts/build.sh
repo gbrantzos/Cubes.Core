@@ -24,8 +24,8 @@ fi
 # Build
 dotnet clean -c release ../src/Cubes.Core/Cubes.Core.csproj
 dotnet build -c release ../src/Cubes.Core/Cubes.Core.csproj -p:VersionPrefix=$VERSION --version-suffix "$HASH" -p:InformationalVersion=$VERSION-$HASH
-dotnet clean -c release ../src/Cubes.Api/Cubes.Api.csproj
-dotnet build -c release ../src/Cubes.Api/Cubes.Api.csproj -p:VersionPrefix=$VERSION --version-suffix "$HASH" -p:InformationalVersion=$VERSION-$HASH
+dotnet clean -c release ../src/Cubes.Web/Cubes.Web.csproj
+dotnet build -c release ../src/Cubes.Web/Cubes.Web.csproj -p:VersionPrefix=$VERSION --version-suffix "$HASH" -p:InformationalVersion=$VERSION-$HASH
 dotnet clean -c release ../src/Cubes.Host/Cubes.Host.csproj
 dotnet build -c release ../src/Cubes.Host/Cubes.Host.csproj -p:VersionPrefix=$VERSION --version-suffix "$HASH" -p:InformationalVersion=$VERSION-$HASH
 

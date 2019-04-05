@@ -1,6 +1,6 @@
 using System;
 
-namespace Cubes.Api.Controllers
+namespace Cubes.Web.Controllers
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
     public class SwaggerCategoryAttribute : Attribute

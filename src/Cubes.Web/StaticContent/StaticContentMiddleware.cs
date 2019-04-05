@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Http;
 
-namespace Cubes.Api.StaticContent
+namespace Cubes.Web.StaticContent
 {
     public class StaticContentMiddleware
     {

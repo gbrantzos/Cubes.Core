@@ -5,7 +5,7 @@ using Cubes.Core.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
-namespace Cubes.Api.Controllers
+namespace Cubes.Web.Controllers
 {
     [ApiController, Route("api/[controller]")]
     public class CommandController : ControllerBase

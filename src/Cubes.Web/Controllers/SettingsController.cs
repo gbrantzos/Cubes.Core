@@ -3,7 +3,7 @@ using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Cubes.Api.Controllers
+namespace Cubes.Web.Controllers
 {
     [ApiController, Route("api/[controller]")]
     public class SettingsController : ControllerBase

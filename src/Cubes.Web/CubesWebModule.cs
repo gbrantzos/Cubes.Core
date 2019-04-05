@@ -1,13 +1,10 @@
-using Cubes.Api.Controllers;
+using Cubes.Web.Controllers;
 
 [assembly: SwaggerCategory("Core")]
-namespace Cubes.Api
+namespace Cubes.Web
 {
     /// <summary>
     /// Marker class, no real functionality
     /// </summary>
-    public class CubesApiModule
-    {
-
-    }
+    public class CubesWebModule { }
 }

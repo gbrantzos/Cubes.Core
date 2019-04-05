@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Cubes.Api.Controllers;
+using Cubes.Web.Controllers;
 using Cubes.Core.Environment;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +13,7 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 
 
 
-namespace Cubes.Api
+namespace Cubes.Web
 {
     public static class SwaggerHelpers
     {
@@ -21,10 +21,10 @@ namespace Cubes.Api
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "CubesNext API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "CubesNext API Documentation", Version = "v1" });
                 c.OperationFilter<SwaggerCategoryAsTagFilter>();
 
-                c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetRootFolder(), "Cubes.Api.xml"));
+                c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetRootFolder(), "Cubes.Web.xml"));
                 var xmlFiles = cubesEnvironment
                     .GetLoadedApps()
                     .Select(i =>

@@ -7,7 +7,7 @@ using Cubes.Core.Environment;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
-namespace Cubes.Api.Controllers
+namespace Cubes.Web.Controllers
 {
     [ApiController, Route("api/[controller]")]
     public class SystemController : ControllerBase

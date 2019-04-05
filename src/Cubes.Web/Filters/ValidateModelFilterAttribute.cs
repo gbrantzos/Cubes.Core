@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 
-namespace Cubes.Api.Filters
+namespace Cubes.Web.Filters
 {
     public class ValidateModelFilterAttribute : ActionFilterAttribute
     {

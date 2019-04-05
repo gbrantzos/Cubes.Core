@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Cubes.Api.RequestContext
+namespace Cubes.Web.RequestContext
 {
     public class ContextProvider : IContextProvider
     {

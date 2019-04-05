@@ -1,4 +1,4 @@
-using Cubes.Api;
+using Cubes.Web;
 using Cubes.Core;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
@@ -36,7 +36,7 @@ namespace Cubes.Host.Helpers
             services
                 .AddMvc(options =>
                 {
-                    options.AddCubesApiMvcOptions();
+                    options.AddCubesWebMvcOptions();
                 })
                 .AddJsonOptions(options =>
                 {
@@ -44,11 +44,11 @@ namespace Cubes.Host.Helpers
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
                 })
-                .AddApplicationPart(typeof(CubesApiModule).Assembly)
+                .AddApplicationPart(typeof(CubesWebModule).Assembly)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddCubesCore(configuration);
-            services.AddCubesApi(cubesEnvironment, enableCompression);
+            services.AddCubesWeb(cubesEnvironment, enableCompression);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

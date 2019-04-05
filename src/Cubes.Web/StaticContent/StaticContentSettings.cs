@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Cubes.Core.Settings;
 
-namespace Cubes.Api.StaticContent
+namespace Cubes.Web.StaticContent
 {
     [SettingsPrefix("Core")]
     public class StaticContentSettings

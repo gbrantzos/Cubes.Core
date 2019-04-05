@@ -1,4 +1,4 @@
-namespace Cubes.Api.RequestContext
+namespace Cubes.Web.RequestContext
 {
     public interface IContextProvider
     {

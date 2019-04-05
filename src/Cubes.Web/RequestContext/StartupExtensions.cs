@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Cubes.Api.RequestContext
+namespace Cubes.Web.RequestContext
 {
     public static class Startupextensions
     {

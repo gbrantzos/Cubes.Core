@@ -2,9 +2,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
-using Cubes.Api.Filters;
-using Cubes.Api.RequestContext;
-using Cubes.Api.StaticContent;
+using Cubes.Web.Filters;
+using Cubes.Web.RequestContext;
+using Cubes.Web.StaticContent;
 using Cubes.Core.Environment;
 using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
@@ -15,11 +15,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Cubes.Api
+namespace Cubes.Web
 {
     public static class StartupExtensions
     {
-        public static void AddCubesApi(this IServiceCollection services, ICubesEnvironment cubesEnvironment, bool enableCompression)
+        public static void AddCubesWeb(this IServiceCollection services, ICubesEnvironment cubesEnvironment, bool enableCompression)
         {
             services.AddScoped<IContextProvider, ContextProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -48,7 +48,7 @@ namespace Cubes.Api
 
         public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            var logger = loggerFactory.CreateLogger("Cubes.Api.CustomExceptionHandler");
+            var logger = loggerFactory.CreateLogger("Cubes.Web.CustomExceptionHandler");
             app.UseExceptionHandler(appError =>
             {
                 appError.Run(async context =>
@@ -84,7 +84,7 @@ namespace Cubes.Api
             return app;
         }
 
-        public static MvcOptions AddCubesApiMvcOptions(this MvcOptions options)
+        public static MvcOptions AddCubesWebMvcOptions(this MvcOptions options)
         {
             options.Filters.Add(typeof(ValidateModelFilterAttribute));
             return options;
