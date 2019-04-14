@@ -85,9 +85,16 @@ namespace Cubes.Core.Jobs
             }
             else
             {
+                int invalidJobs = 0;
                 quartzScheduler.Clear();
                 foreach (var job in activeJobs)
                 {
+                    if (!CronExpression.IsValidExpression(job.CronExpression))
+                    {
+                        invalidJobs++;
+                        logger.LogWarning($"Invalid Cron Expression: {job.Description} - {job.CronExpression}");
+                        continue;
+                    }
                     var trigger = TriggerBuilder
                         .Create()
                         .WithCronSchedule(job.CronExpression, i =>
@@ -107,10 +114,8 @@ namespace Cubes.Core.Jobs
 
                     var scheduledJob = jobBuilder.Build();
                     quartzScheduler.ScheduleJob(scheduledJob, trigger.Build());
-                    if (!job.IsActive)
-                        quartzScheduler.PauseJob(scheduledJob.Key);
                 }
-                logger.LogInformation($"Starting job scheduler with {activeJobs.Count} active jobs.");
+                logger.LogInformation($"Starting job scheduler with {activeJobs.Count - invalidJobs} active jobs.");
                 quartzScheduler.Start();
             }
             return GetStatus();
