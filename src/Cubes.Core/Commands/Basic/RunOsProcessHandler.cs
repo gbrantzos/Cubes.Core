@@ -33,6 +33,10 @@ namespace Cubes.Core.Commands.Basic
 
             // Wait for exit
             process.WaitForExit(command.TimeoutSecs * 1000);
+            process.CancelOutputRead();
+            process.CancelErrorRead();
+
+            var msg = output.ToString();
 
             return new RunOsProcessResult
             {

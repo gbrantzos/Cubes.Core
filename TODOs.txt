@@ -1,10 +1,48 @@
 CubesNext - TODOs
 -----------------
 
+- Make first steps on dotnet core v3
+- Applicationloading and instantiate, with hooks on Startup concerns
+- Environment Settings
+- Proper use of Options patterns, from Applications too (YAML)
+- Transition to MediatR
+- Drop Query executor, in favour of Dapper
+- Start using Autofac
+
+
+Application info
+- Name
+- Path
+- Asemblies (empty for all dll on path)
+- UI path (static content)
+
+
+Host settings
+- Urls (+ports)
+- SSL usage
+- Static files
+- Config format (????) 
+
+
+Thoughts about pipeline (MediatR pipeline):
+- Logging
+- History of execution
+- Audit and security
+- Validation
+- Instrumentation (timing)
+
+
+URLs
+- /docs: Swagger, Wiki, other static
+- /api: RestApi endpoints
+- /Static: Static content
+- /app: Applications clients
+
+
 [ ]     README.md on root folder
 [ ]     Plugin architecture
 [ ]     Pharmex as POC
-[ ]     Dployment plans
+[ ]     Deployment plans
 [ ]     Development arrangment for plugins
 [ ]     Replace ISettingsProvider with IOptions
 [ ]     Generic UI shell

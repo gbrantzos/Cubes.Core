@@ -9,7 +9,7 @@ namespace Cubes.Core.Settings
 {
     public abstract class BaseFilesSettingsProvider : ISettingsProvider
     {
-        private readonly ConcurrentDictionary<string, Tuple<DateTime, object>> cache;
+        private readonly ConcurrentDictionary<string, (DateTime addedAt, object cachedItem)> cache;
         private readonly FileWatcherExtended fwe;
         private readonly string baseFolder;
         private readonly string fileExtension;
@@ -23,10 +23,10 @@ namespace Cubes.Core.Settings
             this.fileExtension = fileExtension;
 
             fs.Directory.CreateDirectory(baseFolder);
-            cache = new ConcurrentDictionary<string, Tuple<DateTime, object>>();
+            cache = new ConcurrentDictionary<string, (DateTime addedAt, object cachedItem)>();
 
             // Nasty, but needed for testing
-            // FileWatcher is is not covered by IO.Abstractions
+            // FileWatcher is not covered by IO.Abstractions
             if (fs is FileSystem)
                 fwe = new FileWatcherExtended(baseFolder, $"*.{fileExtension}");
         }
@@ -66,13 +66,13 @@ namespace Cubes.Core.Settings
         protected object GetValue(Type settingsType, string fileName)
         {
             // Check in cache
-            if (fwe !=null && cache.TryGetValue(fileName, out Tuple<DateTime, object> tmp))
+            if (fwe != null && cache.TryGetValue(fileName, out (DateTime addedAt, object cachedItem) tmp))
             {
                 // Get file's last modification
                 var lastModified = fwe.LastModified(fileName);
 
                 // If cache is older, keep it
-                if (tmp.Item1 >= lastModified && tmp.Item2.GetType().Equals(settingsType))
+                if (tmp.addedAt >= lastModified && tmp.cachedItem.GetType().Equals(settingsType))
                 {
                     // For debugging reasons only
                     // Console.WriteLine("Cache hit!");
@@ -81,7 +81,7 @@ namespace Cubes.Core.Settings
             }
 
             var settings = ProviderSpecificDeserialize(settingsType, fileName);
-            var cacheEntry = new Tuple<DateTime, object>(DateTime.Now, settings);
+            var cacheEntry = (DateTime.Now, settings);
             cache.AddOrUpdate(fileName, cacheEntry, (k, v) => cacheEntry);
             return settings;
         }
