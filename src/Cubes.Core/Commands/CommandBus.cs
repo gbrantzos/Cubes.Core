@@ -9,7 +9,7 @@ namespace Cubes.Core.Commands
 {
     public class CommandBus : ICommandBus
     {
-        private readonly ServiceFactory handlerFactory;    
+        private readonly ServiceFactory handlerFactory;
         private readonly ILogger<CommandBus> logger;
 
         public CommandBus(ServiceFactory handlerFactory, ILoggerFactory loggerFactory)
@@ -36,7 +36,7 @@ namespace Cubes.Core.Commands
             }
             catch (Exception ex)
             {
-                // If no handler found just throw (it's definetelly internal error)
+                // If no handler found just throw (it's definitely internal error)
                 if (ex is CommandHandlerResolveException)
                     throw;
 
