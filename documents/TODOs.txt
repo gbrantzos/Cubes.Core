@@ -1,0 +1,14 @@
+CubesNext - TODOs
+-----------------
+
+[ ]     README.md on root folder
+[ ]     Plugin architecture
+[ ]     Pharmex as POC
+[ ]     Dployment plans
+[ ]     Development arrangment for plugins
+[ ]     Replace ISettingsProvider with IOptions
+[ ]     Generic UI shell
+[ ]     Template for new plugins
+ 
+ 
+https://github.com/aspnet/AspNetCore.Docs/tree/master/aspnetcore/fundamentals/host/platform-specific-configuration/samples
