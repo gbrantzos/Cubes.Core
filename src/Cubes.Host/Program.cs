@@ -1,51 +1,67 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Cubes.Core.Environment;
-using Cubes.Host.Helpers;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
+
+#if DEBUG
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+#endif
+
 
 namespace Cubes.Host
 {
     public class Program
     {
+#if DEBUG
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int cmdShow);
+        private const int HIDE = 0;
+        private const int MAXIMIZE = 3;
+        private const int MINIMIZE = 6;
+        private const int RESTORE = 9;
+#endif
+
         public static void Main(string[] args)
         {
-            ILogger logger = null;
+#if DEBUG
+            Process p = Process.GetCurrentProcess();
+            ShowWindow(p.MainWindowHandle, MAXIMIZE);
+#endif
             try
             {
+                using ILoggerProvider loggerProvider = GetNLogProvider();
                 var rootFolder = GetRootFolder();
-                NLogHelpers.PrepareNLog(rootFolder);
-                logger = new NLogLoggerProvider().CreateLogger(typeof(CubesEnvironment).FullName);
+                var cubesEnvironment = new CubesEnvironment(rootFolder,
+                    loggerProvider.CreateLogger(typeof(CubesEnvironment).FullName));
 
-                var cubesEnvironment = new CubesEnvironment(rootFolder, logger);
-                cubesEnvironment.PrepareEnvironmentFolders();
+                cubesEnvironment.PrepareEnvironment();
                 cubesEnvironment.LoadAppsAssemblies();
 
-                CreateWebHostBuilder(args, cubesEnvironment, logger)
+                CreateHostBuilder(args, cubesEnvironment)
                     .Build()
                     .Run();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Cubes Server stopped because of exception!");
+                Console.WriteLine("Cubes Host stopped because of exception!");
                 Console.WriteLine(ex.ToString());
 
                 new NLogLoggerProvider()
                     .CreateLogger(typeof(CubesEnvironment).FullName)
-                    .LogError(ex, "Cubes Server stopped because of exception!");
+                    .LogError(ex, "Cubes Host stopped because of exception!");
             }
             finally
             {
                 // Ensure to flush and stop internal timers/threads
                 // before application-exit (Avoid segmentation fault on Linux)
-                logger.LogInformation("Cubes shutdown complete.");
                 NLog.LogManager.Shutdown();
             }
         }
@@ -56,36 +72,56 @@ namespace Cubes.Host
             // We should support starting from script and Cubes folder are outside
             // binaries folder.
             var rootFolder = Environment.GetEnvironmentVariable("CUBES_ROOTFOLDER");
-            return String.IsNullOrEmpty(rootFolder) ? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) : rootFolder;
+            return String.IsNullOrEmpty(rootFolder) ?
+                Path.GetDirectoryName(typeof(Program).Assembly.Location) : rootFolder;
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args, ICubesEnvironment cubesEnvironment, ILogger logger)
+        public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubesEnvironment)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(cubesEnvironment.GetSettingsFolder())
-                .AddJsonFile("host.json", optional: true);
+                .SetBasePath(cubesEnvironment.GetRootFolder())
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddCommandLine(args);
 
             var configuration = builder.Build();
-            var urls = configuration.GetValue<string>("urls", "http://localhost:3001");
-            logger.LogInformation($"Cubes listening at {urls.Replace(';' ,',')}");
+            var urls = configuration.GetValue<string>("Host:URLs", "http://localhost:3001");
 
-            var hostBuilder = WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseContentRoot(cubesEnvironment.GetFolder(CubesFolderKind.StaticContent))
-                .UseUrls(urls)
-                .ConfigureServices(services =>
+            return Microsoft.Extensions.Hosting.Host
+                .CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((builder, config) =>
                 {
-                    services.AddSingleton<ICubesEnvironment>(cubesEnvironment);
-                }).
-                ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.SetMinimumLevel(LogLevel.Trace);
+                    // TODO Possibly method on Cubes Environment
+                    var cubesFolders = new Dictionary<string, string>
+                    {
+                        { "Cubes.RootFolder"    , cubesEnvironment.GetRootFolder()  },
+                        { "Cubes.AppsFolder"    , cubesEnvironment.GetAppsFolder()  },
+                        { "Cubes.StorageFolder" , cubesEnvironment.GetStorageFolder()  },
+                    };
+                    config.AddInMemoryCollection(cubesFolders);
                 })
-                .UseConfiguration(configuration)
+                .ConfigureServices((builder, services) => services.AddSingleton(cubesEnvironment))
+                .ConfigureLogging(logging => logging.ClearProviders())
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls(urls);
+                })
+                .UseContentRoot(cubesEnvironment.GetFolder(CubesFolderKind.StaticContent))
                 .UseNLog();
+        }
 
-            return hostBuilder;
+        private static ILoggerProvider GetNLogProvider()
+        {
+            var programPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+            var configFile  = Path.Combine(programPath, "NLog.config");
+            if (!File.Exists(configFile))
+            {
+                var sampleFile = Path.Combine(programPath, "NLog.Sample.config");
+                File.Copy(sampleFile, configFile);
+            }
+            NLogBuilder.ConfigureNLog(configFile);
+
+            return new NLogLoggerProvider();
         }
     }
 }

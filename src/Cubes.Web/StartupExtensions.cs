@@ -14,19 +14,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace Cubes.Web
 {
     public static class StartupExtensions
     {
-        public static void AddCubesWeb(this IServiceCollection services, ICubesEnvironment cubesEnvironment, bool enableCompression)
+        public static void AddCubesWeb(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IContextProvider, ContextProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            var enableCompression = configuration.GetValue<bool>("Host:EnableCompression", true);
             if (enableCompression)
                 services.AddResponseCompression();
-            services.AddCubesSwaggerServices(cubesEnvironment);
+            services.AddCubesSwaggerServices(configuration);
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
@@ -39,7 +41,8 @@ namespace Cubes.Web
                 app.UseResponseCompression();
             return app
                 .UseCustomExceptionHandler(loggerFactory)
-                .UseStaticContent(settingsProvider, environment, loggerFactory)
+                // TODO Check this
+                //.UseStaticContent(settingsProvider, environment, loggerFactory)
                 .UseHomePage()
                 .UseContextProvider()
                 .UseCubesSwagger();

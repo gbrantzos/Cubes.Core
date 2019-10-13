@@ -51,7 +51,7 @@ namespace Cubes.Web.StaticContent
                             var fullRequest = context.Request.PathBase.Value + context.Request.Path.Value;
                             if (context.Response.StatusCode == 404 && !Path.HasExtension(fullRequest))
                             {
-                                // Fallback to SPA entry point
+                                // Fall back to SPA entry point
                                 await context.Response.SendFileAsync(Path.Combine(rootPath, item.FileSystemPath, item.DefaultFile));
                             }
                         });

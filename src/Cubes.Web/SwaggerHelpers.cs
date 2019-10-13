@@ -1,41 +1,41 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using Cubes.Web.Controllers;
-using Cubes.Core.Environment;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-
-
 namespace Cubes.Web
 {
     public static class SwaggerHelpers
     {
-        public static void AddCubesSwaggerServices(this IServiceCollection services, ICubesEnvironment cubesEnvironment)
+        public static void AddCubesSwaggerServices(this IServiceCollection services, IConfiguration configuration)
         {
+            var rootFolder = configuration.GetValue<string>("Cubes:RootFolder");
+            var appsFolder = configuration.GetValue<string>("Cubes:AppsFolder");
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CubesNext API Documentation", Version = "v1" });
                 c.OperationFilter<SwaggerCategoryAsTagFilter>();
 
-                c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetRootFolder(), "Cubes.Web.xml"));
-                var xmlFiles = cubesEnvironment
-                    .GetLoadedApps()
-                    .Select(i =>
-                    {
-                        var file = Path.Combine(cubesEnvironment.GetAppsFolder(), $"{Path.GetFileNameWithoutExtension(i.File)}.xml");
-                        return File.Exists(file) ? file : String.Empty;
-                    })
-                    .Where(i => !String.IsNullOrEmpty(i))
-                    .ToList();
-                foreach (var file in xmlFiles)
-                    c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetAppsFolder(), file));
+                //c.IncludeXmlComments(Path.Combine(rootFolder, "Cubes.Web.xml"));
+                //var xmlFiles = cubesEnvironment
+                //    .GetLoadedApps()
+                //    .Select(i =>
+                //    {
+                //        var file = Path.Combine(cubesEnvironment.GetAppsFolder(), $"{Path.GetFileNameWithoutExtension(i.File)}.xml");
+                //        return File.Exists(file) ? file : String.Empty;
+                //    })
+                //    .Where(i => !String.IsNullOrEmpty(i))
+                    //.ToList();
+
+                // TODO This how?
+                //foreach (var file in xmlFiles)
+                    //c.IncludeXmlComments(Path.Combine(cubesEnvironment.GetAppsFolder(), file));
             });
         }
 

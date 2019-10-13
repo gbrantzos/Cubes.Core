@@ -1,18 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0"/>
-    <PackageReference Include="Moq" Version="4.10.1"/>
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="3.0.10"/>
-    <PackageReference Include="xunit" Version="2.4.0"/>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0"/>
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.1"/>
-    <PackageReference Include="CompareNETObjects" Version="4.58.0"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="Moq" Version="4.10.1" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="3.0.10" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
+    <PackageReference Include="CompareNETObjects" Version="4.58.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Cubes.Core\Cubes.Core.csproj"/>
+    <ProjectReference Include="..\..\src\Cubes.Core\Cubes.Core.csproj" />
   </ItemGroup>
 </Project>

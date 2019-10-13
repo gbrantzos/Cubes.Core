@@ -55,7 +55,7 @@ namespace Cubes.Core.Environment
 
         // The following methods are use for environment - server setup
         // There is no need to be included on ICubesEnvironment interface
-        public void PrepareEnvironmentFolders()
+        public void PrepareEnvironment()
         {
             var enumValues = Enum
                 .GetValues(typeof(CubesFolderKind))
