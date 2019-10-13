@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Cubes.Core.Environment
 {
@@ -41,5 +42,10 @@ namespace Cubes.Core.Environment
             => cubesEnvironment.GetFolder(CubesFolderKind.Settings);
         public static string GetStorageFolder(this ICubesEnvironment cubesEnvironment)
             => cubesEnvironment.GetFolder(CubesFolderKind.Storage);
+
+        public static string GetFileOnPath(this ICubesEnvironment cubesEnvironment,
+            CubesFolderKind folderKind,
+            string fileName)
+            => Path.Combine(cubesEnvironment.GetFolder(folderKind), fileName);
     }
 }

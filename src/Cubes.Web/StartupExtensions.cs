@@ -2,19 +2,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using Cubes.Core.Environment;
 using Cubes.Web.Filters;
 using Cubes.Web.RequestContext;
 using Cubes.Web.StaticContent;
-using Cubes.Core.Environment;
-using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace Cubes.Web
 {
@@ -25,20 +24,20 @@ namespace Cubes.Web
             services.AddScoped<IContextProvider, ContextProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            var enableCompression = configuration.GetValue<bool>("Host:EnableCompression", true);
+            var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
                 services.AddResponseCompression();
             services.AddCubesSwaggerServices(configuration);
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
-            ISettingsProvider settingsProvider,
-            ICubesEnvironment environment,
-            ILoggerFactory loggerFactory,
-            bool enableCompression)
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory)
         {
+            var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
                 app.UseResponseCompression();
+
             return app
                 .UseCustomExceptionHandler(loggerFactory)
                 // TODO Check this
@@ -65,10 +64,10 @@ namespace Cubes.Web
                         var ex = contextFeature.Error;
                         logger.LogError(ex, $"Unhandled exception: {ex.Message}");
 
-                        var frame   = new StackTrace(ex, true).GetFrame(0);
-                        var details = new StringBuilder();
+                        var frame      = new StackTrace(ex, true).GetFrame(0);
+                        var details    = new StringBuilder();
                         var methodInfo = $"{frame.GetMethod().DeclaringType.FullName}.{frame.GetMethod().Name}()";
-                        var fileInfo = $"{Path.GetFileName(frame.GetFileName())}, line {frame.GetFileLineNumber()}";
+                        var fileInfo   = $"{Path.GetFileName(frame.GetFileName())}, line {frame.GetFileLineNumber()}";
                         details.AppendLine($"{ex.GetType().Name}: {ex.Message}");
                         details.AppendLine($"{methodInfo} in {fileInfo}");
 

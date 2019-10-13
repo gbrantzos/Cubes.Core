@@ -2,7 +2,6 @@ using Cubes.Core;
 using Cubes.Core.Environment;
 using Cubes.Web;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,7 +18,7 @@ namespace Cubes.Host
         public void ConfigureServices(IServiceCollection services)
         {
             // Setup WebAPI
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
 
             // Setup Cubes
             services.AddCubesCore(configuration);
@@ -27,9 +26,12 @@ namespace Cubes.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            var useSSL = configuration.GetValue<bool>("Host:UseSSL", false);
+            var useSSL           = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
+            var loggerFactory    = app.ApplicationServices.GetService<ILoggerFactory>();
+            var cubesEnvironment = app.ApplicationServices.GetService<ICubesEnvironment>();
+
             if (useSSL)
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -37,21 +39,12 @@ namespace Cubes.Host
                 app.UseHttpsRedirection();
             }
 
-            var cubesEnvironment  = app.ApplicationServices.GetService<ICubesEnvironment>();
-            var loggerFactory     = app.ApplicationServices.GetService<ILoggerFactory>();
-            var enableCompression = configuration.GetValue<bool>("Host:EnableCompression", true);
-
             // Should be called as soon as possible.
-            app.UseCubesApi(null, //TODO Replace with IOptions  - settingsProvider,
-                cubesEnvironment,
-                loggerFactory,
-              enableCompression);
+            app.UseCubesApi(configuration, loggerFactory);
 
+            // Routing
             app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
 
             // Finally start Cubes
             cubesEnvironment.Start(serviceProvider: app.ApplicationServices);

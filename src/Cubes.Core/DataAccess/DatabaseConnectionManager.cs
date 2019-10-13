@@ -1,8 +1,8 @@
-using Cubes.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace Cubes.Core.DataAccess
 {
@@ -14,14 +14,14 @@ namespace Cubes.Core.DataAccess
             { "mssql",  "System.Data.SqlClient.SqlClientFactory, System.Data" },
             { "mysql",  "MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data" }
         };
+        private readonly DataAccessSettings settings;
 
-        private readonly ISettingsProvider settingsProvider;
-        public DatabaseConnectionManager(ISettingsProvider settingsProvider)
-            => this.settingsProvider = settingsProvider;
+        public DatabaseConnectionManager(IOptionsSnapshot<DataAccessSettings> options)
+            => this.settings = options.Value;
 
         public DbConnection GetConnection(string connectionName)
         {
-            var connections = settingsProvider.Load<DataAccessSettings>().Connections;
+            var connections = settings.Connections;
             var connectionInfo = connections.FirstOrDefault(i => i.Name.Equals(connectionName, StringComparison.CurrentCultureIgnoreCase));
             if (connectionInfo != null)
             {

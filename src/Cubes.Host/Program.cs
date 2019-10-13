@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
-using NLog.Web;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
+using Cubes.Core;
+using NLog.Web;
+using NLog.Extensions.Logging;
 
 #if DEBUG
 using System.Diagnostics;
@@ -78,27 +78,16 @@ namespace Cubes.Host
 
         public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubesEnvironment)
         {
-            var builder = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .SetBasePath(cubesEnvironment.GetRootFolder())
-                .AddJsonFile("appsettings.json", optional: false)
-                .AddCommandLine(args);
-
-            var configuration = builder.Build();
-            var urls = configuration.GetValue<string>("Host:URLs", "http://localhost:3001");
+                .AddJsonFile(CubesConstants.Config_AppSettings, optional: false)
+                .AddCommandLine(args)
+                .Build();
+            var urls = configuration.GetValue<string>(CubesConstants.Config_HostURLs, "http://localhost:3001");
 
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((builder, config) =>
-                {
-                    // TODO Possibly method on Cubes Environment
-                    var cubesFolders = new Dictionary<string, string>
-                    {
-                        { "Cubes.RootFolder"    , cubesEnvironment.GetRootFolder()  },
-                        { "Cubes.AppsFolder"    , cubesEnvironment.GetAppsFolder()  },
-                        { "Cubes.StorageFolder" , cubesEnvironment.GetStorageFolder()  },
-                    };
-                    config.AddInMemoryCollection(cubesFolders);
-                })
+                .ConfigureAppConfiguration((builder, config) => config.AddCubesConfiguration(cubesEnvironment))
                 .ConfigureServices((builder, services) => services.AddSingleton(cubesEnvironment))
                 .ConfigureLogging(logging => logging.ClearProviders())
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -113,10 +102,10 @@ namespace Cubes.Host
         private static ILoggerProvider GetNLogProvider()
         {
             var programPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-            var configFile  = Path.Combine(programPath, "NLog.config");
+            var configFile  = Path.Combine(programPath, CubesConstants.NLog_ConfigFile);
             if (!File.Exists(configFile))
             {
-                var sampleFile = Path.Combine(programPath, "NLog.Sample.config");
+                var sampleFile = Path.Combine(programPath, CubesConstants.NLog_SampleFile);
                 File.Copy(sampleFile, configFile);
             }
             NLogBuilder.ConfigureNLog(configFile);

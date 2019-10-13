@@ -1,9 +1,8 @@
-using Cubes.Core.Environment;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
-using Moq;
 using System;
 using System.IO.Abstractions.TestingHelpers;
+using Cubes.Core.Environment;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace Cubes.Core.Tests.Environment
@@ -27,9 +26,9 @@ namespace Cubes.Core.Tests.Environment
                 .Setup(i => i.Log(
                     It.IsAny<LogLevel>(),
                     It.IsAny<EventId>(),
-                    It.IsAny<FormattedLogValues>(),
+                    It.IsAny<Object>(),
                     It.IsAny<Exception>(),
-                    It.IsAny<Func<object, Exception, string>>()))
+                    It.IsAny<Func<Object, Exception, string>>()))
                 .Verifiable();
             var unitUnderTest = new CubesEnvironment("C:\\Cubes", loggerMock.Object, fileSystem);
 
@@ -40,10 +39,10 @@ namespace Cubes.Core.Tests.Environment
             loggerMock.Verify(m => m.Log(
                     It.IsAny<LogLevel>(),
                     It.IsAny<EventId>(),
-                    It.IsAny<FormattedLogValues>(),
+                    It.IsAny<Object>(),
                     It.IsAny<Exception>(),
-                    It.IsAny<Func<object, Exception, string>>()), Times.Exactly(2));
-            
+                    It.IsAny<Func<Object, Exception, string>>()), Times.Exactly(2));
+
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetAppsFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetStorageFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetSettingsFolder()));
