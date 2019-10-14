@@ -43,7 +43,7 @@ namespace Cubes.Host
                     loggerProvider.CreateLogger(typeof(CubesEnvironment).FullName));
 
                 cubesEnvironment.PrepareEnvironment();
-                cubesEnvironment.LoadAppsAssemblies();
+                cubesEnvironment.LoadApplications();
 
                 CreateHostBuilder(args, cubesEnvironment)
                     .Build()

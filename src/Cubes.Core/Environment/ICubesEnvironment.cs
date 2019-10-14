@@ -8,17 +8,29 @@ namespace Cubes.Core.Environment
     {
         string GetFolder(CubesFolderKind folderKind);
         CubesEnvironmentInformation GetEnvironmentInformation();
-        IEnumerable<CubesLoadedApp> GetLoadedApps();
+
+        IEnumerable<LoadedAssembly> GetLoadedAssemblies();
+        IEnumerable<ApplicationInfo> GetApplications();
 
         void Start(IServiceProvider serviceProvider);
     }
 
-    public class CubesLoadedApp
+    public class LoadedAssembly
     {
         public string File { get; set; }
         public string AssemblyName { get; set; }
         public string AssemblyVersion { get; set; }
 
+    }
+    public class ApplicationInfo
+    {
+        public string Name { get; set; }
+        public bool Active { get; set; } = true;
+        public string Path { get; set; }
+        public string[] Assemblies { get; set; }
+        public string UIPath { get; set; }
+
+        public IApplication Instance { get; set; }
     }
 
     public enum CubesFolderKind

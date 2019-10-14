@@ -16,7 +16,8 @@ namespace Cubes.Core.Environment
         private readonly ILogger logger;
         private readonly CubesEnvironmentInformation environmentInformation;
         private readonly IFileSystem fileSystem;
-        private readonly List<CubesLoadedApp> loadedApps;
+        private readonly List<LoadedAssembly> loadedAssemblies;
+        private readonly List<ApplicationInfo> applications;
 
         /// <summary>
         /// Constructor that accepts <see cref="IFileSystem"/> to support unit testing.
@@ -30,7 +31,8 @@ namespace Cubes.Core.Environment
             this.logger                 = logger;
             this.fileSystem             = fileSystem;
             this.environmentInformation = new CubesEnvironmentInformation(rootFolder);
-            this.loadedApps             = new List<CubesLoadedApp>();
+            this.loadedAssemblies       = new List<LoadedAssembly>();
+            this.applications           = new List<ApplicationInfo>();
 
             logger.LogInformation($"Starting Cubes, version {environmentInformation.Version}, {environmentInformation.Mode} build...");
             logger.LogInformation($"Cubes root folder: {rootFolder}");
@@ -44,7 +46,9 @@ namespace Cubes.Core.Environment
 
         public CubesEnvironmentInformation GetEnvironmentInformation() => this.environmentInformation;
 
-        public IEnumerable<CubesLoadedApp> GetLoadedApps() => this.loadedApps;
+        public IEnumerable<LoadedAssembly> GetLoadedAssemblies() => this.loadedAssemblies;
+
+        public IEnumerable<ApplicationInfo> GetApplications() => this.applications;
 
         public void Start(IServiceProvider serviceProvider)
         {
@@ -65,9 +69,37 @@ namespace Cubes.Core.Environment
                 fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(rootFolder, value.ToString()));
         }
 
-        public void LoadAppsAssemblies()
+        public void LoadApplications()
         {
-            var files = fileSystem.Directory.GetFiles(this.GetAppsFolder(), "*.dll");
+            var appsFolders = Directory
+                .GetDirectories(this.GetAppsFolder())
+                .OrderBy(directory => directory.Equals(CubesConstants.Folders_Common, StringComparison.CurrentCultureIgnoreCase) ? 0 : 1)
+                .ThenBy(directory => directory)
+                .ToList();
+            foreach (var folder in appsFolders)
+            {
+                var appInfo = GetApplicationInfo(folder);
+                if (appInfo != null)
+                    this.applications.Add(appInfo);
+
+                // Load assemblies
+                LoadAssemblies(folder);
+
+            }
+
+
+
+        }
+
+        private ApplicationInfo GetApplicationInfo(string folder)
+        {
+            // TODO Check if a ApplicationInfo.yaml file exists
+            return new ApplicationInfo();
+        }
+
+        private void LoadAssemblies(string folder)
+        {
+            var files = Directory.GetFiles(folder, "*.dll");
             foreach (var file in files)
             {
                 try
@@ -75,10 +107,10 @@ namespace Cubes.Core.Environment
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
                     logger.LogInformation($"Loaded assembly: {asm.FullName}");
 
-                    loadedApps.Add(new CubesLoadedApp
+                    loadedAssemblies.Add(new LoadedAssembly
                     {
-                        File            = Path.GetFileName(file),
-                        AssemblyName    = asm.GetName().Name,
+                        File = Path.GetFileName(file),
+                        AssemblyName = asm.GetName().Name,
                         AssemblyVersion = asm.GetName().Version.ToString()
                     });
                 }

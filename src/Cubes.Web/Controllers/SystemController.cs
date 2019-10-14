@@ -48,7 +48,7 @@ namespace Cubes.Web.Controllers
                 WorkingSet     = Math.Round(proc.WorkingSet64 / 1024M / 1024M, 2),
                 PeakWorkingSet = Math.Round(proc.PeakWorkingSet64 / 1024M / 1024M, 2),
                 Threads        = proc.Threads.Count,
-                LoadedApps     = cubesEnvironment.GetLoadedApps()
+                LoadedApps     = cubesEnvironment.GetLoadedAssemblies()
             };
             return Ok(info);
         }
