@@ -1,14 +1,14 @@
-using Cubes.Core.Jobs;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Runtime.Loader;
-using YamlDotNet.Serialization;
 using System.Reflection;
+using System.Runtime.Loader;
+using Cubes.Core.Jobs;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using YamlDotNet.Serialization;
 
 namespace Cubes.Core.Environment
 {
@@ -63,9 +63,9 @@ namespace Cubes.Core.Environment
         }
         #endregion
 
-        // The following two methods are used for environment - server setup only.
+        // The following method is used for environment - server setup only.
         // There is no need to be included on ICubesEnvironment interface.
-        public void PrepareEnvironment()
+        public void PrepareHost()
         {
             var enumValues = Enum
                 .GetValues(typeof(CubesFolderKind))
@@ -73,9 +73,11 @@ namespace Cubes.Core.Environment
                 .Except(new CubesFolderKind[] { CubesFolderKind.Root });
             foreach (var value in enumValues)
                 fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(rootFolder, value.ToString()));
+
+            LoadApplications();
         }
 
-        public void LoadApplications()
+        private void LoadApplications()
         {
             var applications = new List<ApplicationInfo>();
 
@@ -88,27 +90,36 @@ namespace Cubes.Core.Environment
                 applications = deserializer.Deserialize<List<ApplicationInfo>>(fileContents);
             }
 
-            // Get applications from Applications Folder
-            var appsFolders = fileSystem.Directory
-                .GetDirectories(this.GetAppsFolder())
-                .Where(directory => !directory.Equals(CubesConstants.Folders_Common))
-                .ToList();
-            foreach (var folder in appsFolders)
-            {
-                var appInfo = GetApplicationInfo(folder);
-                if (appInfo != null)
-                    this.definedApplications.Add(appInfo);
-            }
-            this.definedApplications.AddRange(applications);
-
             // Load common assemblies
             var commonPath = fileSystem.Path.Combine(this.GetAppsFolder(), CubesConstants.Folders_Common);
             if (fileSystem.Directory.Exists(commonPath))
                 LoadAssemblies(fileSystem.Directory.GetFiles(commonPath, "*.dll"));
 
+            // Get applications from Applications Folder
+            var appsFolders = fileSystem.Directory
+                .GetDirectories(this.GetAppsFolder())
+                .Where(directory => !directory.Equals(commonPath))
+                .ToList();
+            foreach (var folder in appsFolders)
+            {
+                var appInfo = GetApplicationInfo(folder);
+                if (appInfo != null)
+                {
+                    var existing = this
+                        .definedApplications
+                        .FirstOrDefault(a => a.Name.Equals(appInfo.Name, StringComparison.CurrentCultureIgnoreCase));
+                    if (existing == null)
+                        this.definedApplications.Add(appInfo);
+                    else
+                        logger.LogError("Application already defined: {application}", appInfo.Name);
+                }
+            }
+            this.definedApplications.AddRange(applications);
+
             // Load all applications assemblies
             var allAssemblies = this.definedApplications
-                .SelectMany(app => app.Assemblies)
+                .Where(app => app.Active)
+                .SelectMany(app => app.Assemblies.Select(a => fileSystem.Path.Combine(app.Path, a)))
                 .ToArray();
             LoadAssemblies(allAssemblies);
 
@@ -116,10 +127,11 @@ namespace Cubes.Core.Environment
             foreach (var app in this.definedApplications.Where(a => a.Active).ToList())
                 foreach (var asm in app.Assemblies)
                 {
+                    var assemblyName = AssemblyName.GetAssemblyName(Path.Combine(app.Path, asm)).Name;
                     var loadedAsm = AppDomain
                         .CurrentDomain
                         .GetAssemblies()
-                        .FirstOrDefault(a => a.GetName().Name == asm);
+                        .FirstOrDefault(a => a.GetName().Name == assemblyName);
                     if (loadedAsm != null)
                     {
                         var applicationType = loadedAsm
@@ -127,8 +139,18 @@ namespace Cubes.Core.Environment
                             .FirstOrDefault(t => typeof(IApplication).IsAssignableFrom(t));
                         if (applicationType != null)
                         {
+                            var existing = this
+                                .activatedApplications
+                                .FirstOrDefault(app => app.GetType().Name == applicationType.Name);
+                            if (existing != null)
+                            {
+                                logger.LogError("Already instantiated application of type: {applicationType}", applicationType.Name);
+                                logger.LogError("Please check application setup!");
+                                continue;
+                            }
                             var instance = Activator.CreateInstance(applicationType) as IApplication;
                             this.activatedApplications.Add(instance);
+                            logger.LogInformation("Application instantiated: {application}", app.Name);
                         }
                     }
                 }
@@ -140,19 +162,19 @@ namespace Cubes.Core.Environment
             var infoFile = fileSystem.Path.Combine(folder, CubesConstants.Files_LocalApplication);
             if (fileSystem.File.Exists(infoFile))
             {
-                var fileContents = fileSystem.File.ReadAllText(infoFile);
-                var deserializer = new Deserializer();
-                application = deserializer.Deserialize<ApplicationInfo>(fileContents);
+                var fileContents   = fileSystem.File.ReadAllText(infoFile);
+                var deserializer   = new Deserializer();
+                application        = deserializer.Deserialize<ApplicationInfo>(fileContents);
             }
             else
             {
-                application.Active     = true;
-                application.Name       = new DirectoryInfo(folder).Name;
-                application.Path       = folder;
+                application.Active = true;
+                application.Name   = new DirectoryInfo(folder).Name;
             }
+            application.Path = folder;
 
-            if (application.Active && application.Assemblies == null)
-                application.Assemblies = Directory.GetFiles(folder, "*.dll");
+            if (application.Active && (application.Assemblies == null || application.Assemblies.Count == 0))
+                application.Assemblies = fileSystem.Directory.GetFiles(folder, "*.dll");
 
             return application;
         }
@@ -168,7 +190,7 @@ namespace Cubes.Core.Environment
                     var existing = this.loadedAssemblies.FirstOrDefault(asm => asm.AssemblyName == asmName);
                     if (existing != null)
                     {
-                        logger.LogError("Assembly with name {name} is already loaded: {path}", asmName, existing.File);
+                        logger.LogError("Assembly with name {name} is already loaded: {path}", asmName, existing.Path);
                         continue;
                     }
 
@@ -178,7 +200,8 @@ namespace Cubes.Core.Environment
 
                     loadedAssemblies.Add(new LoadedAssembly
                     {
-                        File            = fileSystem.Path.GetFileName(file),
+                        Filename            = fileSystem.Path.GetFileName(file),
+                        Path        = file,
                         AssemblyName    = asm.GetName().Name,
                         AssemblyVersion = asm.GetName().Version.ToString()
                     });

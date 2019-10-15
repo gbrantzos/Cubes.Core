@@ -1,27 +1,12 @@
 CubesNext - TODOs
------------------
+--------------------------------------------------------------------------------
 
-- Make first steps on dotnet core v3
-- Applicationloading and instantiate, with hooks on Startup concerns
 - Environment Settings
 - Proper use of Options patterns, from Applications too (YAML)
 - Transition to MediatR
 - Drop Query executor, in favour of Dapper
 - Start using Autofac
-
-
-Application info
-- Name
-- Path
-- Asemblies (empty for all dll on path)
-- UI path (static content)
-
-
-Host settings
-- Urls (+ports)
-- SSL usage
-- Static files
-- Config format (????) 
+- Static files using IOptions
 
 
 Thoughts about pipeline (MediatR pipeline):
@@ -40,13 +25,26 @@ URLs
 
 
 [ ]     README.md on root folder
-[ ]     Plugin architecture
-[ ]     Pharmex as POC
+[x]     Plugin architecture
+[x]     Pharmex as POC
 [ ]     Deployment plans
 [ ]     Development arrangment for plugins
 [ ]     Replace ISettingsProvider with IOptions
 [ ]     Generic UI shell
 [ ]     Template for new plugins
- 
- 
-https://github.com/aspnet/AspNetCore.Docs/tree/master/aspnetcore/fundamentals/host/platform-specific-configuration/samples
+
+
+Next steps
+--------------------------------------------------------------------------------
+
+ x  1.  Upgrade to .net Core 3
+ x  2.  Initialise logger
+ x  3.  Initialise environment (folders)
+ x  3.  Load applications (assemblies from Apps folder + Cubes.Apps.yaml file)
+ x  4.  Add all configuration files
+ x  5.  Prepare host (URLs + ports)
+ x  6.  Configuration on Startup (DI, Autofac ???, Http middlewares)
+    7.  Start scheduler (hosted service - delayed start??)
+    8.  Consider using Autofac
+    9.  Version numbers (build number, to be shared with CI)
+    10. Deployment scripts - packages

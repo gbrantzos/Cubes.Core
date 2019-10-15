@@ -13,7 +13,7 @@ namespace Cubes.Core
 {
     public static class StartupExtensions
     {
-        public static void AddCubesCore(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCubesCore(this IServiceCollection services, IConfiguration configuration)
         {
             var settingsFormat = configuration.GetValue<string>("settingsFormat", "yaml");
 
@@ -25,6 +25,8 @@ namespace Cubes.Core
             services.AddJobScheduler();
             services.AddTransient<ITypeResolver, TypeResolver>();
             services.AddTransient<ISerializer, JsonSerializer>();
+
+            return services;
         }
 
         public static IConfigurationBuilder AddCubesConfiguration(
@@ -46,6 +48,25 @@ namespace Cubes.Core
                 reloadOnChange: true);
 
             return config;
+        }
+
+        public static IServiceCollection AddApplicationsServices(this IServiceCollection services,
+            ICubesEnvironment cubes)
+        {
+            services.AddSingleton(cubes);
+            foreach (var application in cubes.GetActivatedApplications())
+                application.ConfigureServices(services);
+
+            return services;
+        }
+
+        public static IConfigurationBuilder AddApplicationsConfiguration(this IConfigurationBuilder configuration,
+            ICubesEnvironment cubes)
+        {
+            foreach (var application in cubes.GetActivatedApplications())
+                application.ConfigureAppConfiguration(configuration);
+
+            return configuration;
         }
     }
 }

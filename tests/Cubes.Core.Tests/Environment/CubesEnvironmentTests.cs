@@ -33,7 +33,7 @@ namespace Cubes.Core.Tests.Environment
             var unitUnderTest = new CubesEnvironment("C:\\Cubes", loggerMock.Object, fileSystem);
 
             // Act
-            unitUnderTest.PrepareEnvironment();
+            unitUnderTest.PrepareHost();
 
             // Assert
             loggerMock.Verify(m => m.Log(

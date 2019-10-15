@@ -6,7 +6,7 @@ namespace Cubes.Core.Environment
     public interface IApplication
     {
         // Configure Application configuration
-        IConfiguration ConfigureAppConfiguration(IConfiguration configuration);
+        IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration);
 
         // Configure Services
         IServiceCollection ConfigureServices(IServiceCollection services);

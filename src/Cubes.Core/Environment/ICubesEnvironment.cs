@@ -42,18 +42,19 @@ namespace Cubes.Core.Environment
 
     public class LoadedAssembly
     {
-        public string File { get; set; }
-        public string AssemblyName { get; set; }
+        public string Filename        { get; set; }
+        public string Path            { get; set; }
+        public string AssemblyName    { get; set; }
         public string AssemblyVersion { get; set; }
     }
 
     public class ApplicationInfo
     {
-        public string Name { get; set; } = String.Empty;
-        public bool Active { get; set; } = true;
-        public ICollection<string> Assemblies { get; set; } = new HashSet<string>();
-        public string Path { get; set; } = String.Empty;
-        public string UIPath { get; set; } = String.Empty;
+        public string Name                    { get; set; } = String.Empty;
+        public bool Active                    { get; set; } = true;
+        public string Path                    { get; set; } = String.Empty;
+        public string UIPath                  { get; set; } = String.Empty;
+        public ICollection<string> Assemblies { get; set; }
     }
 
     public enum CubesFolderKind

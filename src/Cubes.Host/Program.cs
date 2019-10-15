@@ -41,9 +41,7 @@ namespace Cubes.Host
                 var rootFolder = GetRootFolder();
                 var cubesEnvironment = new CubesEnvironment(rootFolder,
                     loggerProvider.CreateLogger(typeof(CubesEnvironment).FullName));
-
-                cubesEnvironment.PrepareEnvironment();
-                cubesEnvironment.LoadApplications();
+                cubesEnvironment.PrepareHost();
 
                 CreateHostBuilder(args, cubesEnvironment)
                     .Build()
@@ -76,10 +74,10 @@ namespace Cubes.Host
                 Path.GetDirectoryName(typeof(Program).Assembly.Location) : rootFolder;
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubesEnvironment)
+        public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubes)
         {
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(cubesEnvironment.GetRootFolder())
+                .SetBasePath(cubes.GetRootFolder())
                 .AddJsonFile(CubesConstants.Config_AppSettings, optional: false)
                 .AddCommandLine(args)
                 .Build();
@@ -87,15 +85,23 @@ namespace Cubes.Host
 
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((builder, config) => config.AddCubesConfiguration(cubesEnvironment))
-                .ConfigureServices((builder, services) => services.AddSingleton(cubesEnvironment))
-                .ConfigureLogging(logging => logging.ClearProviders())
+                .UseContentRoot(cubes.GetFolder(CubesFolderKind.StaticContent)) // TODO Reconsider!
+                .ConfigureAppConfiguration((builder, config) =>
+                {
+                    config.AddCubesConfiguration(cubes);
+                    config.AddApplicationsConfiguration(cubes);
+                })
+                .ConfigureServices((builder, services) =>
+                {
+                    services.AddSingleton(cubes);
+                    services.AddApplicationsServices(cubes);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls(urls);
                 })
-                .UseContentRoot(cubesEnvironment.GetFolder(CubesFolderKind.StaticContent))
+                .ConfigureLogging(logging => logging.ClearProviders())
                 .UseNLog();
         }
 

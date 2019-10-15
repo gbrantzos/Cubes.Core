@@ -1,7 +1,7 @@
--   Name: Pharmex.OLD
-    Path: ekei
-    Active: False
+# Applications Definitions
 
--   Name: Test2
-    Path: ekei
-    Active: False
+-   Name: Pharmex
+    Path: C:\Code\CubesNext\Pharmex\src\Cubes.Pharmex\bin\Debug\netstandard2.1
+    Assemblies:
+        -   Cubes.Pharmex.dll
+    Active: true
