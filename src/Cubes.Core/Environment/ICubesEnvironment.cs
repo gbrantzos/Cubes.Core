@@ -6,11 +6,36 @@ namespace Cubes.Core.Environment
 {
     public interface ICubesEnvironment
     {
+        /// <summary>
+        /// Get Cubes specific folder.
+        /// </summary>
+        /// <param name="folderKind"></param>
+        /// <returns></returns>
         string GetFolder(CubesFolderKind folderKind);
-        CubesEnvironmentInformation GetEnvironmentInformation();
 
+        /// <summary>
+        /// Cubes environment information.
+        /// </summary>
+        /// <returns><see cref="CubesEnvironmentInfo"/></returns>
+        CubesEnvironmentInfo GetEnvironmentInformation();
+
+        /// <summary>
+        /// All assemblies loaded during host startup.
+        /// </summary>
+        /// <returns><see cref="IEnumerable{LoadedAssembly}"/></returns>
         IEnumerable<LoadedAssembly> GetLoadedAssemblies();
+
+        /// <summary>
+        /// All applications found during host startup.
+        /// </summary>
+        /// <returns><see cref="IEnumerable{ApplicationInfo}"/></returns>
         IEnumerable<ApplicationInfo> GetApplications();
+
+        /// <summary>
+        /// All applications that are activated.
+        /// </summary>
+        /// <returns><see cref="IEnumerable{IApplication}"/></returns>
+        IEnumerable<IApplication> GetActivatedApplications();
 
         void Start(IServiceProvider serviceProvider);
     }
@@ -20,17 +45,15 @@ namespace Cubes.Core.Environment
         public string File { get; set; }
         public string AssemblyName { get; set; }
         public string AssemblyVersion { get; set; }
-
     }
+
     public class ApplicationInfo
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
         public bool Active { get; set; } = true;
-        public string Path { get; set; }
-        public string[] Assemblies { get; set; }
-        public string UIPath { get; set; }
-
-        public IApplication Instance { get; set; }
+        public ICollection<string> Assemblies { get; set; } = new HashSet<string>();
+        public string Path { get; set; } = String.Empty;
+        public string UIPath { get; set; } = String.Empty;
     }
 
     public enum CubesFolderKind

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Cubes.Core.Environment
 {
-    public class CubesEnvironmentInformation
+    public class CubesEnvironmentInfo
     {
         // Properties
         public DateTime LiveSince     { get; }
@@ -15,7 +15,7 @@ namespace Cubes.Core.Environment
         public string   Mode => IsDebug ? "DEBUG" : "RELEASE";
 
         // Constructor
-        public CubesEnvironmentInformation(string rootFolder)
+        public CubesEnvironmentInfo(string rootFolder)
         {
             RootFolder  = rootFolder;
             Hostname    = Dns.GetHostName();
