@@ -8,6 +8,9 @@ StaticContentSettings:
         AllowBrowsing: true
         IsStaticFiles: false
         ServeUnknownFileTypes: true
+        CustomContentTypes:
+            json: application/json
+            xml: application/xml
     -   RequestPath: pharmex
         FileSystemPath: C:\Code\Cubes\Pharmex.WebApp\dist\pharmex
         DefaultFileNames: index.html

@@ -16,5 +16,6 @@ namespace Cubes.Web.StaticContent
         public bool PathIsAbsolute { get; set; }
         public string DefaultFile { get; set; } = "index.html";
         public bool ServeUnknownFileTypes { get; set; }
+        public Dictionary<string, string> CustomContentTypes { get; set; }
     }
 }

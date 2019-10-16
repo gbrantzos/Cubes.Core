@@ -28,3 +28,12 @@ URLs
 [ ]     Template for new plugins
 [ ]     Version numbers (build number, to be shared with CI)
     
+    
+Content Delivery (thoughts)
+- Content generation
+    i.e.  =>  TContent Generate(params object args[])
+- Content dispatcher
+    i.e.  =>  void Dispatch(TContent content)
+    
+Example EmailGenerator, EmailDispatcher
+Dependency service => ExcelFromQueryResults

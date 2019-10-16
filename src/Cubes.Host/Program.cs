@@ -85,7 +85,7 @@ namespace Cubes.Host
 
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
-                .UseContentRoot(cubes.GetFolder(CubesFolderKind.StaticContent))
+                .UseContentRoot(cubes.GetRootFolder())
                 .ConfigureAppConfiguration((builder, config) =>
                 {
                     config.AddCubesConfiguration(cubes);
@@ -102,6 +102,7 @@ namespace Cubes.Host
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls(urls);
+                    webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.StaticContent));
                 })
                 .ConfigureLogging(logging => logging.ClearProviders())
                 .UseNLog();
