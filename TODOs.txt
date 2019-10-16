@@ -1,7 +1,6 @@
 CubesNext - TODOs
 --------------------------------------------------------------------------------
 
-- Environment Settings
 - Proper use of Options patterns, from Applications too (YAML)
 - Transition to MediatR
 - Drop Query executor, in favour of Dapper

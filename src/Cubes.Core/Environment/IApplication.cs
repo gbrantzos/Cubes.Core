@@ -11,6 +11,9 @@ namespace Cubes.Core.Environment
         // Configure Services
         IServiceCollection ConfigureServices(IServiceCollection services);
 
+        // Swagger documentation file
+        string SwaggerXmlFile { get; }
+
         // Configure http pipeline
     }
 }

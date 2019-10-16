@@ -1,10 +1,7 @@
-using System.Collections.Generic;
-using System.IO;
 using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Environment;
-using Cubes.Core.Jobs;
 using Cubes.Core.Scheduling;
 using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
@@ -17,17 +14,15 @@ namespace Cubes.Core
     {
         public static IServiceCollection AddCubesCore(this IServiceCollection services, IConfiguration configuration)
         {
-            var settingsFormat = configuration.GetValue<string>("settingsFormat", "yaml");
-
-            // Add standard services
-            services.AddSettings(settingsFormat); // TODO To be removed!
-            services.AddDataAccess(configuration);
-            services.AddCommands();
-            services.AddEmailDispatcher();
-            // services.AddJobScheduler(); // TODO Remove
-            services.AddScheduler(typeof(StartupExtensions).Assembly);
-            services.AddTransient<ITypeResolver, TypeResolver>();
-            services.AddTransient<ISerializer, JsonSerializer>();
+            //
+            services.AddDataAccess(configuration)
+                .AddSettings("yaml") // TODO To be removed!
+                .AddCommands()
+                .AddEmailDispatcher()
+                .AddScheduler(typeof(StartupExtensions).Assembly)
+                .AddTransient<ITypeResolver, TypeResolver>()
+                .AddTransient<ISerializer, JsonSerializer>()
+                .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
 
             return services;
         }
@@ -36,15 +31,7 @@ namespace Cubes.Core
             this IConfigurationBuilder config,
             ICubesEnvironment cubesEnvironment)
         {
-            // TODO Possibly method on Cubes Environment
-            var cubesFolders = new Dictionary<string, string>
-                {
-                    { "Cubes:RootFolder"    , cubesEnvironment.GetRootFolder()  },
-                    { "Cubes:AppsFolder"    , cubesEnvironment.GetAppsFolder()  },
-                    { "Cubes:StorageFolder" , cubesEnvironment.GetStorageFolder()  },
-                };
-            config.AddInMemoryCollection(cubesFolders);
-
+            config.AddCubesConfigurationProvider(cubesEnvironment);
             config.AddYamlFile(
                 cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_DataAccess),
                 optional: true,

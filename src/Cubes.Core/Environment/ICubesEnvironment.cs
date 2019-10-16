@@ -36,6 +36,18 @@ namespace Cubes.Core.Environment
         /// </summary>
         /// <returns><see cref="IEnumerable{IApplication}"/></returns>
         IEnumerable<IApplication> GetActivatedApplications();
+
+        /// <summary>
+        /// Add an XML file for Swagger documentation.
+        /// </summary>
+        /// <param name="xmlFile">XML file path</param>
+        void RegisterSwaggerXmlFile(string xmlFile);
+
+        /// <summary>
+        /// Get all Swagger registered XML files.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetSwaggerFiles();
     }
 
     public class LoadedAssembly

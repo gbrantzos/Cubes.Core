@@ -5,8 +5,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using Cubes.Core.Jobs;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 
@@ -27,6 +25,7 @@ namespace Cubes.Core.Environment
         private readonly List<LoadedAssembly> loadedAssemblies;
         private readonly List<ApplicationInfo> definedApplications;
         private readonly List<IApplication> activatedApplications;
+        private readonly List<string> swaggerFiles;
 
         /// <summary>
         /// Constructor that accepts <see cref="IFileSystem"/> to support unit testing.
@@ -43,6 +42,11 @@ namespace Cubes.Core.Environment
             this.loadedAssemblies       = new List<LoadedAssembly>();
             this.definedApplications    = new List<ApplicationInfo>();
             this.activatedApplications  = new List<IApplication>();
+            this.swaggerFiles           = new List<string>
+            {
+                fileSystem.Path.Combine(this.GetType().Assembly.Location, "Cubes.Core.xml"),
+                fileSystem.Path.Combine(this.GetType().Assembly.Location, "Cubes.Web.xml")
+            };
 
             logger.LogInformation($"Starting Cubes, version {environmentInformation.Version}, {environmentInformation.Mode} build...");
             logger.LogInformation($"Cubes root folder: {rootFolder}");
@@ -61,6 +65,14 @@ namespace Cubes.Core.Environment
         public IEnumerable<ApplicationInfo> GetApplications() => this.definedApplications;
 
         public IEnumerable<IApplication> GetActivatedApplications() => this.activatedApplications;
+
+        public void RegisterSwaggerXmlFile(string xmlFile)
+        {
+            if (!String.IsNullOrEmpty(xmlFile))
+                this.swaggerFiles.Add(xmlFile);
+        }
+
+        public IEnumerable<string> GetSwaggerFiles() => this.swaggerFiles;
         #endregion
 
         // The following method is used for environment - server setup only.
@@ -174,6 +186,9 @@ namespace Cubes.Core.Environment
                                 var instance = Activator.CreateInstance(applicationType) as IApplication;
                                 this.activatedApplications.Add(instance);
                                 logger.LogInformation("Application instantiated: {application}", app.Name);
+
+                                // Add Swagger file
+                                this.RegisterSwaggerXmlFile(instance.SwaggerXmlFile);
                             }
                         }
                     }

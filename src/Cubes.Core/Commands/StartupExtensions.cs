@@ -5,7 +5,7 @@ namespace Cubes.Core.Commands
 {
     public static class StartupExtensions
     {
-        public static void AddCommands(this IServiceCollection services)
+        public static IServiceCollection AddCommands(this IServiceCollection services)
         {
             services.AddScoped<ServiceFactory>(p => p.GetService);
             services.AddScoped<ICommandBus, CommandBus>();
@@ -37,6 +37,8 @@ namespace Cubes.Core.Commands
                 .ToList();
             types.ForEach(t => services.AddScoped(typeof(ICommandBusMiddleware<,>), t));
              */
+
+            return services;
         }
     }
 }

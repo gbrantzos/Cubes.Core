@@ -16,5 +16,7 @@ namespace Cubes.Core.Environment
         public static readonly string NLog_SampleFile              = "NLog.Sample.config";
 
         public static readonly string Folders_Common               = "Common";
+
+        public static readonly string Configuration_Section        = "CubesConfig";
     }
 }

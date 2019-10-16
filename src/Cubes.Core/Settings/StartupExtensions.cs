@@ -6,7 +6,7 @@ namespace Cubes.Core.Settings
 {
     public static class StartupExtensions
     {
-        public static void AddSettings(this IServiceCollection services, string settingsFormat)
+        public static IServiceCollection AddSettings(this IServiceCollection services, string settingsFormat)
         {
             if (!(settingsFormat.Equals("json", StringComparison.CurrentCultureIgnoreCase)) &&
                 !(settingsFormat.Equals("yaml", StringComparison.CurrentCultureIgnoreCase)))
@@ -16,6 +16,8 @@ namespace Cubes.Core.Settings
                 services.AddSingleton<ISettingsProvider>(s => new JsonFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
             if (settingsFormat.Equals("yaml", StringComparison.CurrentCultureIgnoreCase))
                 services.AddSingleton<ISettingsProvider>(s => new YamlFilesSettingsProvider(s.GetService<ICubesEnvironment>().GetSettingsFolder()));
+
+            return services;
         }
     }
 }
