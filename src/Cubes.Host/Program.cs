@@ -85,7 +85,7 @@ namespace Cubes.Host
 
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
-                .UseContentRoot(cubes.GetFolder(CubesFolderKind.StaticContent)) // TODO Reconsider!
+                .UseContentRoot(cubes.GetFolder(CubesFolderKind.StaticContent))
                 .ConfigureAppConfiguration((builder, config) =>
                 {
                     config.AddCubesConfiguration(cubes);

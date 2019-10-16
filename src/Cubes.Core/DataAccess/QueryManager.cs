@@ -4,14 +4,14 @@ using Microsoft.Extensions.Options;
 
 namespace Cubes.Core.DataAccess
 {
-    public class SqlQueryManager : ISqlQueryManager
+    public class QueryManager : IQueryManager
     {
         private readonly DataAccessSettings settings;
 
-        public SqlQueryManager(IOptionsSnapshot<DataAccessSettings> options) =>
+        public QueryManager(IOptionsSnapshot<DataAccessSettings> options) =>
             this.settings = options.Value;
 
-        public SqlQuery GetSqlQuery(string queryName)
+        public Query GetSqlQuery(string queryName)
         {
             var queries = settings.Queries;
             var result = queries.FirstOrDefault(i => i.Name.Equals(queryName, StringComparison.CurrentCultureIgnoreCase));

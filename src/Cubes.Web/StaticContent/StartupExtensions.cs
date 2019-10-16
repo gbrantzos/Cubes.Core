@@ -1,25 +1,28 @@
 using System.IO;
 using Cubes.Core.Environment;
-using Cubes.Core.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
 namespace Cubes.Web.StaticContent
 {
+    // TODO Rename file to something more appropriate!
     public static class StartupExtensions
     {
         public static IApplicationBuilder UseStaticContent(this IApplicationBuilder app,
-            ISettingsProvider settingsProvider,
-            ICubesEnvironment environment,
+            IConfiguration configuration,
             ILoggerFactory loggerFactory)
         {
-            var staticContent = settingsProvider.Load<StaticContentSettings>();
-            var rootPath = environment.GetFolder(CubesFolderKind.StaticContent);
-            var logger = loggerFactory.CreateLogger<Content>();
+            var settings = configuration.GetValue<StaticContentSettings>(nameof(StaticContentSettings));
+            var rootPath = configuration.GetCubesConfiguration().StaticContentFolder;
+            var logger   = loggerFactory.CreateLogger<Content>();
 
-            foreach (var item in staticContent.Content)
+            if (settings == null)
+                return app;
+
+            foreach (var item in settings.Content)
             {
                 var contentPath = item.PathIsAbsolute ?
                     item.FileSystemPath :

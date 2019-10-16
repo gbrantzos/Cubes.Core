@@ -9,10 +9,10 @@ namespace Cubes.Core.Commands.Basic
 {
     public class SqlResultsAsEmailHandler : BaseCommandHandler<SqlResultsAsEmailCommand, SqlResultsAsEmailResult>
     {
-        private readonly IDatabaseConnectionManager connectionManager;
+        private readonly IConnectionManager connectionManager;
         private readonly IQueryExecutor queryExecutor;
 
-        public SqlResultsAsEmailHandler(IDatabaseConnectionManager connectionManager, IQueryExecutor queryExecutor)
+        public SqlResultsAsEmailHandler(IConnectionManager connectionManager, IQueryExecutor queryExecutor)
         {
             this.connectionManager = connectionManager;
             this.queryExecutor = queryExecutor;

@@ -13,14 +13,14 @@ namespace Cubes.Core.DataAccess
         /// </summary>
         /// <typeparam name="TResult">Return object type</typeparam>
         /// <param name="namedConnection">Name of connection</param>
-        /// <param name="sqlQuery"><see cref="SqlQuery"/> to execute</param>
+        /// <param name="sqlQuery"><see cref="DataAccess.Query"/> to execute</param>
         /// <param name="parameterValues">Parameter values</param>
         /// <param name="columnToProperty">Column to parameters mappings</param>
         /// <param name="afterPopulating">Action to execute after object is populated</param>
         /// <returns></returns>
         IEnumerable<TResult> Query<TResult>(
             string namedConnection,
-            SqlQuery sqlQuery,
+            Query sqlQuery,
             Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null,
             Action<TResult> afterPopulating = null) where TResult : class, new();
@@ -29,13 +29,13 @@ namespace Cubes.Core.DataAccess
         /// Execute query and convert results to dynamic
         /// </summary>
         /// <param name="namedConnection">Name of connection</param>
-        /// <param name="sqlQuery"><see cref="SqlQuery"/> to execute</param>
+        /// <param name="sqlQuery"><see cref="DataAccess.Query"/> to execute</param>
         /// <param name="parameterValues">Parameter values</param>
         /// <param name="columnToProperty">Column to parameters mappings</param>
         /// <returns></returns>
         IEnumerable<dynamic> Query(
             string namedConnection,
-            SqlQuery sqlQuery,
+            Query sqlQuery,
             Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null);
 
@@ -60,7 +60,7 @@ namespace Cubes.Core.DataAccess
         /// Execute named query and convert results to dynamic
         /// </summary>
         /// <param name="namedConnection">Name of connection</param>
-        /// <param name="namedSqlQuery"><see cref="SqlQuery"/> to execute</param>
+        /// <param name="namedSqlQuery"><see cref="DataAccess.Query"/> to execute</param>
         /// <param name="parameterValues">Parameter values</param>
         /// <param name="columnToProperty">Column to parameters mappings</param>
         /// <returns></returns>

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Cubes.Core.DataAccess
 {
-    public class DatabaseConnectionManager : IDatabaseConnectionManager
+    public class ConnectionManager : IConnectionManager
     {
         private static Dictionary<string, string> knownProviders = new Dictionary<string, string>()
         {
@@ -16,7 +16,7 @@ namespace Cubes.Core.DataAccess
         };
         private readonly DataAccessSettings settings;
 
-        public DatabaseConnectionManager(IOptionsSnapshot<DataAccessSettings> options)
+        public ConnectionManager(IOptionsSnapshot<DataAccessSettings> options)
             => this.settings = options.Value;
 
         public DbConnection GetConnection(string connectionName)

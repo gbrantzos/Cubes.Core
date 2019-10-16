@@ -45,7 +45,7 @@ namespace Cubes.Web.Controllers
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpPost("{connection}")]
-        public ActionResult ExecuteQuery(string connection, [FromBody]SqlQuery query)
+        public ActionResult ExecuteQuery(string connection, [FromBody]Query query)
         {
             var parameters = Request
                 .Query

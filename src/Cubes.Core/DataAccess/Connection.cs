@@ -1,6 +1,6 @@
 namespace Cubes.Core.DataAccess
 {
-    public class DatabaseConnection
+    public class Connection
     {
         public string Name { get; set; }
         public string ConnectionString { get; set; }

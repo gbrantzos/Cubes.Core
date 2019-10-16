@@ -2,15 +2,15 @@ using System.Collections.Generic;
 
 namespace Cubes.Core.DataAccess
 {
-    public class SqlQuery
+    public class Query
     {
         public string Name { get; set; }
         public string Comments { get; set; }
-        public string Query { get; set; }
-        public List<SqlQueryParameter> Parameters { get; set; }
+        public string QueryCommand { get; set; }
+        public List<QueryParameter> Parameters { get; set; }
     }
 
-    public class SqlQueryParameter
+    public class QueryParameter
     {
         public string Name { get; set; }
         public string DbType { get; set; } = "String";

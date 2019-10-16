@@ -7,8 +7,8 @@ namespace Cubes.Core.DataAccess
     {
         public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IDatabaseConnectionManager, DatabaseConnectionManager>();
-            services.AddScoped<ISqlQueryManager, SqlQueryManager>();
+            services.AddScoped<IConnectionManager, ConnectionManager>();
+            services.AddScoped<IQueryManager, QueryManager>();
             services.AddScoped<IQueryExecutor, QueryExecutor>();
 
             services.Configure<DataAccessSettings>(configuration.GetSection(nameof(DataAccessSettings)));

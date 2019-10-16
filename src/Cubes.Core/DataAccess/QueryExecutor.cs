@@ -8,10 +8,10 @@ namespace Cubes.Core.DataAccess
 {
     public class QueryExecutor : IQueryExecutor
     {
-        private readonly ISqlQueryManager queryManager;
-        private readonly IDatabaseConnectionManager connectionManager;
+        private readonly IQueryManager queryManager;
+        private readonly IConnectionManager connectionManager;
 
-        public QueryExecutor(ISqlQueryManager queryManager, IDatabaseConnectionManager connectionManager)
+        public QueryExecutor(IQueryManager queryManager, IConnectionManager connectionManager)
         {
             this.queryManager = queryManager;
             this.connectionManager = connectionManager;
@@ -19,7 +19,7 @@ namespace Cubes.Core.DataAccess
 
         public IEnumerable<TResult> Query<TResult>(
             string namedConnection,
-            SqlQuery sqlQuery,
+            Query sqlQuery,
             Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null,
             Action<TResult> afterPopulating = null) where TResult : class, new()
@@ -33,7 +33,7 @@ namespace Cubes.Core.DataAccess
 
         public IEnumerable<dynamic> Query(
             string namedConnection,
-            SqlQuery sqlQuery,
+            Query sqlQuery,
             Dictionary<string, object> parameterValues,
             Dictionary<string, string> columnToProperty = null)
         {
@@ -67,7 +67,7 @@ namespace Cubes.Core.DataAccess
 
 
         // Helper methods
-        private IDataReader ExecuteSqlQuery(IDbConnection connection, SqlQuery query, Dictionary<string, object> parameterValues)
+        private IDataReader ExecuteSqlQuery(IDbConnection connection, Query query, Dictionary<string, object> parameterValues)
         {
             // Make sure connection is open
             if (connection.State == ConnectionState.Closed)
@@ -75,7 +75,7 @@ namespace Cubes.Core.DataAccess
 
             // Create connection
             var command = connection.CreateCommand();
-            command.CommandText = query.Query;
+            command.CommandText = query.QueryCommand;
 
             // Oracle hack...
             if (command.GetType().Name.Equals("OracleCommand"))

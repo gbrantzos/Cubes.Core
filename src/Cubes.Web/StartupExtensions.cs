@@ -40,13 +40,11 @@ namespace Cubes.Web
 
             return app
                 .UseCustomExceptionHandler(loggerFactory)
-                // TODO Check this
-                //.UseStaticContent(settingsProvider, environment, loggerFactory)
                 .UseHomePage()
+                .UseStaticContent(configuration, loggerFactory)
                 .UseContextProvider()
                 .UseCubesSwagger();
         }
-
 
         public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app, ILoggerFactory loggerFactory)
         {

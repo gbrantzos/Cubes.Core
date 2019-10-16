@@ -6,13 +6,13 @@ namespace Cubes.Core.DataAccess
     [SettingsPrefix("Core")]
     public class DataAccessSettings
     {
-        public List<DatabaseConnection> Connections { get; set; }
-        public List<SqlQuery> Queries { get; set; }
+        public List<Connection> Connections { get; set; }
+        public List<Query> Queries { get; set; }
 
         public DataAccessSettings()
         {
-            Connections = new List<DatabaseConnection>();
-            Queries = new List<SqlQuery>();
+            Connections = new List<Connection>();
+            Queries = new List<Query>();
         }
     }
 }

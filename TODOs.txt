@@ -5,7 +5,7 @@ CubesNext - TODOs
 - Transition to MediatR
 - Drop Query executor, in favour of Dapper
 - Start using Autofac
-- Static files using IOptions
+- Static files using IOptions (check!)
 
 
 Thoughts about pipeline (MediatR pipeline):

@@ -2,7 +2,7 @@ using System.Data.Common;
 
 namespace Cubes.Core.DataAccess
 {
-    public interface IDatabaseConnectionManager
+    public interface IConnectionManager
     {
         DbConnection GetConnection(string connectionName);
     }
