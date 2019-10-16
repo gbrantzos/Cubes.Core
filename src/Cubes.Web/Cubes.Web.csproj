@@ -23,4 +23,12 @@
     <ProjectReference Include="..\Cubes.Core\Cubes.Core.csproj" />
     <EmbeddedResource Include="Resources/*" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Core.StaticContent.Sample.yaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Core.StaticContent.Sample.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

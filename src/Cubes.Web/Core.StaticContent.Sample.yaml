@@ -1,0 +1,17 @@
+# Static content settings
+StaticContentSettings:
+    Content:
+    -   RequestPath: wms
+        FileSystemPath: C:\Code\Cubes\WMS.MobileApp\dist\wms
+        DefaultFileNames: index.html
+        SpaFallback: index.html
+        AllowBrowsing: true
+        IsStaticFiles: false
+        ServeUnknownFileTypes: true
+    -   RequestPath: pharmex
+        FileSystemPath: C:\Code\Cubes\Pharmex.WebApp\dist\pharmex
+        DefaultFileNames: index.html
+        SpaFallback: index.html
+        AllowBrowsing: true
+        IsStaticFiles: false
+        ServeUnknownFileTypes: true

@@ -15,7 +15,8 @@ namespace Cubes.Core.Environment
         private static readonly HashSet<string> configurationFiles = new HashSet<string>
         {
             CubesConstants.Files_DataAccess,
-            CubesConstants.Files_Scheduling
+            CubesConstants.Files_Scheduling,
+            CubesConstants.Files_StaticContent
         };
 
         private readonly string rootFolder;

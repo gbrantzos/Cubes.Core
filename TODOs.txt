@@ -5,7 +5,6 @@ CubesNext - TODOs
 - Transition to MediatR
 - Drop Query executor, in favour of Dapper
 - Start using Autofac
-- Static files using IOptions (check!)
 
 
 Thoughts about pipeline (MediatR pipeline):
@@ -19,31 +18,13 @@ Thoughts about pipeline (MediatR pipeline):
 URLs
 - /docs: Swagger, Wiki, other static
 - /api: RestApi endpoints
-- /Static: Static content
 - /app: Applications clients
 
 
 [ ]     README.md on root folder
-[x]     Plugin architecture
-[x]     Pharmex as POC
-[ ]     Deployment plans
-[x]     Development arrangment for plugins
+[ ]     Deployment scripts - packages
 [ ]     Replace ISettingsProvider with IOptions
 [ ]     Generic UI shell
 [ ]     Template for new plugins
-
-
-Next steps
---------------------------------------------------------------------------------
-
- x  1.  Upgrade to .net Core 3
- x  2.  Initialise logger
- x  3.  Initialise environment (folders)
- x  3.  Load applications (assemblies from Apps folder + Cubes.Apps.yaml file)
- x  4.  Add all configuration files
- x  5.  Prepare host (URLs + ports)
- x  6.  Configuration on Startup (DI, Autofac ???, Http middlewares)
- x  7.  Start scheduler (hosted service - delayed start??)
-    8.  Consider using Autofac
-    9.  Version numbers (build number, to be shared with CI)
-    10. Deployment scripts - packages
+[ ]     Version numbers (build number, to be shared with CI)
+    

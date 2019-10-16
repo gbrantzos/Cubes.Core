@@ -4,6 +4,7 @@ namespace Cubes.Core.Environment
     {
         public static readonly string Files_DataAccess             = "Core.DataAccess.yaml";
         public static readonly string Files_Scheduling             = "Core.Scheduling.yaml";
+        public static readonly string Files_StaticContent          = "Core.StaticContent.yaml";
         public static readonly string Files_Applications           = "Cubes.Applications.yaml";
         public static readonly string Files_Application            = "Application.yaml";
 

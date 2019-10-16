@@ -31,4 +31,9 @@
     <PackageReference Include="Quartz.Serialization.Json" Version="3.0.7" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Core.Scheduling.Sample.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

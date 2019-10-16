@@ -36,6 +36,10 @@ namespace Cubes.Core
                 cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_DataAccess),
                 optional: true,
                 reloadOnChange: true);
+            config.AddYamlFile(
+                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_StaticContent),
+                optional: true,
+                reloadOnChange: true);
 
             return config;
         }

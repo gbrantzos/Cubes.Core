@@ -18,7 +18,7 @@ namespace Cubes.Core.Scheduling
             // Add default properties for Quartz
             var defaults = new NameValueCollection
             {
-                { "quartz.scheduler.instanceName"   , "Quartz Scheduler"                      },
+                { "quartz.scheduler.instanceName"   , "Cubes Scheduler"                       },
                 { "quartz.threadPool.type"          , "Quartz.Simpl.SimpleThreadPool, Quartz" },
                 { "quartz.threadPool.threadCount"   , "4"                                     },
                 { "quartz.jobStore.misfireThreshold", "60000"                                 },
@@ -47,7 +47,7 @@ namespace Cubes.Core.Scheduling
             {
                 var jobs = assemblies
                     .SelectMany(a => a.GetTypes())
-                    .Where(t => t.GetInterfaces().Contains(typeof(Quartz.IJob)) && !t.IsAbstract)
+                    .Where(t => t.GetInterfaces().Contains(typeof(IJob)) && !t.IsAbstract)
                     .ToList();
                 foreach (var jobType in jobs)
                     services.AddTransient(jobType);

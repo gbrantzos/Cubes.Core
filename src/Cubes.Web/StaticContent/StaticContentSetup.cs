@@ -8,14 +8,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Cubes.Web.StaticContent
 {
-    // TODO Rename file to something more appropriate!
-    public static class StartupExtensions
+    public static class StaticContentSetup
     {
         public static IApplicationBuilder UseStaticContent(this IApplicationBuilder app,
             IConfiguration configuration,
             ILoggerFactory loggerFactory)
         {
-            var settings = configuration.GetValue<StaticContentSettings>(nameof(StaticContentSettings));
+            var settings = configuration
+                .GetSection(nameof(StaticContentSettings))
+                .Get<StaticContentSettings>();
             var rootPath = configuration.GetCubesConfiguration().StaticContentFolder;
             var logger   = loggerFactory.CreateLogger<Content>();
 
@@ -34,10 +35,10 @@ namespace Cubes.Web.StaticContent
                     return app;
                 }
 
-                app.Map($"/{item.RequestPath}",
+                app.Map(new PathString(item.RequestPath),
                     builder =>
                     {
-                        logger.LogInformation($"Preparing static content '{item.RequestPath}'");
+                        logger.LogInformation($"Preparing static content listening on '{item.RequestPath}', serving from {contentPath}");
                         var fsOptions = new FileServerOptions
                         {
                             FileProvider = new PhysicalFileProvider(contentPath),
@@ -60,6 +61,7 @@ namespace Cubes.Web.StaticContent
                         });
                     });
             }
+
             return app;
         }
 
@@ -67,7 +69,7 @@ namespace Cubes.Web.StaticContent
         {
             var fsOptions = new FileServerOptions
             {
-                FileProvider = new ManifestEmbeddedFileProvider(typeof(StartupExtensions).Assembly, "Resources"),
+                FileProvider = new ManifestEmbeddedFileProvider(typeof(StaticContentSetup).Assembly, "Resources"),
                 RequestPath = "",
                 EnableDefaultFiles = true
             };

@@ -3,4 +3,4 @@ SchedulerSettings:
         -   Name: Dummy Job
             Active: false
             CronExpression: '0/10 * * * * ?'
-            JobType: Cubes.Core.Scheduling.Jobs.DummyJob
+            JobType: Cubes.Core.Scheduling.Jobs.SampleJob
