@@ -28,7 +28,7 @@ URLs
 [x]     Plugin architecture
 [x]     Pharmex as POC
 [ ]     Deployment plans
-[ ]     Development arrangment for plugins
+[x]     Development arrangment for plugins
 [ ]     Replace ISettingsProvider with IOptions
 [ ]     Generic UI shell
 [ ]     Template for new plugins
@@ -44,7 +44,7 @@ Next steps
  x  4.  Add all configuration files
  x  5.  Prepare host (URLs + ports)
  x  6.  Configuration on Startup (DI, Autofac ???, Http middlewares)
-    7.  Start scheduler (hosted service - delayed start??)
+ x  7.  Start scheduler (hosted service - delayed start??)
     8.  Consider using Autofac
     9.  Version numbers (build number, to be shared with CI)
     10. Deployment scripts - packages

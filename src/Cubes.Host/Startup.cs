@@ -21,7 +21,6 @@ namespace Cubes.Host
             services.AddControllers().AddNewtonsoftJson();
 
             // Setup Cubes
-            services.AddCubesCore(configuration);
             services.AddCubesWeb(configuration);
         }
 
@@ -45,9 +44,6 @@ namespace Cubes.Host
             // Routing
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
-
-            // Finally start Cubes
-            cubesEnvironment.Start(serviceProvider: app.ApplicationServices);
-        }
+       }
     }
 }

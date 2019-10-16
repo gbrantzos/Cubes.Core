@@ -14,6 +14,12 @@ namespace Cubes.Core.Environment
 {
     public class CubesEnvironment : ICubesEnvironment
     {
+        private static readonly HashSet<string> configurationFiles = new HashSet<string>
+        {
+            CubesConstants.Files_DataAccess,
+            CubesConstants.Files_Scheduling
+        };
+
         private readonly string rootFolder;
         private readonly ILogger logger;
         private readonly CubesEnvironmentInfo environmentInformation;
@@ -55,26 +61,40 @@ namespace Cubes.Core.Environment
         public IEnumerable<ApplicationInfo> GetApplications() => this.definedApplications;
 
         public IEnumerable<IApplication> GetActivatedApplications() => this.activatedApplications;
-
-        public void Start(IServiceProvider serviceProvider)
-        {
-            var jobScheduler = serviceProvider.GetService<IJobScheduler>();
-            jobScheduler.StartScheduler();
-        }
         #endregion
 
         // The following method is used for environment - server setup only.
         // There is no need to be included on ICubesEnvironment interface.
         public void PrepareHost()
         {
+            // Ensure needed folders exist
+            CreateFolders();
+
+            // Load assemblies and applications
+            LoadApplications();
+
+            // Create settings files
+            CreateSettingsFile();
+        }
+
+        private void CreateSettingsFile()
+        {
+            foreach (var file in configurationFiles)
+            {
+                var filePath = this.GetFileOnPath(CubesFolderKind.Settings, file);
+                if (!File.Exists(filePath))
+                    File.Create(filePath);
+            }
+        }
+
+        private void CreateFolders()
+        {
             var enumValues = Enum
-                .GetValues(typeof(CubesFolderKind))
-                .Cast<CubesFolderKind>()
-                .Except(new CubesFolderKind[] { CubesFolderKind.Root });
+                            .GetValues(typeof(CubesFolderKind))
+                            .Cast<CubesFolderKind>()
+                            .Except(new CubesFolderKind[] { CubesFolderKind.Root });
             foreach (var value in enumValues)
                 fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(rootFolder, value.ToString()));
-
-            LoadApplications();
         }
 
         private void LoadApplications()
@@ -82,7 +102,7 @@ namespace Cubes.Core.Environment
             var applications = new List<ApplicationInfo>();
 
             // Check if applications file exists
-            var applicationsFile = this.GetFileOnPath(CubesFolderKind.Root, CubesConstants.Files_CentralApplications);
+            var applicationsFile = this.GetFileOnPath(CubesFolderKind.Root, CubesConstants.Files_Applications);
             if (fileSystem.File.Exists(applicationsFile))
             {
                 var fileContents = File.ReadAllText(applicationsFile);
@@ -125,41 +145,50 @@ namespace Cubes.Core.Environment
 
             // Create an instance of each application
             foreach (var app in this.definedApplications.Where(a => a.Active).ToList())
+            {
                 foreach (var asm in app.Assemblies)
                 {
-                    var assemblyName = AssemblyName.GetAssemblyName(Path.Combine(app.Path, asm)).Name;
-                    var loadedAsm = AppDomain
-                        .CurrentDomain
-                        .GetAssemblies()
-                        .FirstOrDefault(a => a.GetName().Name == assemblyName);
-                    if (loadedAsm != null)
+                    try
                     {
-                        var applicationType = loadedAsm
-                            .GetTypes()
-                            .FirstOrDefault(t => typeof(IApplication).IsAssignableFrom(t));
-                        if (applicationType != null)
+                        var assemblyName = AssemblyName.GetAssemblyName(Path.Combine(app.Path, asm)).Name;
+                        var loadedAsm = AppDomain
+                            .CurrentDomain
+                            .GetAssemblies()
+                            .FirstOrDefault(a => a.GetName().Name == assemblyName);
+                        if (loadedAsm != null)
                         {
-                            var existing = this
-                                .activatedApplications
-                                .FirstOrDefault(app => app.GetType().Name == applicationType.Name);
-                            if (existing != null)
+                            var applicationType = loadedAsm
+                                .GetTypes()
+                                .FirstOrDefault(t => typeof(IApplication).IsAssignableFrom(t));
+                            if (applicationType != null)
                             {
-                                logger.LogError("Already instantiated application of type: {applicationType}", applicationType.Name);
-                                logger.LogError("Please check application setup!");
-                                continue;
+                                var existing = this
+                                    .activatedApplications
+                                    .FirstOrDefault(app => app.GetType().Name == applicationType.Name);
+                                if (existing != null)
+                                {
+                                    logger.LogError("Already instantiated application of type: {applicationType}", applicationType.Name);
+                                    logger.LogError("Please check application setup!");
+                                    continue;
+                                }
+                                var instance = Activator.CreateInstance(applicationType) as IApplication;
+                                this.activatedApplications.Add(instance);
+                                logger.LogInformation("Application instantiated: {application}", app.Name);
                             }
-                            var instance = Activator.CreateInstance(applicationType) as IApplication;
-                            this.activatedApplications.Add(instance);
-                            logger.LogInformation("Application instantiated: {application}", app.Name);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Failed to instantiate application {application}", app.Name);
+                    }
                 }
+            }
         }
 
         private ApplicationInfo GetApplicationInfo(string folder)
         {
             var application = new ApplicationInfo();
-            var infoFile = fileSystem.Path.Combine(folder, CubesConstants.Files_LocalApplication);
+            var infoFile = fileSystem.Path.Combine(folder, CubesConstants.Files_Application);
             if (fileSystem.File.Exists(infoFile))
             {
                 var fileContents   = fileSystem.File.ReadAllText(infoFile);

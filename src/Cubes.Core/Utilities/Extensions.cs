@@ -72,7 +72,7 @@ namespace Cubes.Core.Utilities
         }
 
         /// <summary>
-        /// Get property of object with type TProperty. Object must be nullable.
+        /// Get property of object with type TProperty. Object must be null-able.
         /// </summary>
         /// <typeparam name="TProperty">Type of property to find</typeparam>
         /// <param name="obj">Object to search for property</param>
@@ -124,5 +124,30 @@ namespace Cubes.Core.Utilities
             else
                 return str;
         }
+
+        // https://stackoverflow.com/a/9314733
+
+        /// <summary>
+        /// Get hierarchical structure (parent - child)
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="nextItem"></param>
+        /// <param name="canContinue"></param>
+        /// <returns></returns>
+        public static IEnumerable<TSource> FromHierarchy<TSource>(
+            this TSource source,
+            Func<TSource, TSource> nextItem,
+            Func<TSource, bool> canContinue)
+        {
+            for (var current = source; canContinue(current); current = nextItem(current))
+                yield return current;
+        }
+
+        public static IEnumerable<TSource> FromHierarchy<TSource>(
+            this TSource source,
+            Func<TSource, TSource> nextItem)
+            where TSource : class
+            => FromHierarchy(source, nextItem, s => s != null);
     }
 }

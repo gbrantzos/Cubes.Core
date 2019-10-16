@@ -36,8 +36,6 @@ namespace Cubes.Core.Environment
         /// </summary>
         /// <returns><see cref="IEnumerable{IApplication}"/></returns>
         IEnumerable<IApplication> GetActivatedApplications();
-
-        void Start(IServiceProvider serviceProvider);
     }
 
     public class LoadedAssembly

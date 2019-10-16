@@ -94,6 +94,8 @@ namespace Cubes.Host
                 .ConfigureServices((builder, services) =>
                 {
                     services.AddSingleton(cubes);
+                    services.AddCubesCore(configuration);
+
                     services.AddApplicationsServices(cubes);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>

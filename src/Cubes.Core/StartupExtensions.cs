@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.IO;
 using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Environment;
 using Cubes.Core.Jobs;
+using Cubes.Core.Scheduling;
 using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +24,8 @@ namespace Cubes.Core
             services.AddDataAccess(configuration);
             services.AddCommands();
             services.AddEmailDispatcher();
-            services.AddJobScheduler();
+            // services.AddJobScheduler(); // TODO Remove
+            services.AddScheduler(typeof(StartupExtensions).Assembly);
             services.AddTransient<ITypeResolver, TypeResolver>();
             services.AddTransient<ISerializer, JsonSerializer>();
 
@@ -43,7 +46,7 @@ namespace Cubes.Core
             config.AddInMemoryCollection(cubesFolders);
 
             config.AddYamlFile(
-                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, "Core.DataSettings.yaml"),
+                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_DataAccess),
                 optional: true,
                 reloadOnChange: true);
 
