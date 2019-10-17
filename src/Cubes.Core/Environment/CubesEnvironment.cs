@@ -43,10 +43,12 @@ namespace Cubes.Core.Environment
             this.loadedAssemblies       = new List<LoadedAssembly>();
             this.definedApplications    = new List<ApplicationInfo>();
             this.activatedApplications  = new List<IApplication>();
+
+            var assemblyPath            = fileSystem.Path.GetDirectoryName(this.GetType().Assembly.Location);
             this.swaggerFiles           = new List<string>
             {
-                fileSystem.Path.Combine(this.GetType().Assembly.Location, "Cubes.Core.xml"),
-                fileSystem.Path.Combine(this.GetType().Assembly.Location, "Cubes.Web.xml")
+                fileSystem.Path.Combine(assemblyPath, "Cubes.Core.xml"),
+                fileSystem.Path.Combine(assemblyPath, "Cubes.Web.xml")
             };
 
             logger.LogInformation($"Starting Cubes, version {environmentInformation.Version}, {environmentInformation.Mode} build...");

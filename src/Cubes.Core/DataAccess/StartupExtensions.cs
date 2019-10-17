@@ -9,8 +9,6 @@ namespace Cubes.Core.DataAccess
         {
             services.AddScoped<IConnectionManager, ConnectionManager>();
             services.AddScoped<IQueryManager, QueryManager>();
-            services.AddScoped<IQueryExecutor, QueryExecutor>();
-
             services.Configure<DataAccessSettings>(configuration.GetSection(nameof(DataAccessSettings)));
 
             return services;

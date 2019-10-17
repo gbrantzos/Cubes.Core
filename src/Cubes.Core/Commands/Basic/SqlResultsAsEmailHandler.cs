@@ -4,19 +4,16 @@ using System.Linq;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Utilities;
+using Dapper;
 
 namespace Cubes.Core.Commands.Basic
 {
     public class SqlResultsAsEmailHandler : BaseCommandHandler<SqlResultsAsEmailCommand, SqlResultsAsEmailResult>
     {
         private readonly IConnectionManager connectionManager;
-        private readonly IQueryExecutor queryExecutor;
 
-        public SqlResultsAsEmailHandler(IConnectionManager connectionManager, IQueryExecutor queryExecutor)
-        {
-            this.connectionManager = connectionManager;
-            this.queryExecutor = queryExecutor;
-        }
+        public SqlResultsAsEmailHandler(IConnectionManager connectionManager)
+            => this.connectionManager = connectionManager;
 
         protected override SqlResultsAsEmailResult HandleInternal(SqlResultsAsEmailCommand command)
         {
@@ -70,8 +67,11 @@ namespace Cubes.Core.Commands.Basic
 
             foreach (var query in sqlQueries)
             {
-                var results = queryExecutor.Query(connectionName, query.Value, null);
-                toReturn.Add(query.Key, results);
+                using (var cnx = this.connectionManager.GetConnection(connectionName))
+                {
+                    var results = cnx.Query<dynamic>(query.Value);
+                    toReturn.Add(query.Key, results);
+                }
             }
 
             return toReturn;

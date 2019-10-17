@@ -38,12 +38,18 @@ namespace Cubes.Web
             app.UseSwagger(c => c.RouteTemplate = "docs/{documentName}/swagger.json");
             app.UseSwaggerUI(c =>
             {
+                c.InjectStylesheet("https://raw.githubusercontent.com/ostranme/swagger-ui-themes/develop/themes/3.x/theme-muted.css");
                 c.DocExpansion(DocExpansion.List);
                 c.SwaggerEndpoint("/docs/v1/swagger.json", "Cubes API V1");
                 c.RoutePrefix = "docs/api";
 
                 c.DisplayRequestDuration();
                 c.DocumentTitle = "Cubes API";
+            });
+            app.UseReDoc(c =>
+            {
+                c.RoutePrefix = "docs/api-docs";
+                c.SpecUrl = "/docs/v1/swagger.json";
             });
 
             return app;

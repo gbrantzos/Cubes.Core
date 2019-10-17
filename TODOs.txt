@@ -1,10 +1,15 @@
 CubesNext - TODOs
 --------------------------------------------------------------------------------
 
-- Proper use of Options patterns, from Applications too (YAML)
-- Transition to MediatR
-- Drop Query executor, in favour of Dapper
-- Start using Autofac
+[ ]     Transition to MediatR
+[ ]     Proper use of Options patterns, from Applications too (YAML)
+[ ]     Replace ISettingsProvider with IOptions
+[ ]     Version numbers (build number, to be shared with CI)
+[ ]     Start using Autofac
+[ ]     Deployment scripts - packages
+[ ]     Template for new plugins
+[ ]     Generic UI shell
+[ ]     Provision for settings editing (save)
 
 
 Thoughts about pipeline (MediatR pipeline):
@@ -17,23 +22,16 @@ Thoughts about pipeline (MediatR pipeline):
 
 URLs
 - /docs: Swagger, Wiki, other static
+    TODO: Add themes for Swagger, consider ReDoc
 - /api: RestApi endpoints
 - /app: Applications clients
 
 
-[ ]     README.md on root folder
-[ ]     Deployment scripts - packages
-[ ]     Replace ISettingsProvider with IOptions
-[ ]     Generic UI shell
-[ ]     Template for new plugins
-[ ]     Version numbers (build number, to be shared with CI)
-    
-    
 Content Delivery (thoughts)
 - Content generation
     i.e.  =>  TContent Generate(params object args[])
 - Content dispatcher
     i.e.  =>  void Dispatch(TContent content)
-    
+
 Example EmailGenerator, EmailDispatcher
 Dependency service => ExcelFromQueryResults
