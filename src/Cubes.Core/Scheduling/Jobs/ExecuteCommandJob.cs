@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Quartz;
 
-namespace Cubes.Core.Jobs
+namespace Cubes.Core.Scheduling.Jobs
 {
     public class ExecuteCommandJob : BaseQuartzJob
     {
@@ -37,12 +37,13 @@ namespace Cubes.Core.Jobs
             this.settingsProvider = settingsProvider;
             this.emailDispatcher = emailDispatcher;
         }
+
         public override Task ExecuteInternal(IJobExecutionContext context)
         {
             JobParameterInternal jobParameter = null;
             try
             {
-                var prmAsString = context.JobDetail.JobDataMap.GetString(QuartzJobDataParameters.PARAMETERS_KEY);
+                var prmAsString = context.JobDetail.JobDataMap.GetString("MUST BE A CONSTANT"); // TODO Check this!
                 var jObject = JObject.Parse(prmAsString);
                 jobParameter = new JobParameterInternal
                 {
@@ -66,7 +67,6 @@ namespace Cubes.Core.Jobs
                 if (result.ExecutionResult != CommandExecutionResult.Success)
                 {
                     logger.LogWarning(result.Message);
-                    SetResult(result.Message);
                 }
                 else
                 {
@@ -80,7 +80,6 @@ namespace Cubes.Core.Jobs
                         settings.ThrowIfNull("SmtpSettings");
                         emailDispatcher.DispatchEmail(email, settings);
                     }
-                    SetResult(result.Message);
                 }
             }
             catch (Exception x)

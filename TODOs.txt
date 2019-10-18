@@ -35,3 +35,7 @@ Content Delivery (thoughts)
 
 Example EmailGenerator, EmailDispatcher
 Dependency service => ExcelFromQueryResults
+
+
+Check: Unhandled exceptions (at least log)
+    i.e. YamlDotNet.Core.SyntaxErrorException

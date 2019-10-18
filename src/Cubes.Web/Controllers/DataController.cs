@@ -82,13 +82,31 @@ namespace Cubes.Web.Controllers
         /// <returns></returns>
         [HttpGet("queries/{connectionName}/{queryName}")]
         public async Task<IActionResult> ExecuteQuery(string connectionName, string queryName)
+            => await ExecuteQueryInternal(connectionName, queryName, null);
+
+        /// <summary>
+        /// Execute query defined in request
+        /// </summary>
+        /// <remarks>
+        /// Execute query defined in requests body using a known database connection.
+        /// Query string contains values for query parameters.
+        /// </remarks>
+        /// <param name="connectionName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpPost("queries/{connectionName}")]
+        public async Task<IActionResult> ExecuteQuery(string connectionName, [FromBody] Query query)
+            => await ExecuteQueryInternal(connectionName, null, query);
+
+        private async Task<IActionResult> ExecuteQueryInternal(string connectionName, string queryName, Query query)
         {
             try
             {
                 using var cnx = this.connectionManager.GetConnection(connectionName);
                 await cnx.OpenAsync();
 
-                var query = this.queryManager.GetSqlQuery(queryName);
+                if (query == null)
+                    query = this.queryManager.GetSqlQuery(queryName);
                 var dynamicParameters = new DynamicParameters();
                 if (Request.Query.Count > 0)
                 {
