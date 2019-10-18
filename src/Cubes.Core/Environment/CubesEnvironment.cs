@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Autofac;
 using Figgle;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;

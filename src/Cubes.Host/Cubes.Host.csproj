@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.9.4" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.0.0" />
     <PackageReference Include="NLog" Version="4.6.7" />

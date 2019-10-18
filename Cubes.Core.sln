@@ -29,6 +29,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documents", "documents", "{F5F88370-397C-4308-ADFC-09BDE881DB85}"
 	ProjectSection(SolutionItems) = preProject
 		documents\Commands.md = documents\Commands.md
+		documents\TODOs.txt = documents\TODOs.txt
 	EndProjectSection
 EndProject
 Global

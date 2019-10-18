@@ -1,3 +1,4 @@
+using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,9 @@ namespace Cubes.Core.Environment
 
         // Configure Services
         IServiceCollection ConfigureServices(IServiceCollection services);
+
+        // Register Services on Container (Autofac)
+        ContainerBuilder RegisterServices(ContainerBuilder builder);
 
         // Swagger documentation file
         string SwaggerXmlFile { get; }

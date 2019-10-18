@@ -1,12 +1,14 @@
 using System;
 using System.IO;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Cubes.Core;
 using Cubes.Core.Environment;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Cubes.Core;
 using NLog.Web;
 using NLog.Extensions.Logging;
 
@@ -85,6 +87,7 @@ namespace Cubes.Host
 
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseWindowsService()
                 .UseContentRoot(cubes.GetRootFolder())
                 .ConfigureAppConfiguration((builder, config) =>
@@ -96,6 +99,12 @@ namespace Cubes.Host
                 {
                     logging.ClearProviders();
                     logging.AddNLog();
+                })
+                .ConfigureContainer<ContainerBuilder>(builder =>
+                {
+                    builder
+                        .RegisterCubeServices()
+                        .RegisterApplicationServices(cubes);
                 })
                 .ConfigureServices((builder, services) =>
                 {

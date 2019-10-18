@@ -5,7 +5,6 @@ CubesNext - TODOs
 [ ]     Proper use of Options patterns, from Applications too (YAML)
 [ ]     Replace ISettingsProvider with IOptions
 [ ]     Version numbers (build number, to be shared with CI)
-[ ]     Start using Autofac
 [ ]     Deployment scripts - packages
 [ ]     Template for new plugins
 [ ]     Generic UI shell
@@ -35,7 +34,3 @@ Content Delivery (thoughts)
 
 Example EmailGenerator, EmailDispatcher
 Dependency service => ExcelFromQueryResults
-
-
-Check: Unhandled exceptions (at least log)
-    i.e. YamlDotNet.Core.SyntaxErrorException
