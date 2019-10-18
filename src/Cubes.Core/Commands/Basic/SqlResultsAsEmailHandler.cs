@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Utilities;
 using Dapper;
+using MediatR;
 
 namespace Cubes.Core.Commands.Basic
 {
-    public class SqlResultsAsEmailHandler : BaseCommandHandler<SqlResultsAsEmailCommand, SqlResultsAsEmailResult>
+    public class SqlResultsAsEmailHandler : IRequestHandler<SqlResultsAsEmailCommand, SqlResultsAsEmailResult>
     {
         private readonly IConnectionManager connectionManager;
 
         public SqlResultsAsEmailHandler(IConnectionManager connectionManager)
             => this.connectionManager = connectionManager;
 
-        protected override SqlResultsAsEmailResult HandleInternal(SqlResultsAsEmailCommand command)
+        public  Task<SqlResultsAsEmailResult> Handle(SqlResultsAsEmailCommand command, CancellationToken cancellationToken)
         {
             if (command.SqlQueries.Count <= 0)
                 throw new ArgumentException("No queries defined!");
@@ -58,7 +61,7 @@ namespace Cubes.Core.Commands.Basic
             };
             if (!rowsFound && command.SendIfDataExists)
                 toReturn.EmailContent = null;
-            return toReturn;
+            return Task.FromResult(toReturn);
         }
 
         private Dictionary<string, IEnumerable<dynamic>> GetQueryResults(string connectionName, Dictionary<string, string> sqlQueries)

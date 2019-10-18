@@ -1,12 +1,14 @@
-using System;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 
 namespace Cubes.Core.Commands.Basic
 {
-    public class RunOsProcessHandler : BaseCommandHandler<RunOsProcessCommand, RunOsProcessResult>
+    public class RunOsProcessHandler : IRequestHandler<RunOsProcessCommand, RunOsProcessResult>
     {
-        protected override RunOsProcessResult HandleInternal(RunOsProcessCommand command)
+        public Task<RunOsProcessResult> Handle(RunOsProcessCommand command, CancellationToken cancellationToken)
         {
             // Helpers
             var output = new StringBuilder();
@@ -38,12 +40,13 @@ namespace Cubes.Core.Commands.Basic
 
             var msg = output.ToString();
 
-            return new RunOsProcessResult
+            var result = new RunOsProcessResult
             {
                 Message  = $"Process finished, exit code {process.ExitCode}",
                 ExitCode = process.ExitCode,
                 Output   = output.ToString()
             };
+            return Task.FromResult(result);
         }
     }
 }

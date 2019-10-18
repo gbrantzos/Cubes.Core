@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Cubes.Core.Commands;
 using Cubes.Core.Utilities;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -10,31 +12,31 @@ namespace Cubes.Web.Controllers
     [ApiController, Route("api/[controller]")]
     public class CommandController : ControllerBase
     {
-        private readonly ICommandBus commandBus;
+        private readonly IMediator mediator;
         private readonly ITypeResolver typeResolver;
 
-        public CommandController(ICommandBus commandBus, ITypeResolver typeResolver)
+        public CommandController(IMediator mediator, ITypeResolver typeResolver)
         {
-            this.commandBus = commandBus;
+            this.mediator     = mediator;
             this.typeResolver = typeResolver;
         }
 
         /// <summary>
-        /// Get all available commands
+        /// Get all available requests
         /// </summary>
         /// <remarks>
-        /// List of all available commands with sample empty command instance as JSON.
+        /// List of all available requests with sample empty request instance as JSON.
         /// </remarks>
         /// <returns></returns>
         [HttpGet]
         public ActionResult Get()
         {
-            var commandType = typeof(ICommand<>);
+            var commandType = typeof(IRequest<>);
             var commandTypes = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
                 .SelectMany(a => a.GetTypes())
-                .Where(t => t.IsCommand())
+                .Where(t => t.IsMediatorRequest())
                 .Select(t =>
                 {
                     var attribute = t.GetAttribute<DisplayAttribute>();
@@ -61,7 +63,7 @@ namespace Cubes.Web.Controllers
         /// <param name="commandInst"></param>
         /// <returns></returns>
         [HttpPost, Route("{commandType}")]
-        public ActionResult Execute(string commandType, [FromBody]JToken commandInst)
+        public async Task<ActionResult> Execute(string commandType, [FromBody]JToken commandInst)
         {
             if (commandInst == null)
                 return BadRequest("Body of request cannot be null!");
@@ -74,7 +76,7 @@ namespace Cubes.Web.Controllers
             if (instance == null)
                 return BadRequest($"Given instance is not a valid JSON object of type '{commandType}'");
 
-            var result = commandBus.Submit(instance);
+            object result = await mediator.Send(instance);
             return Ok(result);
         }
     }

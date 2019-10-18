@@ -53,7 +53,7 @@ namespace Cubes.Core.Environment
                 fileSystem.Path.Combine(assemblyPath, "Cubes.Web.xml")
             };
 
-            var figgle  = FiggleFonts.Slant.Render("Cubes  v5");
+            var figgle  = FiggleFonts.Slant.Render(" Cubes v5");
             var version = $"{environmentInformation.Version}, {environmentInformation.Mode}";
             var message = $"Starting Cubes, version {version} build...{System.Environment.NewLine}{figgle}";
             logger.LogInformation(message);

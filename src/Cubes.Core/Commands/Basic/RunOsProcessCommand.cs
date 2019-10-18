@@ -1,10 +1,11 @@
 using System;
 using Cubes.Core.Utilities;
+using MediatR;
 
 namespace Cubes.Core.Commands.Basic
 {
     [Display("Run OS process")]
-    public class RunOsProcessCommand : ICommand<RunOsProcessResult>
+    public class RunOsProcessCommand : IRequest<RunOsProcessResult>
     {
         /// <summary>
         /// OS command to start.

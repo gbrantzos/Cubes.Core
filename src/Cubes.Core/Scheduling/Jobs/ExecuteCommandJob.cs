@@ -4,6 +4,7 @@ using Cubes.Core.Commands;
 using Cubes.Core.Email;
 using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,21 +22,21 @@ namespace Cubes.Core.Scheduling.Jobs
 
         private readonly ILogger<ExecuteCommandJob> logger;
         private readonly ITypeResolver typeResolver;
-        private readonly ICommandBus commandBus;
+        private readonly IMediator mediator;
         private readonly ISettingsProvider settingsProvider;
         private readonly IEmailDispatcher emailDispatcher;
 
         public ExecuteCommandJob(ILogger<ExecuteCommandJob> logger,
             ITypeResolver typeResolver,
-            ICommandBus commandBus,
+            IMediator mediator,
             ISettingsProvider settingsProvider,
             IEmailDispatcher emailDispatcher)
         {
-            this.logger = logger;
-            this.typeResolver = typeResolver;
-            this.commandBus = commandBus;
+            this.logger           = logger;
+            this.typeResolver     = typeResolver;
+            this.mediator         = mediator;
             this.settingsProvider = settingsProvider;
-            this.emailDispatcher = emailDispatcher;
+            this.emailDispatcher  = emailDispatcher;
         }
 
         public override Task ExecuteInternal(IJobExecutionContext context)
@@ -63,12 +64,12 @@ namespace Cubes.Core.Scheduling.Jobs
                 var command = JsonConvert.DeserializeObject(jobParameter.CommandInstance, type);
 
                 logger.LogInformation($"Executing '{command.GetType().Name}' ...");
-                var result = commandBus.Submit(command);
-                if (result.ExecutionResult != CommandExecutionResult.Success)
-                {
-                    logger.LogWarning(result.Message);
-                }
-                else
+                var result = mediator.Send(command);
+                //if (result.ExecutionResult != CommandExecutionResult.Success)
+                //{
+                //    logger.LogWarning(result.Message);
+                //}
+                //else
                 {
                     // If results contain an EmailContent property sent email
                     var email = result.GetPropertyByType<EmailContent>();

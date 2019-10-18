@@ -17,7 +17,6 @@ namespace Cubes.Core
             //
             services.AddDataAccess(configuration)
                 .AddSettings("yaml") // TODO To be removed!
-                .AddCommands()
                 .AddEmailDispatcher()
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()

@@ -1,4 +1,5 @@
 using Autofac;
+using Cubes.Core.Commands.Basic;
 using Cubes.Core.Environment;
 using MediatR;
 
@@ -9,7 +10,7 @@ namespace Cubes.Core
         public static ContainerBuilder RegisterCubeServices(this ContainerBuilder builder)
         {
             // Register our command bus, MediatR
-            builder.RegisterType<IMediator>()
+            builder.RegisterType<Mediator>()
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
             builder.Register<ServiceFactory>(context =>
@@ -17,6 +18,10 @@ namespace Cubes.Core
                 var c = context.Resolve<IComponentContext>();
                 return t => c.Resolve(t);
             });
+
+            // Register basic jobs
+            builder.RegisterType<RunOsProcessHandler>().AsImplementedInterfaces();
+            builder.RegisterType<SqlResultsAsEmailHandler>().AsImplementedInterfaces();
 
             return builder;
         }
