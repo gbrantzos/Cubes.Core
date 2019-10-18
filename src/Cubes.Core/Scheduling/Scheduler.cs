@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CronExpressionDescriptor;
 using Cubes.Core.Environment;
-//using CronExpressionDescriptor;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -161,9 +160,9 @@ namespace Cubes.Core.Scheduling
                 };
                 if (!String.IsNullOrEmpty(jobStatus.CronExpression))
                 {
-                    // var t = CronScheduleBuilder.CronSchedule(jobStatus.CronExpression).Build() as CronTriggerImpl;
-                    // jobStatus.CronExpressionDescription = t.GetExpressionSummary();
-                    // jobStatus.CronExpressionDescription = ExpressionDescriptor.GetDescription(jobStatus.CronExpression);
+                    jobStatus.CronExpressionDescription = ExpressionDescriptor
+                        .GetDescription(jobStatus.CronExpression)
+                        .ToLowerFirstChar();
                 }
 
                 if (internalDetail.LastExecutionException != null)

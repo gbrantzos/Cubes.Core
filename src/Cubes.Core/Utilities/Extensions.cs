@@ -149,5 +149,18 @@ namespace Cubes.Core.Utilities
             Func<TSource, TSource> nextItem)
             where TSource : class
             => FromHierarchy(source, nextItem, s => s != null);
+
+        /// <summary>
+        /// Make first letter of string lower
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ToLowerFirstChar(this string input)
+        {
+            string newString = input;
+            if (!String.IsNullOrEmpty(newString) && Char.IsUpper(newString[0]))
+                newString = Char.ToLower(newString[0]) + newString.Substring(1);
+            return newString;
+        }
     }
 }

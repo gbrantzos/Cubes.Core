@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Figgle;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 
@@ -51,7 +52,10 @@ namespace Cubes.Core.Environment
                 fileSystem.Path.Combine(assemblyPath, "Cubes.Web.xml")
             };
 
-            logger.LogInformation($"Starting Cubes, version {environmentInformation.Version}, {environmentInformation.Mode} build...");
+            var figgle  = FiggleFonts.Slant.Render("Cubes  v5");
+            var version = $"{environmentInformation.Version}, {environmentInformation.Mode}";
+            var message = $"Starting Cubes, version {version} build...{System.Environment.NewLine}{figgle}";
+            logger.LogInformation(message);
             logger.LogInformation($"Cubes root folder: {rootFolder}");
         }
 

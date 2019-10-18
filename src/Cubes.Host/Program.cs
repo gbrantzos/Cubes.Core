@@ -85,11 +85,17 @@ namespace Cubes.Host
 
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
+                .UseWindowsService()
                 .UseContentRoot(cubes.GetRootFolder())
                 .ConfigureAppConfiguration((builder, config) =>
                 {
                     config.AddCubesConfiguration(cubes);
                     config.AddApplicationsConfiguration(cubes);
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddNLog();
                 })
                 .ConfigureServices((builder, services) =>
                 {
@@ -103,9 +109,7 @@ namespace Cubes.Host
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls(urls);
                     webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.StaticContent));
-                })
-                .ConfigureLogging(logging => logging.ClearProviders())
-                .UseNLog();
+                });
         }
 
         private static ILoggerProvider GetNLogProvider()
