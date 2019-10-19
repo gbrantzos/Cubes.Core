@@ -1,7 +1,6 @@
 CubesNext - TODOs
 --------------------------------------------------------------------------------
 
-[ ]     Transition to MediatR
 [ ]     Proper use of Options patterns, from Applications too (YAML)
 [ ]     Replace ISettingsProvider with IOptions
 [ ]     Version numbers (build number, to be shared with CI)

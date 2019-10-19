@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Cubes.Core.Email;
 using Cubes.Core.Utilities;
-using MediatR;
 
 namespace Cubes.Core.Commands.Basic
 {
     [Display("Execute SQL and wrap results in e-mail")]
-    public class SqlResultsAsEmailCommand : MediatR.IRequest<SqlResultsAsEmailResult>
+    public class SqlResultsAsEmail : Request<SqlResultsAsEmailResult>
     {
         public string DbConnection { get; set; }
         public Dictionary<string, string> SqlQueries { get; set; }
@@ -22,7 +21,7 @@ namespace Cubes.Core.Commands.Basic
         {
             var text = SqlQueries.Count > 1 ?
                 $"Run {SqlQueries.Count} queries on {DbConnection} and send as email" :
-                $"Run sql query {SqlQueries.First().Value} on {DbConnection} and send as email";
+                $"Run query {SqlQueries.First().Value} on {DbConnection} and send as email";
             return text;
         }
     }

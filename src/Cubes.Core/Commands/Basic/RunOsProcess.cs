@@ -5,7 +5,7 @@ using MediatR;
 namespace Cubes.Core.Commands.Basic
 {
     [Display("Run OS process")]
-    public class RunOsProcessCommand : IRequest<RunOsProcessResult>
+    public class RunOsProcess : Request<RunOsProcessResult>
     {
         /// <summary>
         /// OS command to start.
@@ -27,7 +27,7 @@ namespace Cubes.Core.Commands.Basic
         /// </summary>
         public int TimeoutSecs { get; set; }
 
-        public RunOsProcessCommand() => TimeoutSecs = 30;
+        public RunOsProcess() => TimeoutSecs = 30;
 
         public override string ToString() => $"Run {Command} with {(String.IsNullOrEmpty(Arguments)? "no argumets" : $"args '{Arguments}'")}, in {StartIn.IfNullOrEmpty("current directory")}";
 
