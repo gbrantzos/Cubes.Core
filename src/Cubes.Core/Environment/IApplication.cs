@@ -18,6 +18,7 @@ namespace Cubes.Core.Environment
         // Swagger documentation file
         string SwaggerXmlFile { get; }
 
+        string[] AssembliesWithControllers { get; }
         // Configure http pipeline
     }
 }

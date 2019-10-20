@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Autofac;
+using Cubes.Core.DataAccess;
+using Cubes.Core.Email;
+using Cubes.Core.Scheduling;
 using Figgle;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
@@ -14,12 +18,23 @@ namespace Cubes.Core.Environment
 {
     public class CubesEnvironment : ICubesEnvironment
     {
-        private static readonly HashSet<string> configurationFiles = new HashSet<string>
+        private static readonly List<(string Filename, Func<object> CreateDefaultObject)> configurationFiles
+            = new List<(string, Func<object>)>
         {
-            CubesConstants.Files_DataAccess,
-            CubesConstants.Files_Scheduling,
-            CubesConstants.Files_StaticContent
+            (CubesConstants.Files_DataAccess,    () => DataAccessSettings.Create()),
+            (CubesConstants.Files_Scheduling,    () => SchedulerSettings.Create()),
+            (CubesConstants.Files_SmtpSettings,  () => SmtpSettingsProfiles.Create()),
+            (CubesConstants.Files_StaticContent, CreateStaticContentSettings)
         };
+
+        private static object CreateStaticContentSettings()
+        {
+            var asm = Assembly.Load("Cubes.Web");
+            var type = asm
+                .GetTypes()
+                .FirstOrDefault(t => t.FullName == "Cubes.Web.StaticContent.StaticContentSettings");
+            return type.GetMethod("Create").Invoke(null, null);
+        }
 
         private readonly string rootFolder;
         private readonly ILogger logger;
@@ -99,11 +114,19 @@ namespace Cubes.Core.Environment
 
         private void CreateSettingsFile()
         {
-            foreach (var file in configurationFiles)
+            var serializer = new SerializerBuilder()
+                .EmitDefaults()
+                .Build();
+            foreach (var config in configurationFiles)
             {
-                var filePath = this.GetFileOnPath(CubesFolderKind.Settings, file);
-                if (!File.Exists(filePath))
-                    File.Create(filePath);
+                var filePath = this.GetFileOnPath(CubesFolderKind.Settings, config.Filename);
+                if (!fileSystem.File.Exists(filePath))
+                {
+                    var toWrite  = new ExpandoObject();
+                    var instance = config.CreateDefaultObject();
+                    toWrite.TryAdd(instance.GetType().Name, instance);
+                    fileSystem.File.WriteAllText(filePath, serializer.Serialize(toWrite));
+                }
             }
         }
 

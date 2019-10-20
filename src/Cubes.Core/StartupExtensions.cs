@@ -1,9 +1,7 @@
-using Cubes.Core.Commands;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Environment;
 using Cubes.Core.Scheduling;
-using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +12,7 @@ namespace Cubes.Core
     {
         public static IServiceCollection AddCubesCore(this IServiceCollection services, IConfiguration configuration)
         {
-            //
             services.AddDataAccess(configuration)
-                .AddSettings("yaml") // TODO To be removed!
                 .AddEmailDispatcher()
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()

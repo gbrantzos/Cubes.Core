@@ -1,8 +1,6 @@
 CubesNext - TODOs
 --------------------------------------------------------------------------------
 
-[ ]     Proper use of Options patterns, from Applications too (YAML)
-[ ]     Replace ISettingsProvider with IOptions
 [ ]     Version numbers (build number, to be shared with CI)
 [ ]     Deployment scripts - packages
 [ ]     Template for new plugins

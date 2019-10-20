@@ -6,6 +6,7 @@ using Cubes.Core.Environment;
 using Cubes.Web.Filters;
 using Cubes.Web.RequestContext;
 using Cubes.Web.StaticContent;
+using Cubes.Web.Swager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
+[assembly: SwaggerCategory("Core")]
 namespace Cubes.Web
 {
     public static class StartupExtensions

@@ -1,12 +1,25 @@
 using System.Collections.Generic;
-using Cubes.Core.Settings;
 
 namespace Cubes.Web.StaticContent
 {
-    [SettingsPrefix("Core")]
     public class StaticContentSettings
     {
         public List<Content> Content { get; set; } = new List<Content>();
+
+        public static StaticContentSettings Create()
+        {
+            var toReturn = new StaticContentSettings();
+            toReturn.Content.Add(new StaticContent.Content
+            {
+                DefaultFile           = "index.html",
+                RequestPath           = "/sample",
+                FileSystemPath        = "sampleContent",
+                PathIsAbsolute        = false,
+                ServeUnknownFileTypes = true,
+                CustomContentTypes    = new Dictionary<string, string> { { "json", "application/json" } }
+            });
+            return toReturn;
+        }
     }
 
     public class Content

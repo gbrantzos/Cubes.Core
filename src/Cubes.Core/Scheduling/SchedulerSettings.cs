@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cubes.Core.Scheduling.Jobs;
 using Quartz;
 
 namespace Cubes.Core.Scheduling
 {
     public class SchedulerSettings
     {
-        public ICollection<SchedulerJob> Jobs { get; set; }
+        public ICollection<SchedulerJob> Jobs { get; set; } = new HashSet<SchedulerJob>();
 
         public void Validate()
         {
@@ -26,14 +27,27 @@ namespace Cubes.Core.Scheduling
             foreach (var job in Jobs)
                 job.Validate();
         }
+
+        public static SchedulerSettings Create()
+        {
+            var toReturn = new SchedulerSettings();
+            toReturn.Jobs.Add(new SchedulerJob
+            {
+                Name           = "Sample Job",
+                Active         = false,
+                JobType        = typeof(SampleJob).FullName,
+                CronExpression = "0/45 * * * * ?",
+            });
+            return toReturn;
+        }
     }
 
     public class SchedulerJob
     {
-        public string Name { get; set; }
-        public bool Active { get; set; } = true;
-        public string CronExpression { get; set; }
-        public string JobType { get; set; }
+        public string Name                                 { get; set; }
+        public bool Active                                 { get; set; } = true;
+        public string CronExpression                       { get; set; }
+        public string JobType                              { get; set; }
         public List<Dictionary<string, string>> Parameters { get; set; }
 
         public void Validate()

@@ -1,18 +1,20 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Cubes.Core.Commands;
 using Cubes.Core.Email;
-using Cubes.Core.Settings;
 using Cubes.Core.Utilities;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Quartz;
 
 namespace Cubes.Core.Scheduling.Jobs
 {
-    public class ExecuteCommandJob : BaseQuartzJob
+    // TODO Revisit
+    public class ExecuteRequestJob : BaseQuartzJob
     {
         class JobParameterInternal
         {
@@ -20,23 +22,23 @@ namespace Cubes.Core.Scheduling.Jobs
             public string CommandInstance { get; set; }
         }
 
-        private readonly ILogger<ExecuteCommandJob> logger;
+        private readonly ILogger<ExecuteRequestJob> logger;
         private readonly ITypeResolver typeResolver;
         private readonly IMediator mediator;
-        private readonly ISettingsProvider settingsProvider;
         private readonly IEmailDispatcher emailDispatcher;
+        private readonly SmtpSettingsProfiles smtpProfiles;
 
-        public ExecuteCommandJob(ILogger<ExecuteCommandJob> logger,
+        public ExecuteRequestJob(ILogger<ExecuteRequestJob> logger,
             ITypeResolver typeResolver,
             IMediator mediator,
-            ISettingsProvider settingsProvider,
+            IOptionsSnapshot<SmtpSettingsProfiles> options,
             IEmailDispatcher emailDispatcher)
         {
             this.logger           = logger;
             this.typeResolver     = typeResolver;
             this.mediator         = mediator;
-            this.settingsProvider = settingsProvider;
             this.emailDispatcher  = emailDispatcher;
+            this.smtpProfiles     = options.Value;
         }
 
         public override Task ExecuteInternal(IJobExecutionContext context)
@@ -77,7 +79,7 @@ namespace Cubes.Core.Scheduling.Jobs
                     {
                         // Results can contain an instance of SmtpSettings to use
                         var settings = result.GetPropertyByType<SmtpSettings>() ??
-                            settingsProvider.Load<SmtpSettings>();
+                            smtpProfiles.Profiles.First();
                         settings.ThrowIfNull("SmtpSettings");
                         emailDispatcher.DispatchEmail(email, settings);
                     }

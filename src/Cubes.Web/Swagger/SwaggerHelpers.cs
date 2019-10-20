@@ -4,15 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Cubes.Core.Environment;
-using Cubes.Web.Controllers;
+using Cubes.Core.Utilities;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-namespace Cubes.Web
+namespace Cubes.Web.Swager
 {
     public static class SwaggerHelpers
     {
@@ -23,6 +24,18 @@ namespace Cubes.Web
                 var cubesConfig = configuration.GetCubesConfiguration();
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Cubes API Documentation", Version = "v1" });
                 c.OperationFilter<SwaggerCategoryAsTagFilter>();
+                c.OrderActionsBy(api =>
+                {
+                    var attr = ((ControllerActionDescriptor)api.ActionDescriptor)
+                        .ControllerTypeInfo
+                        .Assembly
+                        .GetCustomAttribute(typeof(SwaggerCategoryAttribute)) as SwaggerCategoryAttribute;
+                    var categ = attr?.Category.IfNullOrEmpty("Undefined");
+                    var order = categ == "Core" ? 0 : 1;
+                    var ctrl  = $"{api.ActionDescriptor.RouteValues["controller"]}_{api.HttpMethod}";
+
+                    return $"{order}_{categ}_{ctrl}";
+                });
 
                 var swaggerFiles = cubesConfig
                     .SwaggerFiles
@@ -35,12 +48,13 @@ namespace Cubes.Web
 
         public static IApplicationBuilder UseCubesSwagger(this IApplicationBuilder app)
         {
+            var swaggerUrl = "/docs/v1/swagger.json";
             app.UseSwagger(c => c.RouteTemplate = "docs/{documentName}/swagger.json");
             app.UseSwaggerUI(c =>
             {
                 c.InjectStylesheet("https://raw.githubusercontent.com/ostranme/swagger-ui-themes/develop/themes/3.x/theme-muted.css");
                 c.DocExpansion(DocExpansion.List);
-                c.SwaggerEndpoint("/docs/v1/swagger.json", "Cubes API V1");
+                c.SwaggerEndpoint(swaggerUrl, "Cubes API V1");
                 c.RoutePrefix = "docs/api";
 
                 c.DisplayRequestDuration();
@@ -48,8 +62,8 @@ namespace Cubes.Web
             });
             app.UseReDoc(c =>
             {
-                c.RoutePrefix = "docs/api-docs";
-                c.SpecUrl = "/docs/v1/swagger.json";
+                c.RoutePrefix = "docs/redocs";
+                c.SpecUrl = swaggerUrl;
             });
 
             return app;

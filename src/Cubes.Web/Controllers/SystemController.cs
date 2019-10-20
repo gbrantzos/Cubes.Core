@@ -25,7 +25,7 @@ namespace Cubes.Web.Controllers
         /// Cubes server heartbeat
         /// </summary>
         /// <remarks>
-        /// Return usefull information about Cubes Server status.
+        /// Return useful information about Cubes Server status.
         /// </remarks>
         [HttpGet("ping")]
         public ActionResult<string> Ping()

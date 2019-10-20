@@ -8,12 +8,19 @@ namespace Cubes.Core.Environment
     // TODO Needs documentation
     public abstract class Application : IApplication
     {
-        public virtual IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration) => configuration;
+        public virtual IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration)
+            => configuration;
 
-        public virtual IServiceCollection ConfigureServices(IServiceCollection services) => services;
+        public virtual IServiceCollection ConfigureServices(IServiceCollection services)
+            => services;
 
-        public virtual ContainerBuilder RegisterServices(ContainerBuilder builder) => builder;
+        public virtual ContainerBuilder RegisterServices(ContainerBuilder builder)
+            => builder;
 
-        public virtual string SwaggerXmlFile => String.Empty;
+        public virtual string SwaggerXmlFile
+            => String.Empty;
+
+        public virtual string[] AssembliesWithControllers
+            => Array.Empty<string>();
     }
 }

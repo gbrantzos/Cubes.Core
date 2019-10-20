@@ -15,6 +15,7 @@ namespace Cubes.Core.Environment
         public string StaticContentFolder { get; set; }
 
         public IEnumerable<string> SwaggerFiles { get; set; }
+        public IEnumerable<string> AssembliesWithControllers { get; set; }
     }
 
     public static class CubesConfigurationExtensions
@@ -37,6 +38,14 @@ namespace Cubes.Core.Environment
                 .Select((f, i) => new KeyValuePair<string, string>($"{CubesConstants.Configuration_Section}:SwaggerFiles:{i}", f))
                 .ToList();
             foreach (var item in swaggerFiles)
+                cubesConfig.Add(item.Key, item.Value);
+
+            var allAssembliesWithControllers = cubes
+                .GetActivatedApplications()
+                .SelectMany(app => app.AssembliesWithControllers.ToList())
+                .Select((f, i) => new KeyValuePair<string, string>($"{CubesConstants.Configuration_Section}:AssembliesWithControllers:{i}", f))
+                .ToList();
+            foreach (var item in allAssembliesWithControllers)
                 cubesConfig.Add(item.Key, item.Value);
 
             configuration.AddInMemoryCollection(cubesConfig);

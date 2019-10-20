@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Cubes.Core.Environment;
 using Cubes.Web;
 using Microsoft.AspNetCore.Builder;
@@ -16,8 +18,22 @@ namespace Cubes.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Cubes Configuration
+            var cubesConfig = configuration.GetCubesConfiguration();
+
+            var assemblies = AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .Where(asm => cubesConfig.AssembliesWithControllers.Contains(asm.GetName().Name))
+                .ToList();
+
             // Setup WebAPI
-            services.AddControllers().AddNewtonsoftJson();
+            var mvcBuilder = services.AddControllers()
+                .AddNewtonsoftJson();
+
+            // Add applications assemblies
+            foreach (var asm in assemblies)
+                mvcBuilder.AddApplicationPart(asm);
 
             // Setup Cubes
             services.AddCubesWeb(configuration);
