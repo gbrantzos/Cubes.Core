@@ -8,30 +8,34 @@ namespace Cubes.Core.Commands
     public static class MediatorExtensions
     {
         /// <summary>
-        /// submit a command without knowing the result type
+        /// Send a request without knowing the result type.
+        /// <para>
+        /// Although this method returns dynamic we can safely assume it will return an awaitable
+        /// with <see cref="IResult"/> instance as result.
+        /// </para>
         /// </summary>
         /// <param name="mediator">Command bus</param>
-        /// <param name="command">Command to execute</param>
+        /// <param name="request">Command to execute</param>
         /// <returns>Result as ICommandResult</returns>
-        public static dynamic Send(this IMediator mediator, object command)
+        public static dynamic Send(this IMediator mediator, object request)
         {
-            // Command type
-            var commandType = command.GetType();
+            // Request type
+            var requestType = request.GetType();
 
             // Find commands result through reflection
-            var resultType = commandType.GetRequestType();
+            var resultType = requestType.GetRequestType();
             if (resultType == null)
-                throw new ArgumentException($"No request type found for type {commandType.Name}");
+                throw new ArgumentException($"No request type found for type {requestType.Name}");
 
             // Create generic method for given result type and invoke
             var submitMethod = typeof(Mediator)
                 .GetMethod(nameof(Mediator.Send))
                 .MakeGenericMethod(resultType);
-            return (dynamic)submitMethod.Invoke(mediator, new object[] { command , CancellationToken.None });
+            return (dynamic)submitMethod.Invoke(mediator, new object[] { request , CancellationToken.None });
         }
 
         /// <summary>
-        /// Helper method to  determine if a given type is ICommand
+        /// Helper method to determine if a given type is a MediatR <see cref="IRequest"/>.
         /// </summary>
         /// <param name="type">The type to check</param>
         /// <returns></returns>

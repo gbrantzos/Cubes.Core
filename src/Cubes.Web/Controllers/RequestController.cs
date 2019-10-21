@@ -10,12 +10,12 @@ using Newtonsoft.Json.Linq;
 namespace Cubes.Web.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class CommandController : ControllerBase
+    public class RequestController : ControllerBase
     {
         private readonly IMediator mediator;
         private readonly ITypeResolver typeResolver;
 
-        public CommandController(IMediator mediator, ITypeResolver typeResolver)
+        public RequestController(IMediator mediator, ITypeResolver typeResolver)
         {
             this.mediator     = mediator;
             this.typeResolver = typeResolver;
@@ -54,29 +54,34 @@ namespace Cubes.Web.Controllers
         }
 
         /// <summary>
-        /// Execute command
+        /// Execute request
         /// </summary>
         /// <remarks>
-        /// Execute given command using and capture results.
+        /// Execute given request using body as instance and capture results.
         /// </remarks>
-        /// <param name="commandType"></param>
-        /// <param name="commandInst"></param>
+        /// <param name="requestType"></param>
+        /// <param name="requestInst"></param>
         /// <returns></returns>
-        [HttpPost, Route("{commandType}")]
-        public async Task<ActionResult> Execute(string commandType, [FromBody]JToken commandInst)
+        [HttpPost, Route("{requestType}")]
+        public async Task<ActionResult> Execute(string requestType, [FromBody]JToken requestInst)
         {
-            if (commandInst == null)
+            if (requestInst == null)
                 return BadRequest("Body of request cannot be null!");
 
-            var type = typeResolver.GetByName(commandType);
+            var type = typeResolver.GetByName(requestType);
             if (type == null)
-                return BadRequest($"Could not resolve type: {commandType}");
+                return BadRequest($"Could not resolve type: {requestType}");
 
-            var instance = commandInst.ToObject(type);
+            var instance = requestInst.ToObject(type);
             if (instance == null)
-                return BadRequest($"Given instance is not a valid JSON object of type '{commandType}'");
+                return BadRequest($"Given instance is not a valid JSON object of type '{requestType}'");
 
-            object result = await mediator.Send(instance);
+            IResult result = await mediator.Send(instance);
+            if (result.ExceptionThrown != null)
+                throw new Exception($"Request execution failed!{Environment.NewLine}{requestInst}", result.ExceptionThrown);
+            if (result.HasErrors)
+                return BadRequest(result.Message);
+
             return Ok(result);
         }
     }

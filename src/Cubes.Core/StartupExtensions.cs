@@ -13,7 +13,7 @@ namespace Cubes.Core
         public static IServiceCollection AddCubesCore(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDataAccess(configuration)
-                .AddEmailDispatcher()
+                .AddEmailDispatcher(configuration)
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
@@ -32,6 +32,10 @@ namespace Cubes.Core
                 reloadOnChange: true);
             config.AddYamlFile(
                 cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_StaticContent),
+                optional: true,
+                reloadOnChange: true);
+            config.AddYamlFile(
+                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_SmtpSettings),
                 optional: true,
                 reloadOnChange: true);
 

@@ -51,7 +51,7 @@ namespace Cubes.Web.Controllers
         /// </remarks>
         /// <param name="command">Command name</param>
         /// <returns></returns>
-        [HttpPost, Route("{command}")]
+        [HttpPost, Route("command/{command}")]
         public async Task<IActionResult> SendCommand(string command)
         {
             var knownCommands = new HashSet<string> { "start", "stop", "reload" };

@@ -29,3 +29,15 @@ Thoughts about pipeline (MediatR pipeline):
         i.e.  =>  TContent Generate(params object args[])
     * IContentDispatcher<TContent>, ie EmailDispatcher, FileDispatcher, FTP, SSH
         i.e.  =>  void Dispatch(TContent content)
+
+
++-------------------------------------------------------------------------------+
+|   Cubes Version                                                               |
++-------------------------------------------------------------------------------+
+
+-   Git branch
+-   Git commit hash
+-   If repository is dirty (INTERNAL version, not for deploy)
+-   Build time-stamp
+
+Must be produced before build, and ignored by git

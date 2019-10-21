@@ -38,7 +38,7 @@ namespace Cubes.Core.Commands.Basic
                 Subject = command.Subject,
                 ToAddresses = command.ToAddresses
             };
-            bool rowsFound = results.Any(i => i.Value.Count() > 0);
+            bool rowsFound = results.Any(i => i.Data.Any());
             if (rowsFound)
                 email.Attachments = new List<EmailContent.EmailAttachment>
                 {
@@ -51,9 +51,9 @@ namespace Cubes.Core.Commands.Basic
                 };
 
             // Body details
-            string suffix = results.Count == 0 ? "y" : "ies";
+            string suffix = results.Count() == 0 ? "y" : "ies";
             string resultInfo = rowsFound ?
-                $"Executed {results.Count} quer{suffix}, found {results.Select(i => i.Value.Count()).Sum()} rows." :
+                $"Executed {results.Count()} quer{suffix}, found {results.Select(i => i.Data.Count()).Sum()} rows." :
                 "No rows found!";
             email.Body = String.IsNullOrEmpty(command.Body) ?
                 String.Empty :
@@ -64,7 +64,7 @@ namespace Cubes.Core.Commands.Basic
             MessageToReturn = resultInfo;
             var toReturn = new QueryResultsAsEmailResult
             {
-                SqlResults   = results,
+                SqlResults   = results.ToDictionary(d => d.Name, d => d.Data),
                 EmailContent = email,
                 SmtpSettings = this.smtpProfiles.GetByName(command.SmtpProfile)
             };
