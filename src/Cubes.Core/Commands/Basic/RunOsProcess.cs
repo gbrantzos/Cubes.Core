@@ -1,6 +1,5 @@
 using System;
 using Cubes.Core.Utilities;
-using MediatR;
 
 namespace Cubes.Core.Commands.Basic
 {
@@ -29,7 +28,8 @@ namespace Cubes.Core.Commands.Basic
 
         public RunOsProcess() => TimeoutSecs = 30;
 
-        public override string ToString() => $"Run {Command} with {(String.IsNullOrEmpty(Arguments)? "no argumets" : $"args '{Arguments}'")}, in {StartIn.IfNullOrEmpty("current directory")}";
+        public override string ToString()
+            => $"Run {Command} with {(String.IsNullOrEmpty(Arguments)? "no argumets" : $"args '{Arguments}'")}, in {StartIn.IfNullOrEmpty("current directory")}";
 
     }
 }

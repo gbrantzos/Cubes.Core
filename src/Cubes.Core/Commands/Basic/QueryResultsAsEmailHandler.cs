@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Utilities;
-using Dapper;
 using Microsoft.Extensions.Options;
 
 namespace Cubes.Core.Commands.Basic
@@ -31,7 +30,7 @@ namespace Cubes.Core.Commands.Basic
             if (command.QuerySet.Queries.Count == 0)
                 throw new ArgumentException("No queries defined!");
 
-            var results = GetQueryResults(command.QuerySet);
+            var results = QuerySet.GetQueryResults(command.QuerySet, connectionManager, queryManager);
 
             // Prepare email and attachments...
             var email = new EmailContent
@@ -52,11 +51,13 @@ namespace Cubes.Core.Commands.Basic
                 };
 
             // Body details
-            string suffix = results.Count() == 0 ? "y" : "ies";
+            string suffix = results.Count == 0 ? "y" : "ies";
             string resultInfo = rowsFound ?
-                $"Executed {results.Count()} quer{suffix}, found {results.Select(i => i.Value.Count()).Sum()} rows." :
+                $"Executed {results.Count} quer{suffix}, found {results.Select(i => i.Value.Count()).Sum()} rows." :
                 "No rows found!";
-            email.Body = String.IsNullOrEmpty(command.Body) ? String.Empty : command.Body + System.Environment.NewLine + System.Environment.NewLine;
+            email.Body = String.IsNullOrEmpty(command.Body) ?
+                String.Empty :
+                command.Body + System.Environment.NewLine + System.Environment.NewLine;
             email.Body += resultInfo;
 
             // Return command result
@@ -70,23 +71,6 @@ namespace Cubes.Core.Commands.Basic
             if (!rowsFound && command.SendIfDataExists)
                 toReturn.EmailContent = null;
             return Task.FromResult(toReturn);
-        }
-
-        private Dictionary<string, IEnumerable<dynamic>> GetQueryResults(QuerySet querySet)
-        {
-            var toReturn = new Dictionary<string, IEnumerable<dynamic>>();
-
-            foreach (var queryItem in querySet.Queries)
-            {
-                using (var cnx = this.connectionManager.GetConnection(querySet.ConnectionName))
-                {
-                    var query = this.queryManager.GetSqlQuery(queryItem.QueryName);
-                    var results = cnx.Query<dynamic>(query.QueryCommand);
-                    toReturn.Add(queryItem.Name, results);
-                }
-            }
-
-            return toReturn;
         }
     }
 }

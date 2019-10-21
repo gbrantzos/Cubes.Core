@@ -1,10 +1,13 @@
-CubesNext - TODOs
---------------------------------------------------------------------------------
++-------------------------------------------------------------------------------+
+|   CubesNext - TODOs                                                           |
++-------------------------------------------------------------------------------+
 
+[ ]     MediatR pipeline
 [ ]     Version numbers (build number, to be shared with CI)
 [ ]     Deployment scripts - packages
-[ ]     Template for new plugins
+[ ]     Template for new plug-ins
 [ ]     Generic UI shell
+[ ]     Content dispatching
 [ ]     Provision for settings editing (save)
 
 
@@ -16,18 +19,13 @@ Thoughts about pipeline (MediatR pipeline):
 - Instrumentation (timing)
 
 
-URLs
-- /docs: Swagger, Wiki, other static
-    TODO: Add themes for Swagger, consider ReDoc
-- /api: RestApi endpoints
-- /app: Applications clients
++-------------------------------------------------------------------------------+
+|   Content Dispatcher                                                          |
++-------------------------------------------------------------------------------+
 
-
-Content Delivery (thoughts)
-- Content generation
-    i.e.  =>  TContent Generate(params object args[])
-- Content dispatcher
-    i.e.  =>  void Dispatch(TContent content)
-
-Example EmailGenerator, EmailDispatcher
-Dependency service => ExcelFromQueryResults
+-   To replace - augment EmailDispatcher
+-   Building blocks
+    * IContentProducer<TContent>
+        i.e.  =>  TContent Generate(params object args[])
+    * IContentDispatcher<TContent>, ie EmailDispatcher, FileDispatcher, FTP, SSH
+        i.e.  =>  void Dispatch(TContent content)
