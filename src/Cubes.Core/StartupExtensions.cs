@@ -16,7 +16,6 @@ namespace Cubes.Core
                 .AddEmailDispatcher()
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()
-                .AddTransient<ISerializer, JsonSerializer>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
 
             return services;

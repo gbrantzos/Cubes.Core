@@ -1,6 +1,7 @@
 using Autofac;
 using Cubes.Core.Commands.Basic;
 using Cubes.Core.Environment;
+using Cubes.Core.Utilities;
 using MediatR;
 
 namespace Cubes.Core
@@ -21,7 +22,15 @@ namespace Cubes.Core
 
             // Register basic jobs
             builder.RegisterType<RunOsProcessHandler>().AsImplementedInterfaces();
-            builder.RegisterType<SqlResultsAsEmailHandler>().AsImplementedInterfaces();
+            builder.RegisterType<QueryResultsAsEmailHandler>().AsImplementedInterfaces();
+
+            // Register serializers, use them by name
+            builder.RegisterType<JsonSerializer>()
+                .Keyed<ISerializer>(CubesConstants.Serializer_JSON)
+                .As<ISerializer>();
+            builder.RegisterType<YamlSerializer>()
+                .Keyed<ISerializer>(CubesConstants.Serializer_YAML)
+                .As<ISerializer>();
 
             return builder;
         }

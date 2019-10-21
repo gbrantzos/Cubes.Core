@@ -8,6 +8,11 @@ namespace Cubes.Core.Email
     {
         public ICollection<SmtpSettings> Profiles { get; set; } = new HashSet<SmtpSettings>();
 
+        /// <summary>
+        /// Get <see cref="SmtpSettings"/> profile with given name, or null if no profile found
+        /// </summary>
+        /// <param name="profileName">Profile name</param>
+        /// <returns></returns>
         public SmtpSettings GetByName(string profileName)
         {
             var profile = Profiles

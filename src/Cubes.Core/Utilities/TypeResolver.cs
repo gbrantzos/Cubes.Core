@@ -6,20 +6,20 @@ namespace Cubes.Core.Utilities
     {
         public Type GetByName(string typeName)
         {
-            var t = Type.GetType(typeName);
-            if (t == null)
+            var type = Type.GetType(typeName);
+            if (type == null)
             {
                 var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                foreach (var a in assemblies)
+                foreach (var asm in assemblies)
                 {
-                    t = a.GetType(typeName);
-                    if (t != null)
+                    type = asm.GetType(typeName);
+                    if (type != null)
                         break;
                 }
-                if (t == null)
+                if (type == null)
                     return null;
             }
-            return t;
+            return type;
         }
     }
 }

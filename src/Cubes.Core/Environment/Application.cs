@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cubes.Core.Environment
 {
-    // TODO Needs documentation
+    /// <summary>
+    /// Application class, with basic implementation
+    /// </summary>
     public abstract class Application : IApplication
     {
         public virtual IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration)

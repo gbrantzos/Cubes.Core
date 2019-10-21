@@ -44,11 +44,11 @@ namespace Cubes.Core.Scheduling
 
     public class SchedulerJob
     {
-        public string Name                                 { get; set; }
-        public bool Active                                 { get; set; } = true;
-        public string CronExpression                       { get; set; }
-        public string JobType                              { get; set; }
-        public List<Dictionary<string, string>> Parameters { get; set; }
+        public string Name                           { get; set; }
+        public bool Active                           { get; set; } = true;
+        public string CronExpression                 { get; set; }
+        public string JobType                        { get; set; }
+        public Dictionary<string, string> Parameters { get; set; }
 
         public void Validate()
         {
@@ -71,10 +71,7 @@ namespace Cubes.Core.Scheduling
             if (Parameters?.Count > 0)
             {
                 var jobData = new JobDataMap();
-                var parameters = Parameters
-                    .SelectMany(parameter => parameter.Select(kv => kv))
-                    .ToList();
-                foreach (var item in parameters)
+                foreach (var item in Parameters)
                     jobData.Add(item.Key, item.Value);
                 jobBuilder.SetJobData(jobData);
             }

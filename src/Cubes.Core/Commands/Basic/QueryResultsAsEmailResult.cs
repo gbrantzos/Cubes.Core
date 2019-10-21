@@ -3,7 +3,7 @@ using Cubes.Core.Email;
 
 namespace Cubes.Core.Commands.Basic
 {
-    public class SqlResultsAsEmailResult
+    public class QueryResultsAsEmailResult
     {
         public EmailContent EmailContent { get; set; }
         public SmtpSettings SmtpSettings { get; set; }

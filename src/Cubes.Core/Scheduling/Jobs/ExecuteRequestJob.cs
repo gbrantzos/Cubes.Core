@@ -1,96 +1,115 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac.Features.AttributeFilters;
 using Cubes.Core.Commands;
 using Cubes.Core.Email;
+using Cubes.Core.Environment;
 using Cubes.Core.Utilities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Quartz;
 
 namespace Cubes.Core.Scheduling.Jobs
 {
-    // TODO Revisit
     public class ExecuteRequestJob : BaseQuartzJob
     {
-        class JobParameterInternal
-        {
-            public string CommandType { get; set; }
-            public string CommandInstance { get; set; }
-        }
+        private static readonly string Request_Type          = "RequestType";
+        private static readonly string Request_Instance      = "RequestInstance";
+        private static readonly string Dispatcher_Type       = "DispatcherType";
+        private static readonly string Dispatcher_Parameters = "DispatcherParameters";
 
         private readonly ILogger<ExecuteRequestJob> logger;
-        private readonly ITypeResolver typeResolver;
         private readonly IMediator mediator;
+        private readonly ISerializer serializer;
+        private readonly ITypeResolver typeResolver;
         private readonly IEmailDispatcher emailDispatcher;
         private readonly SmtpSettingsProfiles smtpProfiles;
 
         public ExecuteRequestJob(ILogger<ExecuteRequestJob> logger,
-            ITypeResolver typeResolver,
             IMediator mediator,
-            IOptionsSnapshot<SmtpSettingsProfiles> options,
-            IEmailDispatcher emailDispatcher)
+            [KeyFilter(CubesConstants.Serializer_YAML)] ISerializer serializer,
+            ITypeResolver typeResolver,
+            IEmailDispatcher emailDispatcher,
+            IOptionsSnapshot<SmtpSettingsProfiles> options)
         {
             this.logger           = logger;
-            this.typeResolver     = typeResolver;
             this.mediator         = mediator;
+            this.serializer       = serializer;
+            this.typeResolver     = typeResolver;
             this.emailDispatcher  = emailDispatcher;
             this.smtpProfiles     = options.Value;
         }
 
-        public override Task ExecuteInternal(IJobExecutionContext context)
+        public override async Task ExecuteInternal(IJobExecutionContext context)
         {
-            JobParameterInternal jobParameter = null;
-            try
-            {
-                var prmAsString = context.JobDetail.JobDataMap.GetString("MUST BE A CONSTANT"); // TODO Check this!
-                var jObject = JObject.Parse(prmAsString);
-                jobParameter = new JobParameterInternal
-                {
-                    CommandType     = jObject.GetValue("CommandType").ToString(),
-                    CommandInstance = jObject.GetValue("CommandInstance").ToString()
-                };
-            }
-            catch (Exception x)
-            {
-                logger.LogError(x, "Could not deserialize job parameters for ExecuteCommandJob!");
-                throw new JobExecutionException(x);
-            }
+            var jobParams = context
+                .JobDetail
+                .JobDataMap
+                .Where(d => d.Value is string)
+                .ToDictionary(kv => kv.Key, kv => kv.Value as string);
 
-            try
-            {
-                var type    = typeResolver.GetByName(jobParameter.CommandType);
-                var command = JsonConvert.DeserializeObject(jobParameter.CommandInstance, type);
+            if (!jobParams.TryGetValue(Request_Type, out var requestTypeName))
+                throw new ArgumentException("No request type defined!");
 
-                logger.LogInformation($"Executing '{command.GetType().Name}' ...");
-                var result = mediator.Send(command);
-                //if (result.ExecutionResult != CommandExecutionResult.Success)
-                //{
-                //    logger.LogWarning(result.Message);
-                //}
-                //else
+            var requestType = typeResolver.GetByName(requestTypeName);
+            if (requestType == null)
+                throw new ArgumentException($"Could not resolve type {requestTypeName}!");
+
+            if (!jobParams.TryGetValue(Request_Instance, out var requestInstanceRaw))
+                throw new ArgumentException("No request instance defined!");
+
+            var requestInstance = serializer.Deserialize(requestInstanceRaw, requestType);
+            if (requestInstance == null)
+                throw new ArgumentException("Could not create request instance!");
+
+            logger.LogInformation($"Executing '{requestType.Name}', {requestInstance} ...");
+            var requestResponse = await mediator.Send(requestInstance);
+
+            if (requestResponse is IResult)
+            {
+                var result = requestResponse as IResult;
+                if (result.HasErrors)
                 {
-                    // If results contain an EmailContent property sent email
-                    var email = result.GetPropertyByType<EmailContent>();
-                    if (email != null)
-                    {
-                        // Results can contain an instance of SmtpSettings to use
-                        var settings = result.GetPropertyByType<SmtpSettings>() ??
-                            smtpProfiles.Profiles.First();
-                        settings.ThrowIfNull("SmtpSettings");
-                        emailDispatcher.DispatchEmail(email, settings);
-                    }
+                    if (result.ExceptionThrown == null)
+                        logger.LogWarning(result.Message);
+                    else
+                        logger.LogError(result.ExceptionThrown, result.ExceptionThrown.Message);
+                }
+                else
+                {
+                    logger.LogInformation(result.Message);
+                    DispatchResult(result.Response, jobParams);
                 }
             }
-            catch (Exception x)
+        }
+
+        private void DispatchResult(object response, Dictionary<string, string> jobParams)
+        {
+            // TODO This part will be responsible for creating and using the appropriate dispatcher
+            /*
+            if (!jobParams.TryGetValue(Dispatcher_Type, out var dispatcherTypeName))
+                return;
+
+            var dispatcherType = typeResolver.GetByName(dispatcherTypeName);
+            if (dispatcherType == null)
+                throw new ArgumentException($"Could not resolve dispatcher with type {dispatcherTypeName}!");
+                */
+
+            var dispatcher = emailDispatcher;
             {
-                logger.LogError(x, "Could not execute command!");
-                throw new JobExecutionException(x);
+                // If results contain an EmailContent property sent email
+                var email = response.GetPropertyByType<EmailContent>();
+                if (email != null)
+                {
+                    // Results can contain an instance of SmtpSettings to use
+                    var settings = response.GetPropertyByType<SmtpSettings>() ?? smtpProfiles.Profiles.First();
+                    settings.ThrowIfNull("SmtpSettings");
+                    dispatcher.DispatchEmail(email, settings);
+                }
             }
-            return Task.CompletedTask;
         }
     }
 }

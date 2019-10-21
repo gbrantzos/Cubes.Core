@@ -20,5 +20,8 @@ namespace Cubes.Core.Environment
         public static readonly string Folders_Common               = "Common";
 
         public static readonly string Configuration_Section        = "CubesConfig";
+
+        public const string Serializer_JSON                        = "JSON";
+        public const string Serializer_YAML                        = "YAML";
     }
 }

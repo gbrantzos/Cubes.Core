@@ -4,21 +4,40 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cubes.Core.Environment
 {
+    /// <summary>
+    /// Cubes Application
+    /// </summary>
     public interface IApplication
     {
-        // Configure Application configuration
+        /// <summary>
+        /// Configure Application configuration, .Net core specific
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration);
 
-        // Configure Services
+        /// <summary>
+        /// Configure Services, .Net core specific
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         IServiceCollection ConfigureServices(IServiceCollection services);
 
-        // Register Services on Container (Autofac)
+        /// <summary>
+        /// Register Services on Container, Autofac specific
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         ContainerBuilder RegisterServices(ContainerBuilder builder);
 
-        // Swagger documentation file
+        /// <summary>
+        /// File to be used for Swagger documentation
+        /// </summary>
         string SwaggerXmlFile { get; }
 
+        /// <summary>
+        /// Comma separated list of assemblies that contain Controllers
+        /// </summary>
         string[] AssembliesWithControllers { get; }
-        // Configure http pipeline
     }
 }

@@ -19,12 +19,14 @@ namespace Cubes.Host
         public void ConfigureServices(IServiceCollection services)
         {
             // Cubes Configuration
-            var cubesConfig = configuration.GetCubesConfiguration();
+            var cubesAssemblies = configuration
+                .GetCubesConfiguration()
+                .AssembliesWithControllers ?? Array.Empty<string>();
 
             var assemblies = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
-                .Where(asm => cubesConfig.AssembliesWithControllers.Contains(asm.GetName().Name))
+                .Where(asm => cubesAssemblies.Contains(asm.GetName().Name))
                 .ToList();
 
             // Setup WebAPI
