@@ -11,7 +11,7 @@ namespace Cubes.Core.Environment
         public DateTime LiveSince     { get; }
         public string   Version       { get; }
         public string   FileVersion   { get; }
-
+        public string   GitInfo       { get; }
         public bool     IsDebug       { get; } = true;
         public string   Hostname      { get; }
         public string   RootFolder    { get; }
@@ -21,7 +21,7 @@ namespace Cubes.Core.Environment
         public CubesEnvironmentInfo(string rootFolder)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var fvi      = FileVersionInfo.GetVersionInfo(assembly.Location);
 
             RootFolder  = rootFolder;
             Hostname    = Dns.GetHostName();
@@ -31,6 +31,7 @@ namespace Cubes.Core.Environment
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 .ToString();
             FileVersion = fvi.FileVersion;
+            GitInfo     ="Branch:master, #Hash:5421ff1764";
             #if DEBUG
             IsDebug = true;
             #else
