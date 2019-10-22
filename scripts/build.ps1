@@ -4,6 +4,10 @@ $Hash = $Hash.Substring(0, 10)
 $Directory = ($PSScriptRoot)
 
 
+# Make sure we wrk on the correct path
+Set-Location $Directory
+
+
 # Initial values
 $Version = 0.0.0
 $Build = 0
@@ -23,16 +27,19 @@ Write-Output "Preparing deploy for Git commit: $HASH"
 Write-Output "Working directory: $DIRECTORY"
 
 
-# Make sure we wrk on the correct path
-Set-Location $Directory
-
-
 # Check for uncommited files
 $ChangedFiles = $(git status --porcelain | Measure-Object | Select-Object -expand Count)
 if ($ChangedFiles -gt 0)
 {
-    Write-Output "There are uncommited files on workspace, aborting!"
-    exit 1
+    $message  = 'Uncommited Changes'
+    $question = 'There are uncommited files on workspace, continue?'
+    $choices  = '&Yes', '&No'
+
+    $decision = $Host.UI.PromptForChoice($message, $question, $choices, 1)
+    if ($decision -eq 1) {
+        Write-Output "There are uncommited files on workspace, aborting!"
+        exit 1
+    }
 }
 
 

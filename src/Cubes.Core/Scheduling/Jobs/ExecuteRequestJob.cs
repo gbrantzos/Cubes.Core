@@ -18,8 +18,8 @@ namespace Cubes.Core.Scheduling.Jobs
     {
         private static readonly string Request_Type          = "RequestType";
         private static readonly string Request_Instance      = "RequestInstance";
-        private static readonly string Dispatcher_Type       = "DispatcherType";
-        private static readonly string Dispatcher_Parameters = "DispatcherParameters";
+        //private static readonly string Dispatcher_Type       = "DispatcherType";
+        //private static readonly string Dispatcher_Parameters = "DispatcherParameters";
 
         private readonly ILogger<ExecuteRequestJob> logger;
         private readonly IMediator mediator;
@@ -81,12 +81,12 @@ namespace Cubes.Core.Scheduling.Jobs
                 else
                 {
                     logger.LogInformation(result.Message);
-                    DispatchResult(result.Response, jobParams);
+                    DispatchResult(result.Response/*, jobParams*/);
                 }
             }
         }
 
-        private void DispatchResult(object response, Dictionary<string, string> jobParams)
+        private void DispatchResult(object response/*, Dictionary<string, string> jobParams*/)
         {
             // TODO This part will be responsible for creating and using the appropriate dispatcher
             /*
