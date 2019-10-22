@@ -42,7 +42,6 @@ namespace Cubes.Web.Controllers
                 Machine          = proc.MachineName,
                 Hostname         = envInfo.Hostname,
                 KernelVersion    = envInfo.FileVersion,
-                GitInfo          = envInfo.GitInfo,
                 Build            = envInfo.IsDebug ? "DEBUG" : "RELEASE",
                 LiveSince        = envInfo.LiveSince.ToString("yyyy-MM-dd HH:mm:ss"),
                 ServerTime       = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
