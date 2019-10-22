@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{5C0907B4-9822-463E-921A-8512E6C69528}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		Cubes.Core.sln.vsspell = Cubes.Core.sln.vsspell
 		README.md = README.md
 	EndProjectSection
 EndProject

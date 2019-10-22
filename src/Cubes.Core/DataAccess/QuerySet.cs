@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using Dapper;
 
@@ -8,7 +7,6 @@ namespace Cubes.Core.DataAccess
 {
     public class QuerySet
     {
-        public string Name { get; set; }
         public string ConnectionName { get; set; }
         public ICollection<QuerySetItem> Queries { get; set; } = new HashSet<QuerySetItem>();
 
@@ -17,7 +15,6 @@ namespace Cubes.Core.DataAccess
             IQueryManager queryManager)
         {
             var toReturn = new List<QueryResult>();
-
             foreach (var queryItem in querySet.Queries)
             {
                 using (var cnx = connectionManager.GetConnection(querySet.ConnectionName))
@@ -35,21 +32,17 @@ namespace Cubes.Core.DataAccess
                     {
                         var headers = firstRow.Keys.ToArray();
                         var values  = firstRow.Values.Select(v => v.GetType()).ToArray();
-
-                        var columns = headers
+                        queryResult.Columns = headers
                             .Zip(values, (h, v) => new QueryResult.Column
                             {
                                 Name = h,
                                 ColumnType = v
                             })
                             .ToList();
-                        queryResult.Columns = columns;
                     }
-
                     toReturn.Add(queryResult);
                 }
             }
-
             return toReturn;
         }
     }
@@ -72,5 +65,4 @@ namespace Cubes.Core.DataAccess
             public Type ColumnType { get; set; }
         }
     }
-
 }

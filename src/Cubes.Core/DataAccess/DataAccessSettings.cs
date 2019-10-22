@@ -19,7 +19,7 @@ namespace Cubes.Core.DataAccess
             toReturn.Connections.Add(new Connection
             {
                 Name             = "SampleConnection",
-                DbProvider       = "sqlserver",
+                DbProvider       = "mssql",
                 ConnectionString = "Server=(local);Database=myDataBase;Trusted_Connection=True;"
             });
             toReturn.Queries.Add(new Query

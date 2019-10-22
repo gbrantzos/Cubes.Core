@@ -56,6 +56,7 @@ namespace Cubes.Core.Utilities
                 return p.GetAsByteArray();
             }
         }
+
         private static void AddPage<T>(ExcelPackage package, string pageName, IEnumerable<T> data, ExcelFormattingSettings formattingSettings)
         {
             var type = typeof(T);
@@ -65,9 +66,9 @@ namespace Cubes.Core.Utilities
             var ws = package.Workbook.Worksheets.Add(pageName);
 
             // Default style
-            ws.Cells.Style.Font.Size = formattingSettings.DefaultFont.Size;
-            ws.Cells.Style.Font.Name = formattingSettings.DefaultFont.Family;
-            ws.Cells.Style.Font.Bold = formattingSettings.DefaultFont.IsBold;
+            ws.Cells.Style.Font.Size   = formattingSettings.DefaultFont.Size;
+            ws.Cells.Style.Font.Name   = formattingSettings.DefaultFont.Family;
+            ws.Cells.Style.Font.Bold   = formattingSettings.DefaultFont.IsBold;
             ws.Cells.Style.Font.Italic = formattingSettings.DefaultFont.IsItalic;
             int iColumn = 0;
 
@@ -76,9 +77,9 @@ namespace Cubes.Core.Utilities
             if (formattingSettings.HeaderSettings.AddHeaders)
             {
                 //Header font settings
-                ws.Cells[1, 1, 1, props.Length].Style.Font.Name = formattingSettings.HeaderSettings.Font.Family;
-                ws.Cells[1, 1, 1, props.Length].Style.Font.Size = formattingSettings.HeaderSettings.Font.Size;
-                ws.Cells[1, 1, 1, props.Length].Style.Font.Bold = formattingSettings.HeaderSettings.Font.IsBold;
+                ws.Cells[1, 1, 1, props.Length].Style.Font.Name   = formattingSettings.HeaderSettings.Font.Family;
+                ws.Cells[1, 1, 1, props.Length].Style.Font.Size   = formattingSettings.HeaderSettings.Font.Size;
+                ws.Cells[1, 1, 1, props.Length].Style.Font.Bold   = formattingSettings.HeaderSettings.Font.IsBold;
                 ws.Cells[1, 1, 1, props.Length].Style.Font.Italic = formattingSettings.HeaderSettings.Font.IsItalic;
 
                 foreach (var prop in props)
@@ -106,7 +107,6 @@ namespace Cubes.Core.Utilities
 
             // Freeze headers
             ws.View.FreezePanes(2, 1);
-
         }
 
         private static void AddQueryResultPage(ExcelPackage package, QueryResult result, ExcelFormattingSettings formattingSettings)
@@ -118,9 +118,9 @@ namespace Cubes.Core.Utilities
             var ws = package.Workbook.Worksheets.Add(result.Name);
 
             // Default style
-            ws.Cells.Style.Font.Size = formattingSettings.DefaultFont.Size;
-            ws.Cells.Style.Font.Name = formattingSettings.DefaultFont.Family;
-            ws.Cells.Style.Font.Bold = formattingSettings.DefaultFont.IsBold;
+            ws.Cells.Style.Font.Size   = formattingSettings.DefaultFont.Size;
+            ws.Cells.Style.Font.Name   = formattingSettings.DefaultFont.Family;
+            ws.Cells.Style.Font.Bold   = formattingSettings.DefaultFont.IsBold;
             ws.Cells.Style.Font.Italic = formattingSettings.DefaultFont.IsItalic;
             int iColumn = 0;
 
@@ -139,13 +139,13 @@ namespace Cubes.Core.Utilities
 
             // Add data
             int iRow = 2;
-            foreach (var obj in result.Data)
+            var columns = result.Columns.ToArray();
+            foreach (IDictionary<string, object> obj in result.Data)
             {
                 iColumn = 0;
-                var columns = result.Columns.ToArray();
                 for (int i = 0; i < length; i++)
                 {
-                    ws.Cells[iRow, ++iColumn].Value = ((IDictionary<string, object>)obj)[columns[i].Name];
+                    ws.Cells[iRow, ++iColumn].Value = obj[columns[i].Name];
                     if (columns[i].ColumnType.Equals(typeof(DateTime)))
                         ws.Cells[iRow, iColumn].Style.Numberformat.Format = formattingSettings.DateFormat;
                 }

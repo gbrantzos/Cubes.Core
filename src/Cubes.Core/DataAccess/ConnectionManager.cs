@@ -22,16 +22,16 @@ namespace Cubes.Core.DataAccess
         public DbConnection GetConnection(string connectionName)
         {
             var connections = settings.Connections;
-            var connectionInfo = connections.FirstOrDefault(i => i.Name.Equals(connectionName, StringComparison.CurrentCultureIgnoreCase));
+            var connectionInfo = connections
+                .Find(i => i.Name.Equals(connectionName, StringComparison.CurrentCultureIgnoreCase));
             if (connectionInfo != null)
             {
-                string providerName = String.Empty;
-                if (!knownProviders.TryGetValue(connectionInfo.DbProvider, out providerName))
+                if (!knownProviders.TryGetValue(connectionInfo.DbProvider,out string providerName))
                     providerName = connectionInfo.DbProvider;
 
                 var providerType = GetProviderType(providerName);
                 var providerInst = Activator.CreateInstance(providerType, true);
-                var cnxFactory = providerInst.GetType().GetMethod("CreateConnection");
+                var cnxFactory   = providerInst.GetType().GetMethod(nameof(DbProviderFactory.CreateConnection));
 
                 var connection = cnxFactory.Invoke(providerInst, null) as DbConnection;
                 connection.ConnectionString = connectionInfo.ConnectionString;
@@ -51,8 +51,7 @@ namespace Cubes.Core.DataAccess
                 .CurrentDomain
                 .GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .Where(t => t.FullName.Equals(providerName))
-                .FirstOrDefault();
+                .FirstOrDefault(t => t.FullName.Equals(providerName));
             if (type == null)
                 throw new ArgumentException($"Could not create DbProvider type for '{providerName}'");
 
