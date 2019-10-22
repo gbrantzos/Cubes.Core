@@ -14,10 +14,6 @@ foreach($line in Get-Content .\buildInfo.txt) {
     if ($line.StartsWith("VERSION=")) { $Version = $line.Substring("VERSION=".Length) }
     if ($line.StartsWith("BUILD=")) { $Build = $line.Substring("BUILD=".Length) }
 }
-
-
-# Increase build number
-$Build = [int]$Build +1
 $Version = "$Version.$Build"
 Write-Output "Version is $Version"
 
@@ -62,14 +58,7 @@ If(!(test-path $DeployPath)) { New-Item -ItemType Directory -Force -Path $Deploy
 Compress-Archive -Path Cubes-v$Version/* -CompressionLevel Optimal -DestinationPath ../deploy/Cubes-v$Version.zip -Force
 
 
-# Increase build number
-Set-Location $Directory
-$line = Get-Content .\buildInfo.txt | Select-String "BUILD=" | Select-Object -ExpandProperty Line
-$content = Get-Content .\buildInfo.txt
-$content | ForEach-Object {$_ -replace $line,"BUILD=$Build"} | Set-Content .\buildInfo.txt
-git commit -a -m "Bump build number"
-
-
 # Finally
+Set-Location $Directory
 Remove-Item ../tmp -Recurse
 exit 0
