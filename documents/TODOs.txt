@@ -3,7 +3,6 @@
 +-------------------------------------------------------------------------------+
 
 [ ]     MediatR pipeline
-[ ]     Version numbers (build number, to be shared with CI)
 [ ]     Deployment scripts - packages
 [ ]     Template for new plug-ins
 [ ]     Generic UI shell

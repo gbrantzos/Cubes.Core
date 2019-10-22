@@ -34,21 +34,22 @@ namespace Cubes.Web.Controllers
             var proc = Process.GetCurrentProcess();
             var info = new
             {
-                ProcID         = proc.Id,
-                ProcessName    = proc.ProcessName,
-                Executable     = Path.GetFileName(proc.MainModule.FileName),
-                Assembly       = Assembly.GetEntryAssembly().GetName().Name,
-                WorkingFolder  = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                Machine        = proc.MachineName,
-                Hostname       = envInfo.Hostname,
-                KernelVersion  = envInfo.Version,
-                Build          = envInfo.IsDebug ? "DEBUG" : "RELEASE",
-                LiveSince      = envInfo.LiveSince.ToString("yyyy-MM-dd HH:mm:ss"),
-                ServerTime     = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                WorkingSet     = Math.Round(proc.WorkingSet64 / 1024M / 1024M, 2),
-                PeakWorkingSet = Math.Round(proc.PeakWorkingSet64 / 1024M / 1024M, 2),
-                Threads        = proc.Threads.Count,
-                LoadedApps     = cubesEnvironment.GetLoadedAssemblies()
+                ProcID           = proc.Id,
+                ProcessName      = proc.ProcessName,
+                Executable       = Path.GetFileName(proc.MainModule.FileName),
+                Assembly         = Assembly.GetEntryAssembly().GetName().Name,
+                WorkingFolder    = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                Machine          = proc.MachineName,
+                Hostname         = envInfo.Hostname,
+                KernelVersion    = envInfo.FileVersion,
+                Build            = envInfo.IsDebug ? "DEBUG" : "RELEASE",
+                LiveSince        = envInfo.LiveSince.ToString("yyyy-MM-dd HH:mm:ss"),
+                ServerTime       = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                WorkingSet       = Math.Round(proc.WorkingSet64 / 1024M / 1024M, 2),
+                PeakWorkingSet   = Math.Round(proc.PeakWorkingSet64 / 1024M / 1024M, 2),
+                Threads          = proc.Threads.Count,
+                LoadedAssemblies = cubesEnvironment.GetLoadedAssemblies(),
+                LoadedApps       = cubesEnvironment.GetApplications()
             };
             return Ok(info);
         }
