@@ -67,6 +67,7 @@ Set-Location $Directory
 $line = Get-Content .\buildInfo.txt | Select-String "BUILD=" | Select-Object -ExpandProperty Line
 $content = Get-Content .\buildInfo.txt
 $content | ForEach-Object {$_ -replace $line,"BUILD=$Build"} | Set-Content .\buildInfo.txt
+git commit -a -m "Bump build number"
 
 
 # Finally
