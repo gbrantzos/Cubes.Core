@@ -1,6 +1,6 @@
 using System;
 using System.IO.Abstractions.TestingHelpers;
-using Cubes.Core.Environment;
+using Cubes.Core.Base;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;

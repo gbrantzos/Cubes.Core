@@ -1,6 +1,6 @@
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
-using Cubes.Core.Environment;
+using Cubes.Core.Base;
 using Cubes.Core.Scheduling;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +16,7 @@ namespace Cubes.Core
                 .AddEmailDispatcher(configuration)
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()
+                .AddScoped<IContextProvider, ContextProvider>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
 
             return services;

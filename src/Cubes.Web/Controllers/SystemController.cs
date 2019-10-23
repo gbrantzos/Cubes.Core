@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Cubes.Core.Environment;
+using Cubes.Core.Base;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
@@ -14,11 +14,15 @@ namespace Cubes.Web.Controllers
     {
         private readonly ICubesEnvironment cubesEnvironment;
         private readonly IApiDescriptionGroupCollectionProvider apiExplorer;
+        private readonly IContextProvider context;
 
-        public SystemController(ICubesEnvironment cubesEnvironment, IApiDescriptionGroupCollectionProvider apiExplorer)
+        public SystemController(ICubesEnvironment cubesEnvironment,
+            IApiDescriptionGroupCollectionProvider apiExplorer,
+            IContextProvider context)
         {
             this.cubesEnvironment = cubesEnvironment;
             this.apiExplorer = apiExplorer;
+            this.context = context;
         }
 
         /// <summary>

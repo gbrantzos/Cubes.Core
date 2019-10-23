@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Autofac;
 
-namespace Cubes.Core.Environment
+namespace Cubes.Core.Base
 {
     public interface ICubesEnvironment
     {

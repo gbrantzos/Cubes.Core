@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
-using Cubes.Core.Environment;
+using Cubes.Core.Base;
 using Cubes.Web;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -42,7 +43,7 @@ namespace Cubes.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             var useSSL           = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
             var loggerFactory    = app.ApplicationServices.GetService<ILoggerFactory>();
@@ -57,7 +58,7 @@ namespace Cubes.Host
             }
 
             // Should be called as soon as possible.
-            app.UseCubesApi(configuration, loggerFactory);
+            app.UseCubesApi(configuration, env, loggerFactory);
 
             // Routing
             app.UseRouting();

@@ -1,4 +1,4 @@
-namespace Cubes.Core.Environment
+namespace Cubes.Core.Base
 {
     public static class CubesConstants
     {

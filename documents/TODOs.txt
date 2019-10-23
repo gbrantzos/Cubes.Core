@@ -3,11 +3,9 @@
 +-------------------------------------------------------------------------------+
 
 [ ]     MediatR pipeline
-[ ]     Cubes middleware
 [ ]     Create nuget packages
 [ ]     Template for new plug-ins
 [ ]     Generic UI shell
-[ ]     Improve Context to support flows initiated from scheduler
 [ ]     Content dispatching
 [ ]     Provision for settings editing (save)
 [ ]     Improve - add documentation

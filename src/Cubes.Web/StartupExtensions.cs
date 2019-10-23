@@ -1,18 +1,19 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
-using Cubes.Core.Environment;
-using Cubes.Web.Filters;
-using Cubes.Web.RequestContext;
+using System.Threading.Tasks;
+using Cubes.Core.Base;
 using Cubes.Web.StaticContent;
 using Cubes.Web.Swager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -21,10 +22,12 @@ namespace Cubes.Web
 {
     public static class StartupExtensions
     {
+        public const string CUBES_HEADER_REQUEST_ID = "X-Cubes-RequestID";
+        public const string CUBES_MIDDLEWARE_LOGGER = "Cubes.Web.CubesMiddleware";
+
         public static void AddCubesWeb(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IContextProvider, ContextProvider>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
 
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
@@ -34,21 +37,80 @@ namespace Cubes.Web
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
             IConfiguration configuration,
+            IWebHostEnvironment env,
             ILoggerFactory loggerFactory)
         {
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
                 app.UseResponseCompression();
 
+            if (env.IsDevelopment())
+                app.UseDeveloperExceptionPage();
+            else
+                app.UseCustomExceptionHandler(loggerFactory);
+
             return app
-                .UseCustomExceptionHandler(loggerFactory)
                 .UseHomePage()
+                .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
-                .UseContextProvider()
-                .UseCubesSwagger();
+                .UseCubesMiddleware(loggerFactory);
         }
 
-        public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app, ILoggerFactory loggerFactory)
+        public static IApplicationBuilder UseCubesMiddleware(this IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+            app.Use(async (ctx, next) =>
+            {
+                // Prepare
+                var logger = loggerFactory.CreateLogger(CUBES_MIDDLEWARE_LOGGER);
+                var requestID = Guid.NewGuid().ToString("N");
+                var requestInfo = $"{ctx.Request.Method} {ctx.Request.Path}{ctx.Request.Query.AsString()}";
+
+                // Add to headers
+                ctx.Request.Headers.Add(CUBES_HEADER_REQUEST_ID, new[] { requestID });
+
+                // Provide context information
+                var ctxProvider = ctx.RequestServices.GetService<IContextProvider>();
+                var context = new Context(requestID, ContextSourceEnum.HttpRequest, requestInfo);
+                ctxProvider.Current = context;
+
+                var watcher = Stopwatch.StartNew();
+                ctx.Response.OnStarting(() =>
+                {
+                    watcher.Stop();
+                    ctx.Response.Headers.Add(CUBES_HEADER_REQUEST_ID, new[] { requestID });
+                    return Task.FromResult(0);
+                });
+
+                await next.Invoke();
+
+                // Just in case...
+                watcher.Stop();
+
+                var httpContextAccessor = ctx.RequestServices.GetService<IHttpContextAccessor>();
+
+                // Inform user
+                logger.LogInformation("{IP} [{startedAt}] \"{info}\", {statusCode}, {elapsed} ms",
+                    httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    context.StartedAt,
+                    context.SourceInfo,
+                    ctx.Response.StatusCode,
+                    watcher.ElapsedMilliseconds);
+            });
+
+            app.UseStatusCodePages(async context =>
+            {
+                // TODO return Json with info
+                context.HttpContext.Response.ContentType = "text/plain";
+                await context.HttpContext.Response.WriteAsync(
+                    "Status code page, status code: " +
+                    context.HttpContext.Response.StatusCode);
+            });
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app,
+            ILoggerFactory loggerFactory)
         {
             var logger = loggerFactory.CreateLogger("Cubes.Web.CustomExceptionHandler");
             app.UseExceptionHandler(appError =>
@@ -62,14 +124,19 @@ namespace Cubes.Web
                     if (contextFeature != null)
                     {
                         var ex = contextFeature.Error;
-                        logger.LogError(ex, $"Unhandled exception: {ex.Message}");
 
                         var frame      = new StackTrace(ex, true).GetFrame(0);
                         var details    = new StringBuilder();
                         var methodInfo = $"{frame.GetMethod().DeclaringType.FullName}.{frame.GetMethod().Name}()";
                         var fileInfo   = $"{Path.GetFileName(frame.GetFileName())}, line {frame.GetFileLineNumber()}";
-                        details.AppendLine($"{ex.GetType().Name}: {ex.Message}");
-                        details.AppendLine($"{methodInfo} in {fileInfo}");
+                        details
+                            .Append(ex.GetType().Name)
+                            .Append(": ")
+                            .AppendLine(ex.Message);
+                        details
+                            .Append(methodInfo)
+                            .Append(" in ")
+                            .AppendLine(fileInfo);
 
                         await context
                             .Response
@@ -84,12 +151,6 @@ namespace Cubes.Web
                 });
             });
             return app;
-        }
-
-        public static MvcOptions AddCubesWebMvcOptions(this MvcOptions options)
-        {
-            options.Filters.Add(typeof(ValidateModelFilterAttribute));
-            return options;
         }
 
         private sealed class ErrorDetails

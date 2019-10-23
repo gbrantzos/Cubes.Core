@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using Cubes.Core.Commands;
 using Cubes.Core.Email;
-using Cubes.Core.Environment;
+using Cubes.Core.Base;
 using Cubes.Core.Utilities;
 using MediatR;
 using Microsoft.Extensions.Logging;

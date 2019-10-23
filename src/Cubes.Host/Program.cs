@@ -3,7 +3,7 @@ using System.IO;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Cubes.Core;
-using Cubes.Core.Environment;
+using Cubes.Core.Base;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

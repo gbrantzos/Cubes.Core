@@ -1,6 +1,6 @@
 using System;
 
-namespace Cubes.Core.Environment
+namespace Cubes.Core.Base
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
     public class SwaggerCategoryAttribute : Attribute

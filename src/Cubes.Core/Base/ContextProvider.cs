@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Cubes.Web.RequestContext
+namespace Cubes.Core.Base
 {
     public class ContextProvider : IContextProvider
     {
@@ -9,13 +9,15 @@ namespace Cubes.Web.RequestContext
 
         public Context Current
         {
-            get { return context.Value; }
+            get => context.Value;
             set
             {
                 if (context != null)
                     throw new Exception("Context can only be set once!");
-                context = new AsyncLocal<Context>();
-                context.Value = value;
+                context = new AsyncLocal<Context>
+                {
+                    Value = value
+                };
             }
         }
 
@@ -36,7 +38,6 @@ namespace Cubes.Web.RequestContext
                 if (data != null)
                     context.Value.Data.Add(key, data);
             }
-
         }
     }
 }

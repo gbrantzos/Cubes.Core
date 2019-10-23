@@ -3,7 +3,7 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Cubes.Core.Environment
+namespace Cubes.Core.Base
 {
     /// <summary>
     /// Application class, with basic implementation

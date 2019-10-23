@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 
-namespace Cubes.Core.Environment
+namespace Cubes.Core.Base
 {
     public class CubesEnvironmentInfo
     {

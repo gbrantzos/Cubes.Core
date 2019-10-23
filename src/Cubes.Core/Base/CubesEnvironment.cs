@@ -14,7 +14,7 @@ using Figgle;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
 
-namespace Cubes.Core.Environment
+namespace Cubes.Core.Base
 {
     public class CubesEnvironment : ICubesEnvironment
     {
