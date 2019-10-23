@@ -5,6 +5,12 @@
     <AssemblyVersion>5.0.1.0</AssemblyVersion>
     <FileVersion>5.0.1.0</FileVersion>
     <InformationalVersion>5.0.1</InformationalVersion>
+    <Version>5.0.1</Version>
+    <Authors>Giorgos Brantzos</Authors>
+    <Company>GbWorks</Company>
+    <Copyright>2019</Copyright>
+    <PackageProjectUrl>https://github.com/gbrantzos/CubesNEXT</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gbrantzos/CubesNEXT</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Cubes.Applications.yaml" />

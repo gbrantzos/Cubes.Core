@@ -31,3 +31,10 @@ Thoughts about pipeline (MediatR pipeline):
         i.e.  =>  TContent Generate(params object args[])
     * IContentDispatcher<TContent>, ie EmailDispatcher, FileDispatcher, FTP, SSH
         i.e.  =>  void Dispatch(TContent content)
+
+
+# Create package
+dotnet pack .\src\Cubes.Core\Cubes.Core.csproj --include-symbols -c release -o .\deploy -p:PackageVersion=5.0.1.238
+
+# Publish package
+dotnet nuget push .\deploy\Cubes.Core.5.0.1.238.nupkg -s C:\Nuget\

@@ -1,3 +1,8 @@
+# Get original directory
+$OriginalDirectory = Get-Location
+Write-Output "Starting from: $OriginalDirectory"
+
+
 # Prepare environment
 $Hash = (git rev-parse HEAD)
 $Hash = $Hash.Substring(0, 10)
@@ -38,6 +43,7 @@ if ($ChangedFiles -gt 0)
     $decision = $Host.UI.PromptForChoice($message, $question, $choices, 1)
     if ($decision -eq 1) {
         Write-Output "There are uncommited files on workspace, aborting!"
+        Set-Location $OriginalDirectory
         exit 1
     }
 }
@@ -68,4 +74,5 @@ Compress-Archive -Path Cubes-v$Version/* -CompressionLevel Optimal -DestinationP
 # Finally
 Set-Location $Directory
 Remove-Item ../tmp -Recurse
+Set-Location $OriginalDirectory
 exit 0
