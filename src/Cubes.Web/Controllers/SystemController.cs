@@ -45,7 +45,8 @@ namespace Cubes.Web.Controllers
                 WorkingFolder    = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 Machine          = proc.MachineName,
                 Hostname         = envInfo.Hostname,
-                KernelVersion    = envInfo.FileVersion,
+                KernelVersion    = envInfo.BuildVersion,
+                GitHash          = envInfo.GitHash,
                 Build            = envInfo.IsDebug ? "DEBUG" : "RELEASE",
                 LiveSince        = envInfo.LiveSince.ToString("yyyy-MM-dd HH:mm:ss"),
                 ServerTime       = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -53,7 +54,8 @@ namespace Cubes.Web.Controllers
                 PeakWorkingSet   = Math.Round(proc.PeakWorkingSet64 / 1024M / 1024M, 2),
                 Threads          = proc.Threads.Count,
                 LoadedAssemblies = cubesEnvironment.GetLoadedAssemblies(),
-                LoadedApps       = cubesEnvironment.GetApplications()
+                ConfiguredApps   = cubesEnvironment.GetApplications(),
+                ActivatedApps    = cubesEnvironment.GetActivatedApplications().Select(app => app.GetType().Name)
             };
             return Ok(info);
         }

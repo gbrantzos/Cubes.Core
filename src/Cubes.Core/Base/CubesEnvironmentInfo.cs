@@ -10,7 +10,8 @@ namespace Cubes.Core.Base
         // Properties
         public DateTime LiveSince     { get; }
         public string   Version       { get; }
-        public string   FileVersion   { get; }
+        public string   BuildVersion  { get; }
+        public string   GitHash       { get; } = "DEVELOPMENT";
         public bool     IsDebug       { get; } = true;
         public string   Hostname      { get; }
         public string   RootFolder    { get; }
@@ -22,19 +23,25 @@ namespace Cubes.Core.Base
             var assembly = Assembly.GetExecutingAssembly();
             var fvi      = FileVersionInfo.GetVersionInfo(assembly.Location);
 
-            RootFolder  = rootFolder;
-            Hostname    = Dns.GetHostName();
-            LiveSince   = DateTime.Now;
-            Version     = Assembly
+            RootFolder   = rootFolder;
+            Hostname     = Dns.GetHostName();
+            LiveSince    = DateTime.Now;
+            Version      = fvi.FileVersion;
+#if DEBUG
+            IsDebug      = true;
+#else
+            IsDebug      = false;
+#endif
+            BuildVersion = Assembly
                 .GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                .ToString();
-            FileVersion = fvi.FileVersion;
-            #if DEBUG
-            IsDebug = true;
-            #else
-            IsDebug = false;
-            #endif
+                .InformationalVersion;
+
+            if (BuildVersion.Contains("-"))
+            {
+                GitHash = BuildVersion.Substring(BuildVersion.IndexOf('-') + 1);
+                BuildVersion = BuildVersion.Substring(0, BuildVersion.IndexOf('-'));
+            }
         }
     }
 }
