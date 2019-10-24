@@ -3,8 +3,8 @@
 +-------------------------------------------------------------------------------+
 
 [ ]     MediatR pipeline
-[ ]     Generic UI shell
 [ ]     Content dispatching
+[ ]     Generic UI shell
 [ ]     Provision for settings editing (save)
 [ ]     Improve - add documentation
 

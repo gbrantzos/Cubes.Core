@@ -68,10 +68,10 @@ namespace Cubes.Core.Base
                 fileSystem.Path.Combine(assemblyPath, "Cubes.Web.xml")
             };
 
-            var figgle  = FiggleFonts.Slant.Render(" Cubes v5");
-            var gitHash = $"Git Commit #{environmentInformation.GitHash}";
-            var version = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode} [{gitHash}]";
-            var message = $"Starting Cubes, version {version} build...{System.Environment.NewLine}{figgle}";
+            var figgle    = FiggleFonts.Slant.Render(" Cubes v5");
+            var buildInfo = $"Git Commit #{environmentInformation.GitHash}, build at {environmentInformation.BuildDateTime}";
+            var version   = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode} [{buildInfo}]";
+            var message   = $"Starting Cubes, version {version} build...{System.Environment.NewLine}{figgle}";
             logger.LogInformation(message);
             logger.LogInformation($"Cubes root folder: {rootFolder}");
         }

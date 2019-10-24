@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
@@ -13,12 +13,16 @@
     <RepositoryUrl>https://github.com/gbrantzos/CubesNEXT</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="BuildDate.txt" />
     <None Remove="Cubes.Applications.yaml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Cubes.Applications.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BuildDate.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
@@ -46,4 +50,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="PowerShell -Command &quot;&amp; {Get-Date -Format 'yyyy/MM/dd HH:mm' | Out-File -FilePath BuildDate.txt  }&quot;" />
+  </Target>
 </Project>
