@@ -1,42 +1,46 @@
-using System;
 using System.Threading;
 
 namespace Cubes.Core.Base
 {
     public class ContextProvider : IContextProvider
     {
-        private AsyncLocal<Context> context;
+        private class ContextHolder
+        {
+            public Context Context { get; set; }
+        }
+
+        private static AsyncLocal<ContextHolder> currentContext = new AsyncLocal<ContextHolder>();
 
         public Context Current
         {
-            get => context.Value;
+            get { return currentContext.Value?.Context; }
             set
             {
-                if (context != null)
-                    throw new Exception("Context can only be set once!");
-                context = new AsyncLocal<Context>
-                {
-                    Value = value
-                };
+                var holder = currentContext.Value;
+                if (holder != null)
+                    holder.Context = null;
+
+                if (value != null)
+                    currentContext.Value = new ContextHolder { Context = value };
             }
         }
 
         public object GetData(string key)
-            => context.Value.Data.TryGetValue(key, out object value) ? value : null;
+            => Current.Data.TryGetValue(key, out object value) ? value : null;
 
         public void SetData(string key, object data)
         {
-            if (context.Value.Data.ContainsKey(key))
+            if (Current.Data.ContainsKey(key))
             {
                 if (data != null)
-                    context.Value.Data[key] = data;
+                    Current.Data[key] = data;
                 else
-                    context.Value.Data.Remove(key);
+                    Current.Data.Remove(key);
             }
             else
             {
                 if (data != null)
-                    context.Value.Data.Add(key, data);
+                    Current.Data.Add(key, data);
             }
         }
     }

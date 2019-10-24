@@ -16,7 +16,7 @@ namespace Cubes.Core
                 .AddEmailDispatcher(configuration)
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()
-                .AddScoped<IContextProvider, ContextProvider>()
+                .AddSingleton<IContextProvider, ContextProvider>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
 
             return services;

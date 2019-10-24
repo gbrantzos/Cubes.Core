@@ -14,15 +14,12 @@ namespace Cubes.Web.Controllers
     {
         private readonly ICubesEnvironment cubesEnvironment;
         private readonly IApiDescriptionGroupCollectionProvider apiExplorer;
-        private readonly IContextProvider context;
 
         public SystemController(ICubesEnvironment cubesEnvironment,
-            IApiDescriptionGroupCollectionProvider apiExplorer,
-            IContextProvider context)
+            IApiDescriptionGroupCollectionProvider apiExplorer)
         {
             this.cubesEnvironment = cubesEnvironment;
             this.apiExplorer = apiExplorer;
-            this.context = context;
         }
 
         /// <summary>

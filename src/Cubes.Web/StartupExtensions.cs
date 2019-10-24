@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Cubes.Core.Base;
+using Cubes.Core.Scheduling.Jobs;
 using Cubes.Web.StaticContent;
 using Cubes.Web.Swager;
 using Microsoft.AspNetCore.Builder;
@@ -70,7 +71,7 @@ namespace Cubes.Web
 
                 // Provide context information
                 var ctxProvider = ctx.RequestServices.GetService<IContextProvider>();
-                var context = new Context(requestID, ContextSourceEnum.HttpRequest, requestInfo);
+                var context = new Context(requestID, requestInfo);
                 ctxProvider.Current = context;
 
                 var watcher = Stopwatch.StartNew();

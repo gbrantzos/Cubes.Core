@@ -16,7 +16,7 @@ namespace Cubes.Core.Scheduling
         public SchedulerJobFactory(IServiceScopeFactory scopeFactory, ILogger<SchedulerJobFactory> logger)
         {
             this.scopeFactory = scopeFactory;
-            this.logger = logger;
+            this.logger       = logger;
         }
 
         public IJob NewJob(TriggerFiredBundle bundle, Quartz.IScheduler scheduler)

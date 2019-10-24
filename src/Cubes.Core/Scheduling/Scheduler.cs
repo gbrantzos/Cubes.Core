@@ -276,6 +276,7 @@ namespace Cubes.Core.Scheduling
         private class JobListener : IJobListener
         {
             private readonly Scheduler scheduler;
+            private readonly IContextProvider contextProvider;
 
             public JobListener(Scheduler scheduler) => this.scheduler = scheduler;
 
