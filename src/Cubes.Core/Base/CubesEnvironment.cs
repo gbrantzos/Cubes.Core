@@ -79,6 +79,9 @@ namespace Cubes.Core.Base
         public CubesEnvironment(string rootFolder, ILogger logger) : this(rootFolder, logger, new FileSystem()) { }
 
         #region ICubesEnvironment implementation
+        public string GetBinariesFolder()
+            => fileSystem.Path.GetDirectoryName(typeof(CubesEnvironment).Assembly.Location);
+
         public string GetFolder(CubesFolderKind folderKind)
             => folderKind == CubesFolderKind.Root ? rootFolder : fileSystem.Path.Combine(rootFolder, folderKind.ToString());
 
@@ -149,7 +152,7 @@ namespace Cubes.Core.Base
             var applicationsFile = this.GetFileOnPath(CubesFolderKind.Root, CubesConstants.Files_Applications);
             if (fileSystem.File.Exists(applicationsFile))
             {
-                var fileContents = File.ReadAllText(applicationsFile);
+                var fileContents = fileSystem.File.ReadAllText(applicationsFile);
                 var deserializer = new Deserializer();
                 applications = deserializer.Deserialize<List<ApplicationInfo>>(fileContents);
             }
@@ -194,7 +197,7 @@ namespace Cubes.Core.Base
                 {
                     try
                     {
-                        var assemblyName = AssemblyName.GetAssemblyName(Path.Combine(app.Path, asm)).Name;
+                        var assemblyName = AssemblyName.GetAssemblyName(fileSystem.Path.Combine(app.Path, asm)).Name;
                         var loadedAsm = AppDomain
                             .CurrentDomain
                             .GetAssemblies()

@@ -39,8 +39,8 @@ namespace Cubes.Host
 #endif
             try
             {
-                using ILoggerProvider loggerProvider = GetNLogProvider();
                 var rootFolder = GetRootFolder();
+                using ILoggerProvider loggerProvider = GetNLogProvider(rootFolder);
                 var cubesEnvironment = new CubesEnvironment(rootFolder,
                     loggerProvider.CreateLogger(typeof(CubesEnvironment).FullName));
                 cubesEnvironment.PrepareHost();
@@ -79,7 +79,7 @@ namespace Cubes.Host
         public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubes)
         {
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(cubes.GetRootFolder())
+                .SetBasePath(cubes.GetBinariesFolder())
                 .AddJsonFile(CubesConstants.Config_AppSettings, optional: false)
                 .AddCommandLine(args)
                 .Build();
@@ -121,7 +121,7 @@ namespace Cubes.Host
                 });
         }
 
-        private static ILoggerProvider GetNLogProvider()
+        private static ILoggerProvider GetNLogProvider(string basedir)
         {
             var programPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
             var configFile  = Path.Combine(programPath, CubesConstants.NLog_ConfigFile);
@@ -131,6 +131,7 @@ namespace Cubes.Host
                 File.Copy(sampleFile, configFile);
             }
             NLogBuilder.ConfigureNLog(configFile);
+            NLog.LogManager.Configuration.Variables["basedir"] = basedir;
 
             return new NLogLoggerProvider();
         }
