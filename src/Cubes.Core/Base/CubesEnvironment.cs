@@ -149,7 +149,7 @@ namespace Cubes.Core.Base
             var applications = new List<ApplicationInfo>();
 
             // Check if applications file exists
-            var applicationsFile = this.GetFileOnPath(CubesFolderKind.Root, CubesConstants.Files_Applications);
+            var applicationsFile = fileSystem.Path.Combine(this.GetBinariesFolder(), CubesConstants.Files_Applications);
             if (fileSystem.File.Exists(applicationsFile))
             {
                 var fileContents = fileSystem.File.ReadAllText(applicationsFile);

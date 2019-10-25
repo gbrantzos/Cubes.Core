@@ -92,6 +92,7 @@ namespace Cubes.Host
                 .UseContentRoot(cubes.GetRootFolder())
                 .ConfigureAppConfiguration((builder, config) =>
                 {
+                    config.SetBasePath(cubes.GetBinariesFolder());
                     config.AddCubesConfiguration(cubes);
                     config.AddApplicationsConfiguration(cubes);
                 })
