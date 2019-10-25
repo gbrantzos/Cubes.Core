@@ -13,6 +13,8 @@ namespace Cubes.Core.Base
         public static readonly string Config_HostURLs              = "Host:URLs";
         public static readonly string Config_HostUseSSL            = "Host:UseSSL";
         public static readonly string Config_HostEnableCompression = "Host:EnableCompression";
+        public static readonly string Config_HostSwaggerTheme      = "Host:SwaggerTheme";
+
 
         public static readonly string NLog_ConfigFile              = "NLog.config";
         public static readonly string NLog_SampleFile              = "NLog.Sample.config";

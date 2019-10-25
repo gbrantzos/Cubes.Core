@@ -49,7 +49,7 @@ namespace Cubes.Core.Base
             using var buildDate = assembly.GetManifestResourceStream("Cubes.Core.BuildDate.txt");
             using var reader    = new StreamReader(buildDate);
             string value        = reader.ReadToEnd().Trim();
-            BuildDateTime       = DateTime.ParseExact(value, "yyyy/MM/dd HH:mm", CultureInfo.InvariantCulture);
+            BuildDateTime       = DateTime.ParseExact(value, "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
         }
     }
 }

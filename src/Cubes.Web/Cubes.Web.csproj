@@ -30,4 +30,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Swagger\Themes\*" />
+  </ItemGroup>
 </Project>

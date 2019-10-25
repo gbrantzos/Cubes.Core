@@ -24,13 +24,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Web", "src\Cubes.Web\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{21A91696-000F-4B49-BDC9-D3A24896BFCA}"
 	ProjectSection(SolutionItems) = preProject
-		scripts\build.sh = scripts\build.sh
+		scripts\build.ps1 = scripts\build.ps1
+		scripts\Cubes.Bootstrap.ps1 = scripts\Cubes.Bootstrap.ps1
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documents", "documents", "{F5F88370-397C-4308-ADFC-09BDE881DB85}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F5F88370-397C-4308-ADFC-09BDE881DB85}"
 	ProjectSection(SolutionItems) = preProject
-		documents\Commands.md = documents\Commands.md
-		documents\TODOs.txt = documents\TODOs.txt
+		docs\Commands.md = docs\Commands.md
+		docs\TODOs.txt = docs\TODOs.txt
 	EndProjectSection
 EndProject
 Global
