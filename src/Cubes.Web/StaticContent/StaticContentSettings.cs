@@ -9,12 +9,13 @@ namespace Cubes.Web.StaticContent
         public static StaticContentSettings Create()
         {
             var toReturn = new StaticContentSettings();
-            toReturn.Content.Add(new StaticContent.Content
+            toReturn.Content.Add(new Content
             {
                 DefaultFile           = "index.html",
                 RequestPath           = "/sample",
                 FileSystemPath        = "sampleContent",
                 PathIsAbsolute        = false,
+                Active                = false,
                 ServeUnknownFileTypes = true,
                 CustomContentTypes    = new Dictionary<string, string> { { "json", "application/json" } }
             });
@@ -25,6 +26,7 @@ namespace Cubes.Web.StaticContent
     public class Content
     {
         public string RequestPath { get; set; }
+        public bool Active { get; set; }
         public string FileSystemPath { get; set; }
         public bool PathIsAbsolute { get; set; }
         public string DefaultFile { get; set; } = "index.html";

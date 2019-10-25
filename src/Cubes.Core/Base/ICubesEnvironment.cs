@@ -78,9 +78,9 @@ namespace Cubes.Core.Base
     {
         Root,
         Apps,
+        Content,
         Logs,
         Settings,
-        StaticContent,
         Storage,
         Temp
     }

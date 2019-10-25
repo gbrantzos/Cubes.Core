@@ -31,7 +31,7 @@ namespace Cubes.Core.Base
                     { $"{CubesConstants.Configuration_Section}:SettingsFolder"     , cubes.GetSettingsFolder() },
                     { $"{CubesConstants.Configuration_Section}:StorageFolder"      , cubes.GetStorageFolder() },
                     { $"{CubesConstants.Configuration_Section}:TempFolder"         , cubes.GetFolder(CubesFolderKind.Temp) },
-                    { $"{CubesConstants.Configuration_Section}:StaticContentFolder", cubes.GetFolder(CubesFolderKind.StaticContent) },
+                    { $"{CubesConstants.Configuration_Section}:StaticContentFolder", cubes.GetFolder(CubesFolderKind.Content) },
                 };
             var swaggerFiles = cubes
                 .GetSwaggerFiles()

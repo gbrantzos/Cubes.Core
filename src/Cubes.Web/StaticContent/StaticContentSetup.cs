@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using Cubes.Core.Base;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +24,7 @@ namespace Cubes.Web.StaticContent
             if (settings == null)
                 return app;
 
-            foreach (var item in settings.Content)
+            foreach (var item in settings.Content.Where(c => c.Active).ToList())
             {
                 var contentPath = item.PathIsAbsolute ?
                     item.FileSystemPath :

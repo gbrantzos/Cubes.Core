@@ -46,7 +46,7 @@ namespace Cubes.Core.Tests.Environment
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetAppsFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetStorageFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetSettingsFolder()));
-            Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.StaticContent)));
+            Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Content)));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Temp)));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Logs)));
         }

@@ -117,7 +117,7 @@ namespace Cubes.Host
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls(urls);
-                    webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.StaticContent));
+                    webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.Content));
                 });
         }
 
