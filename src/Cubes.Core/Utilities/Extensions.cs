@@ -151,6 +151,17 @@ namespace Cubes.Core.Utilities
             => FromHierarchy(source, nextItem, s => s != null);
 
         /// <summary>
+        /// Get all distinct messages from inner <see cref="Exception"/> hierarchy
+        /// </summary>
+        /// <param name="x">Root <see cref="Exception"/></param>
+        /// <returns><see cref="IEnumerable{sting}"/> with all distinct messages</returns>
+        public static IEnumerable<string> GetAllMessages(this Exception x)
+            => x.FromHierarchy(x => x.InnerException)
+                .Select(x => x.Message)
+                .Distinct()
+                .ToList();
+
+        /// <summary>
         /// Make first letter of string lower
         /// </summary>
         /// <param name="input"></param>

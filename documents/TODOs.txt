@@ -2,28 +2,6 @@
 |   CubesNext - TODOs                                                           |
 +-------------------------------------------------------------------------------+
 
-[ ]     MediatR pipeline
-[ ]     Content dispatching
+[ ]     Improve - add documentation
 [ ]     Generic UI shell
 [ ]     Provision for settings editing (save)
-[ ]     Improve - add documentation
-
-
-Thoughts about pipeline (MediatR pipeline):
-- Logging
-- History of execution
-- Audit and security
-- Validation
-- Instrumentation (timing)
-
-
-+-------------------------------------------------------------------------------+
-|   Content Dispatcher                                                          |
-+-------------------------------------------------------------------------------+
-
--   To replace - augment EmailDispatcher
--   Building blocks
-    * IContentProducer<TContent>
-        i.e.  =>  TContent Generate(params object args[])
-    * IContentDispatcher<TContent>, ie EmailDispatcher, FileDispatcher, FTP, SSH
-        i.e.  =>  void Dispatch(TContent content)

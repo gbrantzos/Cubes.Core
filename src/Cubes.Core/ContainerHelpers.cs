@@ -3,6 +3,8 @@ using Cubes.Core.Commands.Basic;
 using Cubes.Core.Base;
 using Cubes.Core.Utilities;
 using MediatR;
+using Cubes.Core.Commands;
+using MediatR.Pipeline;
 
 namespace Cubes.Core
 {
@@ -20,9 +22,20 @@ namespace Cubes.Core
                 return t => c.Resolve(t);
             });
 
+            // Simple MediatR pipeline
+            builder.RegisterGeneric(typeof(DefaultBehaviour<,>)).As(typeof(IPipelineBehavior<,>));
+            builder.RegisterGeneric(typeof(ValidatorBehaviour<,>)).As(typeof(IPipelineBehavior<,>));
+            // TODO We could add
+            // - History of execution
+            // - Auditing and security
+
+            builder.RegisterGeneric(typeof(RequestPreProcessorBehavior<,>)).AsImplementedInterfaces();
+            builder.RegisterGeneric(typeof(RequestPostProcessorBehavior<,>)).AsImplementedInterfaces();
+
             // Register basic jobs
             builder.RegisterType<RunOsProcessHandler>().AsImplementedInterfaces();
             builder.RegisterType<QueryResultsAsEmailHandler>().AsImplementedInterfaces();
+            builder.RegisterType<RunOsProcessValidator>().AsImplementedInterfaces();
 
             // Register serializers, use them by name
             builder.RegisterType<JsonSerializer>()

@@ -167,13 +167,10 @@ namespace Cubes.Core.Scheduling
 
                 if (internalDetail.LastExecutionException != null)
                 {
-                    var allMesages = internalDetail
+                    var all = internalDetail
                         .LastExecutionException
-                        .FromHierarchy(x => x.InnerException)
-                        .Select(x => x.Message)
-                        .Distinct()
-                        .ToList();
-                    jobStatus.FailureMessage = String.Join(System.Environment.NewLine, allMesages);
+                        .GetAllMessages();
+                    jobStatus.FailureMessage = String.Join(Environment.NewLine, all);
                 }
 
                 result.Jobs.Add(jobStatus);
@@ -276,11 +273,10 @@ namespace Cubes.Core.Scheduling
         private class JobListener : IJobListener
         {
             private readonly Scheduler scheduler;
-            private readonly IContextProvider contextProvider;
 
             public JobListener(Scheduler scheduler) => this.scheduler = scheduler;
 
-            public string Name => "Internal Job Listener";
+            public string Name => "Internal Job Listener [Cubes.Core]";
 
             public Task JobExecutionVetoed(IJobExecutionContext context, CancellationToken cancellationToken = default)
                 => Task.CompletedTask;

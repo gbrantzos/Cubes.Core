@@ -14,10 +14,10 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="BuildDate.txt" />
-    <None Remove="Cubes.Applications.yaml" />
+    <None Remove="Cubes.Applications.Sample.yaml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Cubes.Applications.yaml">
+    <Content Include="Cubes.Applications.Sample.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -30,6 +30,7 @@
     <PackageReference Include="Dapper" Version="2.0.30" />
     <PackageReference Include="EPPlus" Version="4.5.3.2" />
     <PackageReference Include="Figgle" Version="0.3.0" />
+    <PackageReference Include="FluentValidation" Version="8.5.0" />
     <PackageReference Include="MediatR" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0" />

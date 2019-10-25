@@ -5,7 +5,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Cubes.Core.Base;
-using Cubes.Core.Scheduling.Jobs;
 using Cubes.Web.StaticContent;
 using Cubes.Web.Swager;
 using Microsoft.AspNetCore.Builder;
@@ -100,11 +99,16 @@ namespace Cubes.Web
 
             app.UseStatusCodePages(async context =>
             {
-                // TODO return Json with info
-                context.HttpContext.Response.ContentType = "text/plain";
-                await context.HttpContext.Response.WriteAsync(
-                    "Status code page, status code: " +
-                    context.HttpContext.Response.StatusCode);
+                context.HttpContext.Response.ContentType = "application/json";
+                await context
+                    .HttpContext
+                    .Response
+                    .WriteAsync(new ErrorDetails
+                        {
+                            StatusCode = context.HttpContext.Response.StatusCode,
+                            Message = $"Invalid request, status code: {context.HttpContext.Response.StatusCode}",
+                            Details = $"URL: {context.HttpContext.Request.Path}, Method: {context.HttpContext.Request.Method}"
+                        }.ToString());
             });
 
             return app;

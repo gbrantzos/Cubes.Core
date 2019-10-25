@@ -10,12 +10,12 @@ using Newtonsoft.Json.Linq;
 namespace Cubes.Web.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class RequestController : ControllerBase
+    public class RequestsController : ControllerBase
     {
         private readonly IMediator mediator;
         private readonly ITypeResolver typeResolver;
 
-        public RequestController(IMediator mediator, ITypeResolver typeResolver)
+        public RequestsController(IMediator mediator, ITypeResolver typeResolver)
         {
             this.mediator     = mediator;
             this.typeResolver = typeResolver;
