@@ -31,7 +31,8 @@ namespace Cubes.Host
                 .ToList();
 
             // Setup WebAPI
-            var mvcBuilder = services.AddControllers()
+            var mvcBuilder = services
+                .AddControllers()
                 .AddNewtonsoftJson();
 
             // Add applications assemblies
@@ -39,7 +40,7 @@ namespace Cubes.Host
                 mvcBuilder.AddApplicationPart(asm);
 
             // Setup Cubes
-            services.AddCubesWeb(configuration);
+            services.AddCubesWeb(configuration, mvcBuilder);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

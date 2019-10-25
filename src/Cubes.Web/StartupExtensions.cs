@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Cubes.Core.Base;
+using Cubes.Web.Filters;
 using Cubes.Web.StaticContent;
 using Cubes.Web.Swager;
 using Microsoft.AspNetCore.Builder;
@@ -25,7 +26,7 @@ namespace Cubes.Web
         public const string CUBES_HEADER_REQUEST_ID = "X-Cubes-RequestID";
         public const string CUBES_MIDDLEWARE_LOGGER = "Cubes.Web.CubesMiddleware";
 
-        public static void AddCubesWeb(this IServiceCollection services, IConfiguration configuration)
+        public static void AddCubesWeb(this IServiceCollection services, IConfiguration configuration, IMvcBuilder mvcBuilder)
         {
             services.AddHttpContextAccessor();
 
@@ -33,6 +34,8 @@ namespace Cubes.Web
             if (enableCompression)
                 services.AddResponseCompression();
             services.AddCubesSwaggerServices(configuration);
+
+            mvcBuilder.AddMvcOptions(options => options.Filters.Add(typeof(ValidateModelFilterAttribute)));
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
