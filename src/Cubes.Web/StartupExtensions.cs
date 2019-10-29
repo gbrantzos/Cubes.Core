@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cubes.Core.Base;
 using Cubes.Web.Filters;
+using Cubes.Web.ResponseWrapping;
 using Cubes.Web.StaticContent;
 using Cubes.Web.Swager;
 using Microsoft.AspNetCore.Builder;
@@ -56,7 +57,8 @@ namespace Cubes.Web
                 .UseHomePage()
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
-                .UseCubesMiddleware(loggerFactory);
+                .UseCubesMiddleware(loggerFactory)
+                .UseResponseWrapper();
         }
 
         public static IApplicationBuilder UseCubesMiddleware(this IApplicationBuilder app, ILoggerFactory loggerFactory)
@@ -150,9 +152,10 @@ namespace Cubes.Web
                             .Response
                             .WriteAsync(new ErrorDetails()
                             {
-                                StatusCode = context.Response.StatusCode,
-                                Message    = "An unhandled exception occurred while processing the request.",
-                                Details    = details.ToString()
+                                StatusCode  = context.Response.StatusCode,
+                                Message     = "An unhandled exception occurred while processing the request.",
+                                Details     = details.ToString(),
+                                RequestInfo = $"{context.Request.Path} [{context.Request.Method}]"
                             }
                             .ToString());
                     }
@@ -166,6 +169,7 @@ namespace Cubes.Web
             public int StatusCode { get; set; }
             public string Message { get; set; }
             public string Details { get; set; }
+            public string RequestInfo { get; set; }
 
             public override string ToString() => JsonConvert.SerializeObject(this);
         }
