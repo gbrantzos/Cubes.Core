@@ -1,20 +1,27 @@
 using System;
 using Cubes.Core.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Cubes.Web.ResponseWrapping
 {
     public class ApiResponse
     {
+        private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
+        };
+
         public string Version     { get; set; }
         public DateTime CreatedAt { get; set; }
         public int StatusCode     { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Message     { get; set; }
         public bool HasErrors     { get; set; }
         public object Response    { get; set; }
 
         public override string ToString()
-            => JsonConvert.SerializeObject(this);
+            => JsonConvert.SerializeObject(this, serializerSettings);
 
         internal ApiResponse(DateTime createdAt, string version)
         {

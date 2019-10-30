@@ -2,6 +2,26 @@
 |   CubesNext - TODOs                                                           |
 +-------------------------------------------------------------------------------+
 
-[ ]     Improve - add documentation
-[ ]     Generic UI shell
 [ ]     Provision for settings editing (save)
+        >   Something like ISettingsPersistene (storage ??)
+        >   Attribute based, filePath - elementPath,
+            in order to support multiple settings per file
+[ ]     Improve - add documentation
+
+
++-------------------------------------------------------------------------------+
+|   Cubes Management Console (UI Shell)                                         |
++-------------------------------------------------------------------------------+
+
+* Data Access settings:
+    - Display and edit connections
+    - Test connection (unsaved, using full connection details)
+    - Display and edit queries
+    - Execute query and Preview results
+
+* Scheduling:
+    - Job definition and editing
+    - Scheduler status and control
+
+* SMTP settings:
+    - Display and edit profiles

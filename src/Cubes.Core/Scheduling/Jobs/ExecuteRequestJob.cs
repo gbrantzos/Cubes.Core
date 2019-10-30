@@ -88,7 +88,7 @@ namespace Cubes.Core.Scheduling.Jobs
 
         private void DispatchResult(object response/*, Dictionary<string, string> jobParams*/)
         {
-            // TODO This part will be responsible for creating and using the appropriate dispatcher
+            // This part will be responsible for creating and using the appropriate dispatcher
             /*
             if (!jobParams.TryGetValue(Dispatcher_Type, out var dispatcherTypeName))
                 return;
