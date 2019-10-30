@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +34,7 @@ namespace Cubes.Web.ResponseWrapping
             this.responseBuilder = responseBuilder;
 
             this.includePath = configuration.GetValue(CubesConstants.Config_HostWrapPath, "/api/");
-            this.excludePath = ""; // configuration.GetValue(CubesConstants.Config_HostWrapPathExclude, "");
+            this.excludePath = configuration.GetValue(CubesConstants.Config_HostWrapPathExclude, "");
         }
 
         public async Task Invoke(HttpContext context)
