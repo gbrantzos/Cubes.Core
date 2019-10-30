@@ -35,14 +35,15 @@ namespace Cubes.Web.ResponseWrapping
             this.responseBuilder = responseBuilder;
 
             this.includePath = configuration.GetValue(CubesConstants.Config_HostWrapPath, "/api/");
-            this.excludePath = configuration.GetValue(CubesConstants.Config_HostWrapPathExclude, "");
+            this.excludePath = ""; // configuration.GetValue(CubesConstants.Config_HostWrapPathExclude, "");
         }
 
         public async Task Invoke(HttpContext context)
         {
             // Honor include and exclude paths
-            if (!context.Request.Path.Value.StartsWith(this.includePath)
-                || context.Request.Path.Value.StartsWith(this.excludePath))
+            var shouldSkip = !context.Request.Path.Value.StartsWith(this.includePath) ||
+                (!String.IsNullOrEmpty(this.excludePath) && context.Request.Path.Value.StartsWith(this.excludePath));
+            if (shouldSkip)
             {
                 await this.next(context);
                 return;
