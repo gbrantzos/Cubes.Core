@@ -35,13 +35,16 @@ namespace Cubes.Web
             if (enableCompression)
                 services.AddResponseCompression();
             services.AddCubesSwaggerServices(configuration);
+            services.AddSingleton<IApiResponseBuilder, ApiResponseBuilder>();
 
             mvcBuilder.AddMvcOptions(options => options.Filters.Add(typeof(ValidateModelFilterAttribute)));
+
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
             IConfiguration configuration,
             IWebHostEnvironment env,
+            IApiResponseBuilder responseBuilder,
             ILoggerFactory loggerFactory)
         {
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
@@ -51,17 +54,19 @@ namespace Cubes.Web
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
-                app.UseCustomExceptionHandler(loggerFactory);
+                app.UseCustomExceptionHandler(responseBuilder, loggerFactory);
 
             return app
                 .UseHomePage()
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
-                .UseCubesMiddleware(loggerFactory)
+                .UseCubesMiddleware(loggerFactory, responseBuilder)
                 .UseResponseWrapper();
         }
 
-        public static IApplicationBuilder UseCubesMiddleware(this IApplicationBuilder app, ILoggerFactory loggerFactory)
+        public static IApplicationBuilder UseCubesMiddleware(this IApplicationBuilder app,
+            ILoggerFactory loggerFactory,
+            IApiResponseBuilder responseBuilder)
         {
             app.Use(async (ctx, next) =>
             {
@@ -105,21 +110,25 @@ namespace Cubes.Web
             app.UseStatusCodePages(async context =>
             {
                 context.HttpContext.Response.ContentType = "application/json";
+                var apiResponse = responseBuilder.Create()
+                            .HasErrors()
+                            .WithStatusCode(context.HttpContext.Response.StatusCode)
+                            .WithMessage($"Invalid request, status code: {context.HttpContext.Response.StatusCode}")
+                            .WithResponse(new
+                            {
+                                Details = $"URL: {context.HttpContext.Request.Path}, Method: {context.HttpContext.Request.Method}"
+                            });
                 await context
                     .HttpContext
                     .Response
-                    .WriteAsync(new ErrorDetails
-                        {
-                            StatusCode = context.HttpContext.Response.StatusCode,
-                            Message = $"Invalid request, status code: {context.HttpContext.Response.StatusCode}",
-                            Details = $"URL: {context.HttpContext.Request.Path}, Method: {context.HttpContext.Request.Method}"
-                        }.ToString());
+                    .WriteAsync(apiResponse.ToString());
             });
 
             return app;
         }
 
         public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app,
+            IApiResponseBuilder responseBuilder,
             ILoggerFactory loggerFactory)
         {
             var logger = loggerFactory.CreateLogger("Cubes.Web.CustomExceptionHandler");
@@ -148,16 +157,18 @@ namespace Cubes.Web
                             .Append(" in ")
                             .AppendLine(fileInfo);
 
+                        var apiResponse = responseBuilder.Create()
+                            .HasErrors()
+                            .WithStatusCode(context.Response.StatusCode)
+                            .WithMessage("An unhandled exception occurred while processing the request.")
+                            .WithResponse(new
+                            {
+                                Details = details.ToString(),
+                                RequestInfo = $"{context.Request.Path} [{context.Request.Method}]"
+                            });
                         await context
                             .Response
-                            .WriteAsync(new ErrorDetails()
-                            {
-                                StatusCode  = context.Response.StatusCode,
-                                Message     = "An unhandled exception occurred while processing the request.",
-                                Details     = details.ToString(),
-                                RequestInfo = $"{context.Request.Path} [{context.Request.Method}]"
-                            }
-                            .ToString());
+                            .WriteAsync(apiResponse.ToString());
                     }
                 });
             });

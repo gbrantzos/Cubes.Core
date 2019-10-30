@@ -6,13 +6,14 @@ namespace Cubes.Core.Base
 {
     public class CubesConfiguration
     {
-        public string RootFolder { get; set; }
-        public string AppsFolder { get; set; }
-        public string LogsFolder { get; set; }
-        public string SettingsFolder { get; set; }
-        public string StorageFolder { get; set; }
-        public string TempFolder { get; set; }
-        public string StaticContentFolder { get; set; }
+        public string Version                   { get; set; }
+        public string RootFolder                { get; set; }
+        public string AppsFolder                { get; set; }
+        public string LogsFolder                { get; set; }
+        public string SettingsFolder            { get; set; }
+        public string StorageFolder             { get; set; }
+        public string TempFolder                { get; set; }
+        public string StaticContentFolder       { get; set; }
 
         public IEnumerable<string> SwaggerFiles { get; set; }
         public IEnumerable<string> AssembliesWithControllers { get; set; }
@@ -25,6 +26,7 @@ namespace Cubes.Core.Base
         {
             var cubesConfig = new Dictionary<string, string>
                 {
+                    { $"{CubesConstants.Configuration_Section}:Version"            , cubes.GetEnvironmentInformation().FullVersion },
                     { $"{CubesConstants.Configuration_Section}:RootFolder"         , cubes.GetRootFolder() },
                     { $"{CubesConstants.Configuration_Section}:AppsFolder"         , cubes.GetAppsFolder() },
                     { $"{CubesConstants.Configuration_Section}:LogsFolder"         , cubes.GetFolder(CubesFolderKind.Logs) },

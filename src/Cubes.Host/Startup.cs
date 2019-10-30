@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Cubes.Core.Base;
 using Cubes.Web;
+using Cubes.Web.ResponseWrapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -49,6 +50,7 @@ namespace Cubes.Host
             var useSSL           = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
             var loggerFactory    = app.ApplicationServices.GetService<ILoggerFactory>();
             var cubesEnvironment = app.ApplicationServices.GetService<ICubesEnvironment>();
+            var responseBuilder = app.ApplicationServices.GetService<IApiResponseBuilder>();
 
             if (useSSL)
             {
@@ -59,7 +61,7 @@ namespace Cubes.Host
             }
 
             // Should be called as soon as possible.
-            app.UseCubesApi(configuration, env, loggerFactory);
+            app.UseCubesApi(configuration, env, responseBuilder, loggerFactory);
 
             // Routing
             app.UseRouting();

@@ -6,6 +6,11 @@ namespace Cubes.Web
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Convert <see cref="IQueryCollection"/> (query string) to <see cref="String"/>
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public static string AsString(this IQueryCollection query)
         {
             var sb = new StringBuilder();
@@ -22,5 +27,13 @@ namespace Cubes.Web
             }
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Check if <see cref="HttpResponse"/> is successful.
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public static bool IsSuccess(this HttpResponse response)
+            => response.StatusCode >= 200 && response.StatusCode <= 299;
     }
 }

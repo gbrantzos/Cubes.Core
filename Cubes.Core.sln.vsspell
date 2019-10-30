@@ -9,11 +9,12 @@
   <InheritIgnoredWords>True</InheritIgnoredWords>
   <IgnoredWords>
     <Ignore>api</Ignore>
+    <Ignore>basedir</Ignore>
     <Ignore>json</Ignore>
     <Ignore>mssql</Ignore>
     <Ignore>mysql</Ignore>
     <Ignore>unhandled</Ignore>
-    <Ignore>basedir</Ignore>
+    <Ignore>deserialize</Ignore>
   </IgnoredWords>
   <InheritExclusionExpressions>True</InheritExclusionExpressions>
   <InheritIgnoredFilePatterns>True</InheritIgnoredFilePatterns>

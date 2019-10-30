@@ -13,7 +13,8 @@ namespace Cubes.Core.Base
         public DateTime LiveSince     { get; }
         public string   Version       { get; }
         public string   BuildVersion  { get; }
-        public DateTime BuildDateTime { get; set; }
+        public string   FullVersion   { get; }
+        public DateTime BuildDateTime { get; }
         public string   GitHash       { get; } = "DEVELOPMENT";
         public bool     IsDebug       { get; } = true;
         public string   Hostname      { get; }
@@ -35,11 +36,11 @@ namespace Cubes.Core.Base
 #else
             IsDebug      = false;
 #endif
-            BuildVersion = Assembly
+            FullVersion = Assembly
                 .GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 .InformationalVersion;
-
+            BuildVersion = FullVersion;
             if (BuildVersion.Contains("-"))
             {
                 GitHash = BuildVersion.Substring(BuildVersion.IndexOf('-') + 1);
