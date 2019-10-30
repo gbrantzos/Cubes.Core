@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Cubes.Core.Base;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -20,16 +22,32 @@ namespace Cubes.Web.ResponseWrapping
         private readonly RequestDelegate next;
         private readonly ILogger<ResponseWrapper> logger;
         private readonly IApiResponseBuilder responseBuilder;
+        private readonly string includePath;
+        private readonly string excludePath;
 
-        public ResponseWrapper(RequestDelegate next, ILogger<ResponseWrapper> logger, IApiResponseBuilder responseBuilder)
+        public ResponseWrapper(RequestDelegate next,
+            ILogger<ResponseWrapper> logger,
+            IApiResponseBuilder responseBuilder,
+            IConfiguration configuration)
         {
             this.next = next;
             this.logger = logger;
             this.responseBuilder = responseBuilder;
+
+            this.includePath = configuration.GetValue(CubesConstants.Config_HostWrapPath, "/api/");
+            this.excludePath = configuration.GetValue(CubesConstants.Config_HostWrapPathExclude, "");
         }
 
         public async Task Invoke(HttpContext context)
         {
+            // Honor include and exclude paths
+            if (!context.Request.Path.Value.StartsWith(this.includePath)
+                || context.Request.Path.Value.StartsWith(this.excludePath))
+            {
+                await this.next(context);
+                return;
+            }
+
             // Keep track of original response body
             var originalBody = context.Response.Body;
 

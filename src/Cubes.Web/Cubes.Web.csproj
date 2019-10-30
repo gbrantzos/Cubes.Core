@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Cubes.Core\Cubes.Core.csproj" />
     <EmbeddedResource Include="Resources/*" />
+    <EmbeddedResource Include="Resources/Admin/*" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Core.StaticContent.Sample.yaml" />

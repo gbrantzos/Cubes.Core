@@ -8,7 +8,7 @@ namespace Cubes.Web.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("swagger")]
-    public class SwaggerUiController : ControllerBase
+    public class SwaggerController : ControllerBase
     {
         private static HashSet<string> themes = new HashSet<string>
         {
@@ -22,7 +22,7 @@ namespace Cubes.Web.Controllers
         private static string resourceRoot = "Cubes.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
 
-        public SwaggerUiController(IConfiguration configuration)
+        public SwaggerController(IConfiguration configuration)
             => this.configuration = configuration;
 
         [HttpGet("css")]
@@ -32,7 +32,7 @@ namespace Cubes.Web.Controllers
             var css = string.Empty;
             if (themes.Contains(themeName))
             {
-                var assembly = typeof(SwaggerUiController).Assembly;
+                var assembly = typeof(SwaggerController).Assembly;
                 using var stream = assembly.GetManifestResourceStream($"{resourceRoot}.theme-{themeName}.css");
                 using var reader = new StreamReader(stream);
                 css = reader.ReadToEnd().Trim();
