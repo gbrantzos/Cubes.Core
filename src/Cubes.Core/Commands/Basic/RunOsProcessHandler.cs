@@ -23,9 +23,9 @@ namespace Cubes.Core.Commands.Basic
             // Capture output
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-            process.OutputDataReceived += (s, e) => { output.Append($"{System.Environment.NewLine}{e.Data}"); };
-            process.ErrorDataReceived += (s, e) => { output.Append($"{System.Environment.NewLine}ERROR: { e.Data}"); };
-            output.Append($"==> {command.ToString()}");
+            process.OutputDataReceived += (s, e) => output.Append($"{System.Environment.NewLine}{e.Data}");
+            process.ErrorDataReceived += (s, e) => output.Append($"{System.Environment.NewLine}ERROR: { e.Data}");
+            output.Append($"==> {command}");
 
             // Start process and handlers
             process.Start();

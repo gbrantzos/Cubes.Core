@@ -16,6 +16,7 @@ namespace Cubes.Core.Base
         public static readonly string Config_HostSwaggerTheme      = "Host:SwaggerTheme";
         public static readonly string Config_HostWrapPath          = "Host:WrapPath";
         public static readonly string Config_HostWrapPathExclude   = "Host:WrapPathExclude";
+        public static readonly string Config_HostCorsPolicies      = "Host:CorsPolicies";
 
 
         public static readonly string NLog_ConfigFile              = "NLog.config";

@@ -1,17 +1,17 @@
-+-------------------------------------------------------------------------------+
-|   CubesNext - TODOs                                                           |
-+-------------------------------------------------------------------------------+
++------------------------------------------------------------------------------+
+|   CubesNext - TODOs                                                          |
++------------------------------------------------------------------------------+
 
 [ ]     Provision for settings editing (save)
         >   Something like ISettingsPersistene (storage ??)
         >   Attribute based, filePath - elementPath,
             in order to support multiple settings per file
 [ ]     Improve - add documentation
+[ ]     CORS support from configuration
 
-
-+-------------------------------------------------------------------------------+
-|   Cubes Management Console (UI Shell)                                         |
-+-------------------------------------------------------------------------------+
++------------------------------------------------------------------------------+
+|   Cubes Management Console (UI Shell)                                        |
++------------------------------------------------------------------------------+
 
 * Data Access settings:
     - Display and edit connections

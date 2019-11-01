@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace Cubes.Web
         public static void AddCubesWeb(this IServiceCollection services, IConfiguration configuration, IMvcBuilder mvcBuilder)
         {
             services.AddHttpContextAccessor();
+            services.AddCorsConfiguration(configuration);
 
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
@@ -38,7 +40,6 @@ namespace Cubes.Web
             services.AddSingleton<IApiResponseBuilder, ApiResponseBuilder>();
 
             mvcBuilder.AddMvcOptions(options => options.Filters.Add(typeof(ValidateModelFilterAttribute)));
-
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
@@ -55,6 +56,13 @@ namespace Cubes.Web
                 app.UseDeveloperExceptionPage();
             else
                 app.UseCustomExceptionHandler(responseBuilder, loggerFactory);
+
+            var corsPolicies = configuration
+                .GetCorsPolicies()
+                .Select(p => p.PolicyName)
+                .ToList();
+            foreach (var policy in corsPolicies)
+                app.UseCors(policy);
 
             return app
                 .UseHomePage()
