@@ -8,6 +8,18 @@ namespace Cubes.Core.Utilities
     public static class Extensions
     {
         /// <summary>
+        /// Determine whether the object is real - non-abstract, non-generic-needed, non-interface class.
+        /// </summary>
+        /// <param name="testType">Type to be verified.</param>
+        /// <returns>True in case the class is real, false otherwise.</returns>
+        public static bool IsConcrete(this Type testType)
+        {
+            return testType.IsAbstract == false
+                && testType.IsGenericTypeDefinition == false
+                && testType.IsInterface == false;
+        }
+
+        /// <summary>
         /// Get first Attribute of type TAttribute for given type
         /// </summary>
         /// <typeparam name="TAttribute">Attribute type</typeparam>

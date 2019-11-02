@@ -10,6 +10,7 @@ using Cubes.Web.Filters;
 using Cubes.Web.ResponseWrapping;
 using Cubes.Web.StaticContent;
 using Cubes.Web.Swager;
+using Cubes.Web.UIHelpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -38,6 +39,8 @@ namespace Cubes.Web
                 services.AddResponseCompression();
             services.AddCubesSwaggerServices(configuration);
             services.AddSingleton<IApiResponseBuilder, ApiResponseBuilder>();
+
+            services.AddUIServices();
 
             mvcBuilder.AddMvcOptions(options => options.Filters.Add(typeof(ValidateModelFilterAttribute)));
         }

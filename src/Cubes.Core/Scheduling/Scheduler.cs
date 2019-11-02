@@ -123,7 +123,11 @@ namespace Cubes.Core.Scheduling
 
         public async Task<SchedulerStatus> GetStatus(CancellationToken cancellationToken = default)
         {
-            var result = new SchedulerStatus { Jobs = new List<SchedulerJobStatus>() };
+            var result = new SchedulerStatus
+            {
+                ServerTime = DateTime.Now,
+                Jobs       = new List<SchedulerJobStatus>()
+            };
             if (failedToLoad)
             {
                 result.SchedulerState = SchedulerStatus.State.FailedToLoad;

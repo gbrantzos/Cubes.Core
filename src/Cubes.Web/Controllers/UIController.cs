@@ -1,14 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Cubes.Core.Base;
+using Cubes.Web.UIHelpers.Lookups;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace Cubes.Web.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
-    [Route("swagger")]
-    public class SwaggerController : ControllerBase
+    [Route("ui")]
+    public class UIController : ControllerBase
     {
         private static HashSet<string> themes = new HashSet<string>
         {
@@ -21,23 +24,39 @@ namespace Cubes.Web.Controllers
         };
         private static string resourceRoot = "Cubes.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
+        private readonly List<ILookupProvider> lookupProviders;
 
-        public SwaggerController(IConfiguration configuration)
-            => this.configuration = configuration;
+        public UIController(IConfiguration configuration, IEnumerable<ILookupProvider> lookupProviders)
+        {
+            this.configuration = configuration;
+            this.lookupProviders = lookupProviders.ToList();
+        }
 
-        [HttpGet("css")]
-        public ActionResult GetTheme()
+        [HttpGet("swagger-css")]
+        public IActionResult GetTheme()
         {
             var themeName = this.configuration.GetValue<string>(CubesConstants.Config_HostSwaggerTheme, "material");
             var css = string.Empty;
             if (themes.Contains(themeName))
             {
-                var assembly = typeof(SwaggerController).Assembly;
+                var assembly = typeof(UIController).Assembly;
                 using var stream = assembly.GetManifestResourceStream($"{resourceRoot}.theme-{themeName}.css");
                 using var reader = new StreamReader(stream);
                 css = reader.ReadToEnd().Trim();
             }
             return Content(css, "text/css");
+        }
+
+        [HttpGet("lookup/{lookupName}")]
+        public IActionResult GetLookup(string lookupName)
+        {
+            var provider = this
+                .lookupProviders
+                .FirstOrDefault(pr => pr.Name.Equals(lookupName, StringComparison.CurrentCultureIgnoreCase));
+            if (provider == null)
+                return BadRequest($"Unknown lookup provider: {lookupName}");
+
+            return Ok(provider.Get());
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Cubes.Core.Scheduling
 
         [JsonConverter(typeof(StringEnumConverter))]
         public State SchedulerState { get; set; }
+        public DateTime ServerTime { get; set; }
         public List<SchedulerJobStatus> Jobs { get; set; }
     }
 
