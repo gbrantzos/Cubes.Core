@@ -68,7 +68,7 @@ namespace Cubes.Core.Base
                 fileSystem.Path.Combine(assemblyPath, "Cubes.Web.xml")
             };
 
-            var figgle    = FiggleFonts.Slant.Render(" Cubes v5");
+            var figgle = FiggleFonts.Slant.Render(" Cubes v5");
             var buildInfo = $"Git Commit #{environmentInformation.GitHash}, build at {environmentInformation.BuildDateTime}";
             var version   = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode} [{buildInfo}]";
             var message   = $"Starting Cubes, version {version} build...{Environment.NewLine}{figgle}";
