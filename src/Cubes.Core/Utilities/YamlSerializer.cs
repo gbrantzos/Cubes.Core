@@ -11,8 +11,7 @@ namespace Cubes.Core.Utilities
     {
         private static YamlDotNet.Serialization.ISerializer Serializer { get; } = new SerializerBuilder()
             //.WithEventEmitter(next => new MultilineStringEmitter(next))
-            .WithAttributeOverride(typeof(DataAccess.DataAccessSettings), nameof(DataAccess.Query.QueryCommand), new YamlMemberAttribute { ScalarStyle = ScalarStyle.Folded })
-            .EmitDefaults()
+            //.WithAttributeOverride(typeof(DataAccess.DataAccessSettings), nameof(DataAccess.Query.QueryCommand), new YamlMemberAttribute { ScalarStyle = ScalarStyle.Folded })
             .Build();
         private static IDeserializer Deserializer { get; } = new DeserializerBuilder()
             .IgnoreUnmatchedProperties()

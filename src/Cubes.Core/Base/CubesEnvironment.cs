@@ -119,9 +119,7 @@ namespace Cubes.Core.Base
 
         private void CreateSettingsFile()
         {
-            var serializer = new SerializerBuilder()
-                .EmitDefaults()
-                .Build();
+            var serializer = new SerializerBuilder().Build();
             foreach (var config in configurationFiles)
             {
                 var filePath = this.GetFileOnPath(CubesFolderKind.Settings, config.Filename);

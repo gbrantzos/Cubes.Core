@@ -3,6 +3,8 @@
 +------------------------------------------------------------------------------+
 
 [ ]     Improve - add documentation
+[ ]     Handle cases when API response are already ApiResponse instances
+
 
 
 +------------------------------------------------------------------------------+
