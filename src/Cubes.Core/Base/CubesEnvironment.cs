@@ -71,7 +71,8 @@ namespace Cubes.Core.Base
             var figgle    = FiggleFonts.Slant.Render(" Cubes v5");
             var buildInfo = $"Git Commit #{environmentInformation.GitHash}, build at {environmentInformation.BuildDateTime}";
             var version   = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode} [{buildInfo}]";
-            var message   = $"Starting Cubes, version {version} build...{System.Environment.NewLine}{figgle}";
+            var message   = $"Starting Cubes, version {version} build...{Environment.NewLine}{figgle}";
+            logger.LogInformation(new String('-',100));
             logger.LogInformation(message);
             logger.LogInformation($"Cubes root folder: {rootFolder}");
         }
