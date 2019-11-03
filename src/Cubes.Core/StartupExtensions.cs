@@ -5,6 +5,7 @@ using Cubes.Core.Scheduling;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Cubes.Core.Configuration;
 
 namespace Cubes.Core
 {
@@ -17,6 +18,7 @@ namespace Cubes.Core
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()
                 .AddSingleton<IContextProvider, ContextProvider>()
+                .AddTransient<IConfigurationWriter, ConfigurationWriter>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
 
             return services;

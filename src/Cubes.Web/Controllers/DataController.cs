@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cubes.Core.Configuration;
 using Cubes.Core.DataAccess;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +14,17 @@ namespace Cubes.Web.Controllers
     public class DataController : ControllerBase
     {
         private readonly IQueryManager queryManager;
+        private readonly IConfigurationWriter configurationWriter;
         private readonly IConnectionManager connectionManager;
         private readonly DataAccessSettings settings;
 
         public DataController(IConnectionManager connectionManager,
             IQueryManager queryManager,
+            IConfigurationWriter configurationWriter,
             IOptionsSnapshot<DataAccessSettings> options)
         {
             this.queryManager      = queryManager;
+            this.configurationWriter = configurationWriter;
             this.connectionManager = connectionManager;
             this.settings          = options.Value;
         }
@@ -97,6 +101,13 @@ namespace Cubes.Web.Controllers
         [HttpPost("queries/{connectionName}")]
         public async Task<IActionResult> ExecuteQuery(string connectionName, [FromBody] Query query)
             => await ExecuteQueryInternal(connectionName, null, query);
+
+        [HttpPut("settings")]
+        public IActionResult SaveSettings(DataAccessSettings settings)
+        {
+            configurationWriter.Save(typeof(DataAccessSettings), settings);
+            return Ok();
+        }
 
         private async Task<IActionResult> ExecuteQueryInternal(string connectionName, string queryName, Query query)
         {

@@ -1,4 +1,5 @@
 using System;
+using Cubes.Core.Base;
 using Newtonsoft.Json;
 
 namespace Cubes.Core.Utilities
@@ -15,5 +16,7 @@ namespace Cubes.Core.Utilities
 
         public string Serialize(object objToSerialize)
             => JsonConvert.SerializeObject(objToSerialize, settings);
+
+        public string Format => CubesConstants.Serializer_JSON;
     }
 }

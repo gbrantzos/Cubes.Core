@@ -31,3 +31,6 @@ BuildDate.txt
 
 # Visual Studio Code
 .vscode/
+
+# Rider IDE
+.idea/

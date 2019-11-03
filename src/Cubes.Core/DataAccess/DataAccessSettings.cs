@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using Cubes.Core.Base;
+using Cubes.Core.Configuration;
 
 namespace Cubes.Core.DataAccess
 {
+    [ConfigurationStore(CubesConstants.Files_DataAccess)]
     public class DataAccessSettings
     {
         public List<Connection> Connections { get; set; }

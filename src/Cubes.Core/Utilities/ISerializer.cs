@@ -4,9 +4,11 @@ namespace Cubes.Core.Utilities
 {
     public interface ISerializer
     {
-         string Serialize(object objToSerialize);
+        string Format { get; }
 
-         object Deserialize(string objAsString, Type targetType);
+        string Serialize(object objToSerialize);
+
+        object Deserialize(string objAsString, Type targetType);
     }
 
     public static class SerializerExtensions

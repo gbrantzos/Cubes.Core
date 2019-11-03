@@ -279,8 +279,8 @@ namespace Cubes.Core.Base
 
                     loadedAssemblies.Add(new LoadedAssembly
                     {
-                        Filename            = fileSystem.Path.GetFileName(file),
-                        Path        = file,
+                        Filename        = fileSystem.Path.GetFileName(file),
+                        Path            = file,
                         AssemblyName    = asm.GetName().Name,
                         AssemblyVersion = asm.GetName().Version.ToString()
                     });
