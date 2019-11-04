@@ -4,7 +4,7 @@ $workingPath  = ($PSScriptRoot)
 $hash         = (git rev-parse HEAD).Substring(0, 10)
 $baseVersion  = "5.0.1"
 $version      = "0.0.1"
-$buildConfig  = "release"
+$buildConfig  = "Release"
 
 # Output to user
 function Log {

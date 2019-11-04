@@ -42,8 +42,8 @@ namespace Cubes.Web.StaticContent
                         logger.LogInformation($"Preparing static content listening on '{item.RequestPath}', serving from {contentPath}");
                         var fsOptions = new FileServerOptions
                         {
-                            FileProvider = new PhysicalFileProvider(contentPath),
-                            RequestPath = "",
+                            FileProvider       = new PhysicalFileProvider(contentPath),
+                            RequestPath        = "",
                             EnableDefaultFiles = true
                         };
                         fsOptions.DefaultFilesOptions.DefaultFileNames.Add(item.DefaultFile);
@@ -70,8 +70,8 @@ namespace Cubes.Web.StaticContent
         {
             var fsOptions = new FileServerOptions
             {
-                FileProvider = new ManifestEmbeddedFileProvider(typeof(StaticContentSetup).Assembly, "Resources"),
-                RequestPath = "",
+                FileProvider       = new ManifestEmbeddedFileProvider(typeof(StaticContentSetup).Assembly, "Resources"),
+                RequestPath        = "",
                 EnableDefaultFiles = true
             };
             fsOptions.DefaultFilesOptions.DefaultFileNames.Add("index.html");
