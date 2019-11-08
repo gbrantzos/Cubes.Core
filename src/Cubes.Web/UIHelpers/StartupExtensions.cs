@@ -1,4 +1,5 @@
 using Cubes.Web.UIHelpers.Lookups;
+using Cubes.Web.UIHelpers.Schema;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cubes.Web.UIHelpers
@@ -9,6 +10,8 @@ namespace Cubes.Web.UIHelpers
         {
             services.AddTransient<ILookupProvider, RequestTypeLokkupProvider>();
             services.AddTransient<ILookupProvider, JobTypeLookupProvider>();
+
+            services.AddTransient<ISchemaManager, SchemaManager>();
 
             return services;
         }

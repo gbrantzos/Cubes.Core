@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Cubes.Core.Base;
 using Cubes.Web.UIHelpers.Lookups;
+using Cubes.Web.UIHelpers.Schema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -24,11 +25,15 @@ namespace Cubes.Web.Controllers
         };
         private static string resourceRoot = "Cubes.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
+        private readonly ISchemaManager schemaManager;
         private readonly List<ILookupProvider> lookupProviders;
 
-        public UIController(IConfiguration configuration, IEnumerable<ILookupProvider> lookupProviders)
+        public UIController(IConfiguration configuration,
+            IEnumerable<ILookupProvider> lookupProviders,
+            ISchemaManager schemaManager)
         {
             this.configuration = configuration;
+            this.schemaManager = schemaManager;
             this.lookupProviders = lookupProviders.ToList();
         }
 
@@ -57,6 +62,12 @@ namespace Cubes.Web.Controllers
                 return BadRequest($"Unknown lookup provider: {lookupName}");
 
             return Ok(provider.Get());
+        }
+
+        [HttpGet("schema/{schemaName}")]
+        public IActionResult GetSchema(string schemaName)
+        {
+            return Ok(schemaManager.GetSchema(schemaName));
         }
     }
 }
