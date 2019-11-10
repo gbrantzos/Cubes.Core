@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Autofac.Features.AttributeFilters;
 using Cubes.Core.Base;
 using Cubes.Web;
 using Cubes.Web.ResponseWrapping;
@@ -34,6 +35,7 @@ namespace Cubes.Host
             // Setup WebAPI
             var mvcBuilder = services
                 .AddControllers()
+                .AddControllersAsServices()
                 .AddNewtonsoftJson();
 
             // Add applications assemblies
@@ -47,12 +49,11 @@ namespace Cubes.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var useSSL           = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
+            var useSsl           = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
             var loggerFactory    = app.ApplicationServices.GetService<ILoggerFactory>();
-            var cubesEnvironment = app.ApplicationServices.GetService<ICubesEnvironment>();
             var responseBuilder = app.ApplicationServices.GetService<IApiResponseBuilder>();
 
-            if (useSSL)
+            if (useSsl)
             {
                 // The default HSTS value is 30 days.
                 // You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

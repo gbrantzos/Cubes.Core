@@ -1,4 +1,5 @@
 using Autofac;
+using Autofac.Features.AttributeFilters;
 using Cubes.Core.Commands.Basic;
 using Cubes.Core.Base;
 using Cubes.Core.Utilities;
@@ -39,11 +40,11 @@ namespace Cubes.Core
 
             // Register serializers, use them by name
             builder.RegisterType<JsonSerializer>()
-                .Keyed<ISerializer>(CubesConstants.Serializer_JSON)
-                .As<ISerializer>();
+                .As<ISerializer>()
+                .Keyed<ISerializer>(CubesConstants.Serializer_JSON);
             builder.RegisterType<YamlSerializer>()
-                .Keyed<ISerializer>(CubesConstants.Serializer_YAML)
-                .As<ISerializer>();
+                .As<ISerializer>()
+                .Keyed<ISerializer>(CubesConstants.Serializer_YAML);
 
             return builder;
         }

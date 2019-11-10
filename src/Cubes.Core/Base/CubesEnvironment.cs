@@ -21,9 +21,9 @@ namespace Cubes.Core.Base
         private static readonly List<(string Filename, Func<object> CreateDefaultObject)> configurationFiles
             = new List<(string, Func<object>)>
         {
-            (CubesConstants.Files_DataAccess,    () => DataAccessSettings.Create()),
-            (CubesConstants.Files_Scheduling,    () => SchedulerSettings.Create()),
-            (CubesConstants.Files_SmtpSettings,  () => SmtpSettingsProfiles.Create()),
+            (CubesConstants.Files_DataAccess,    DataAccessSettings.Create),
+            (CubesConstants.Files_Scheduling,    SchedulerSettings.Create),
+            (CubesConstants.Files_SmtpSettings,  SmtpSettingsProfiles.Create),
             (CubesConstants.Files_StaticContent, CreateStaticContentSettings)
         };
 

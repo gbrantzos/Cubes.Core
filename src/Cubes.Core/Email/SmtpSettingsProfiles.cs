@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cubes.Core.Base;
+using Cubes.Core.Configuration;
 
 namespace Cubes.Core.Email
 {
+    [ConfigurationStore(CubesConstants.Files_SmtpSettings)]
     public class SmtpSettingsProfiles
     {
         public ICollection<SmtpSettings> Profiles { get; set; } = new HashSet<SmtpSettings>();
@@ -46,11 +49,11 @@ namespace Cubes.Core.Email
             Timeout = 600;
             Sender  = "no-reply@somewhere.com";
 
-            Credentials = new SmtpCredentials
+            /*Credentials = new SmtpCredentials
             {
                 UserName = "user",
                 Password = "password"
-            };
+            };*/
         }
 
         public class SmtpCredentials
