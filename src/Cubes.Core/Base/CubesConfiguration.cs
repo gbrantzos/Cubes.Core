@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Cubes.Core.Base
 {
+    /// <summary>
+    /// Exposes Cubes environment and settings information through <see cref="IConfiguration"/>.
+    /// </summary>
     public class CubesConfiguration
     {
         public string Version                   { get; set; }

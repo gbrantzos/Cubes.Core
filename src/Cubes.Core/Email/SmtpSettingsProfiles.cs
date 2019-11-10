@@ -17,12 +17,8 @@ namespace Cubes.Core.Email
         /// <param name="profileName">Profile name</param>
         /// <returns></returns>
         public SmtpSettings GetByName(string profileName)
-        {
-            var profile = Profiles
+            => Profiles
                 .FirstOrDefault(p => p.Name.Equals(profileName, StringComparison.CurrentCultureIgnoreCase));
-
-            return profile;
-        }
 
         public static SmtpSettingsProfiles Create()
         {
