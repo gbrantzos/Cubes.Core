@@ -1,89 +1,34 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Cubes.Web.UIHelpers.Schema
 {
     public class SchemaManager : ISchemaManager
     {
+        private ConcurrentDictionary<string, Schema> cache = new ConcurrentDictionary<string, Schema>();
+        private readonly List<ISchemaProvider> providers;
+
+        public SchemaManager(IEnumerable<ISchemaProvider> providers)
+        {
+            this.providers = providers.ToList();
+        }
+
         public Schema GetSchema(string name)
         {
-            var schema = new Schema
-            {
-                Name = "SmtpSettings",
-                Label = "SMTP Settings"
-            };
+            // Search on cache
+            if (cache.TryGetValue(name, out var schema))
+                return schema;
 
-            schema.Items = new List<SchemaItem>
-            {
-                new SchemaItem
-                {
-                    Key = "name",
-                    Label = "Name",
-                    Type = SchemaItemType.Text,
-                    Validators = new List<Validator>
-                    {
-                        new Validator {Name = ValidatorType.Required}
-                    }
-                },
-                new SchemaItem
-                {
-                    Key = "host",
-                    Label = "Host",
-                    Type = SchemaItemType.Text,
-                    Validators = new List<Validator>
-                    {
-                        new Validator {Name = ValidatorType.Required}
-                    }
-                },
-                new SchemaItem
-                {
-                    Key = "port",
-                    Label = "Port",
-                    Type = SchemaItemType.Text,
-                    Validators = new List<Validator>
-                    {
-                        new Validator {Name = ValidatorType.Required},
-                        new Validator {Name = ValidatorType.Min, Parameters = 25}
-                    }
-                },
-                new SchemaItem
-                {
-                    Key = "timeout",
-                    Label = "Timeout",
-                    Type = SchemaItemType.Text,
-                    Validators = new List<Validator>
-                    {
-                        new Validator {Name = ValidatorType.Required}
-                    }
-                },
-                new SchemaItem
-                {
-                    Key = "sender",
-                    Label = "Sender",
-                    Type = SchemaItemType.Text,
-                    Validators = new List<Validator>
-                    {
-                        new Validator {Name = ValidatorType.Required}
-                    }
-                },
-                new SchemaItem
-                {
-                    Key = "useSsl",
-                    Label = "Use SSL",
-                    Type = SchemaItemType.Checkbox
-                },
-                new SchemaItem
-                {
-                    Key = "userName",
-                    Label = "User name",
-                    Type = SchemaItemType.Text
-                },
-                new SchemaItem
-                {
-                    Key = "password",
-                    Label = "Password",
-                    Type = SchemaItemType.Text
-                },
-            };
+            // Search for appropriate provider
+            var provider = providers.FirstOrDefault(pr => pr.Name == name);
+            if (provider == null)
+                throw new ArgumentException($"No schema provider registered for {name}");
+
+            // Get schema and add on cache
+            schema = provider.GetSchema();
+            cache.AddOrUpdate(name, schema, (n, s) => schema);
 
             return schema;
         }

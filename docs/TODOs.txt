@@ -6,8 +6,6 @@
 [ ]     Handle cases when API response are already ApiResponse instances
 
 => Schema Manager
-    - RegisterSchema(name, schema) on interface
-    - GetSchema should throw on non existing schema name
     - Fluent extensions on schema creation
 
 Also:
@@ -29,6 +27,3 @@ Also:
 * Scheduling:
     - Job definition and editing
     - Scheduler status and control
-
-* SMTP settings:
-    - Display and edit profiles

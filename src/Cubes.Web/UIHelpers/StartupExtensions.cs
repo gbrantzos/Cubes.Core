@@ -11,7 +11,7 @@ namespace Cubes.Web.UIHelpers
             services.AddTransient<ILookupProvider, RequestTypeLokkupProvider>();
             services.AddTransient<ILookupProvider, JobTypeLookupProvider>();
 
-            services.AddTransient<ISchemaManager, SchemaManager>();
+            services.AddSchemaServices();
 
             return services;
         }

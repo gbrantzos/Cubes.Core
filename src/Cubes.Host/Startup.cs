@@ -49,8 +49,8 @@ namespace Cubes.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var useSsl           = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
-            var loggerFactory    = app.ApplicationServices.GetService<ILoggerFactory>();
+            var useSsl          = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
+            var loggerFactory   = app.ApplicationServices.GetService<ILoggerFactory>();
             var responseBuilder = app.ApplicationServices.GetService<IApiResponseBuilder>();
 
             if (useSsl)
