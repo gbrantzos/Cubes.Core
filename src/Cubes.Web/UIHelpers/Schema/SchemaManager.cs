@@ -7,13 +7,10 @@ namespace Cubes.Web.UIHelpers.Schema
 {
     public class SchemaManager : ISchemaManager
     {
-        private ConcurrentDictionary<string, Schema> cache = new ConcurrentDictionary<string, Schema>();
+        private readonly ConcurrentDictionary<string, Schema> cache = new ConcurrentDictionary<string, Schema>();
         private readonly List<ISchemaProvider> providers;
 
-        public SchemaManager(IEnumerable<ISchemaProvider> providers)
-        {
-            this.providers = providers.ToList();
-        }
+        public SchemaManager(IEnumerable<ISchemaProvider> providers) => this.providers = providers.ToList();
 
         public Schema GetSchema(string name)
         {
