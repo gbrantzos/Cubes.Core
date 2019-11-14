@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cubes.Core.Base;
 using Cubes.Web.Filters;
+using Cubes.Web.Formatters;
 using Cubes.Web.ResponseWrapping;
 using Cubes.Web.StaticContent;
 using Cubes.Web.Swager;
@@ -42,7 +43,11 @@ namespace Cubes.Web
 
             services.AddUIServices();
 
-            mvcBuilder.AddMvcOptions(options => options.Filters.Add(typeof(ValidateModelFilterAttribute)));
+            mvcBuilder.AddMvcOptions(options =>
+            {
+                options.Filters.Add(typeof(ValidateModelFilterAttribute));
+                options.InputFormatters.Insert(0, new RawStringInputFormatter());
+            });
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,

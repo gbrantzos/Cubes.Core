@@ -5,11 +5,6 @@
 [ ]     Improve - add documentation
 [ ]     Handle cases when API response are already ApiResponse instances
 
-Also:
-- Attribute to get body as string
-    https://weblog.west-wind.com/posts/2017/sep/14/accepting-raw-request-body-content-in-aspnet-core-api-controllers
-- XML comments on ConfigurationController
-
 
 +------------------------------------------------------------------------------+
 |   Cubes Management Console (UI Shell)                                        |

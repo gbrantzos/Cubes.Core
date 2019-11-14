@@ -1,6 +1,3 @@
-﻿using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using Cubes.Core.Base;
 using Cubes.Core.Configuration;
@@ -29,6 +26,14 @@ namespace Cubes.Web.Controllers
             this.configurationWriter = configurationWriter;
         }
 
+        /// <summary>
+        /// Get configuration
+        /// </summary>
+        /// <remarks>
+        /// Gets strongly typed configuration object identified by <paramref name="configurationName"/>.
+        /// </remarks>
+        /// <param name="configurationName"></param>
+        /// <returns></returns>
         [HttpGet("{configurationName}")]
         public IActionResult GetConfiguration(string configurationName)
         {
@@ -40,13 +45,20 @@ namespace Cubes.Web.Controllers
             return Ok(configurationInstance);
         }
 
+        /// <summary>
+        /// Save configuration
+        /// </summary>
+        /// <remarks>
+        /// Saves configuration object from body (in JSON format), that corresponds to type named <paramref name="configurationName"/>.
+        /// This method must be called using 'text/plain' Content-Type!
+        /// </remarks>
+        /// <param name="configurationName"></param>
+        /// <param name="configurationJson"></param>
+        /// <returns></returns>
+        [Consumes("text/plain")]
         [HttpPost("{configurationName}")]
-        public async Task<IActionResult> SaveConfiguration(string configurationName)
+        public IActionResult SaveConfiguration(string configurationName, [FromBody] string configurationJson)
         {
-            string configurationJson;
-            using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
-                 configurationJson = await reader.ReadToEndAsync();
-
             var configurationType = typeResolver.GetByName(configurationName);
             if (configurationType == null)
                 return BadRequest($"Could not resolve type '{configurationName}");
@@ -54,8 +66,7 @@ namespace Cubes.Web.Controllers
             var configurationInstance = serializer.Deserialize(configurationJson, configurationType);
             configurationWriter.Save(configurationType, configurationInstance);
 
-            return Ok();
+            return Ok($"Configuration {configurationName} saved");
         }
-
     }
 }
