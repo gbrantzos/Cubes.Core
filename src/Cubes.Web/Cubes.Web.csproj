@@ -8,6 +8,7 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Humanizer.Core" Version="2.7.9" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="5.0.0-rc4" />

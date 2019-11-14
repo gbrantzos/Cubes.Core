@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Cubes.Web.UIHelpers.Schema
 {
-
     public enum SchemaItemType
     {
         Text,
@@ -18,8 +17,10 @@ namespace Cubes.Web.UIHelpers.Schema
     {
         public string Key { get; set; }
         public string Label { get; set; }
+
         [JsonConverter(typeof(CustomStringEnumConverter))]
         public SchemaItemType Type { get; set; }
+
         public int? TextareaRows { get; set; }
         public Options Options { get; set; }
         public ICollection<Validator> Validators { get; set; } = new List<Validator>();

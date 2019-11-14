@@ -6,7 +6,6 @@
 [ ]     Handle cases when API response are already ApiResponse instances
 
 Also:
-- Type model binder,
 - Attribute to get body as string
     https://weblog.west-wind.com/posts/2017/sep/14/accepting-raw-request-body-content-in-aspnet-core-api-controllers
 - XML comments on ConfigurationController

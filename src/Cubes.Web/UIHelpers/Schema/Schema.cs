@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Cubes.Web.UIHelpers.Schema
@@ -10,10 +10,8 @@ namespace Cubes.Web.UIHelpers.Schema
         public string Label { get; set; }
         public ICollection<SchemaItem> Items { get; set; } = new List<SchemaItem>();
 
-        // Factory method
+        // Factory methods
         public static Schema Create(string name, string label) => new Schema { Name = name, Label = label};
-        public static Schema Create(string name) => Schema.Create(name, name);
-
-        // TODO Add missing methods
+        public static Schema Create(string name) => Create(name, name);
     }
 }
