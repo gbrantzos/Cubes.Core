@@ -14,8 +14,9 @@
     <Ignore>json</Ignore>
     <Ignore>mssql</Ignore>
     <Ignore>mysql</Ignore>
-    <Ignore>unhandled</Ignore>
     <Ignore>serializer</Ignore>
+    <Ignore>unhandled</Ignore>
+    <Ignore>serializers</Ignore>
   </IgnoredWords>
   <InheritExclusionExpressions>True</InheritExclusionExpressions>
   <InheritIgnoredFilePatterns>True</InheritIgnoredFilePatterns>

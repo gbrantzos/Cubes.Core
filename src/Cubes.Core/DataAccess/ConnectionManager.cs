@@ -8,7 +8,7 @@ namespace Cubes.Core.DataAccess
 {
     public class ConnectionManager : IConnectionManager
     {
-        private static Dictionary<string, string> knownProviders = new Dictionary<string, string>()
+        public static Dictionary<string, string> KnownProviders = new Dictionary<string, string>()
         {
             { "oracle", "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" },
             { "mssql",  "System.Data.SqlClient.SqlClientFactory, System.Data" },
@@ -26,7 +26,7 @@ namespace Cubes.Core.DataAccess
                 .Find(i => i.Name.Equals(connectionName, StringComparison.CurrentCultureIgnoreCase));
             if (connectionInfo != null)
             {
-                if (!knownProviders.TryGetValue(connectionInfo.DbProvider,out string providerName))
+                if (!KnownProviders.TryGetValue(connectionInfo.DbProvider,out string providerName))
                     providerName = connectionInfo.DbProvider;
 
                 var providerType = GetProviderType(providerName);

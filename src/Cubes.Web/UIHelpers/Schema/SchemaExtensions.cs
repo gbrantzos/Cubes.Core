@@ -15,9 +15,9 @@ namespace Cubes.Web.UIHelpers.Schema
 
             return new SchemaItem
             {
-                Key = key,
-                Label = label,
-                Type = type,
+                Key        = key,
+                Label      = label,
+                Type       = type,
                 Validators = validators
             };
         }
@@ -65,6 +65,9 @@ namespace Cubes.Web.UIHelpers.Schema
         public static Schema WithTextArea(this Schema schema, string key, int rows = 4, params Validator[] validators)
             => schema.WithTextArea(key, String.Empty, rows, validators);
 
+        public static Schema WithTextArea(this Schema schema, string key, params Validator[] validators)
+            => schema.WithTextArea(key, String.Empty, 4, validators);
+
         public static Schema WithDatepicker(this Schema schema, string key, string label, params Validator[] validators)
         {
             var item = CreateItem(key, label, SchemaItemType.Datepicker, validators);
@@ -78,7 +81,7 @@ namespace Cubes.Web.UIHelpers.Schema
 
         public static Schema WithSelect(this Schema schema, string key, string label, Options options, params Validator[] validators)
         {
-            var item = CreateItem(key, label, SchemaItemType.Checkbox, validators);
+            var item = CreateItem(key, label, SchemaItemType.Select, validators);
             item.Options = options;
             schema.AddItem(item);
 
