@@ -12,5 +12,13 @@ namespace Cubes.Core.DataAccess
         /// <returns>an instance of <see cref="DbConnection"/></returns>
         /// <exception cref="ArgumentException">Thrown when connectionName not found</exception>
         DbConnection GetConnection(string connectionName);
+
+        /// <summary>
+        /// Get a new <see cref="DbConnection"/> instance created using given <paramref name="connection"/>.
+        /// </summary>
+        /// <param name="connection">A <see cref="Connection"/> instance</param>
+        /// <returns>an instance of <see cref="DbConnection"/></returns>
+        /// <exception cref="ArgumentException">Thrown when connectionName not found</exception>
+        DbConnection GetConnection(Connection connection);
     }
 }

@@ -19,25 +19,28 @@ namespace Cubes.Core.DataAccess
         public ConnectionManager(IOptionsSnapshot<DataAccessSettings> options)
             => this.settings = options.Value;
 
+        public DbConnection GetConnection(Connection connection)
+        {
+            if (!KnownProviders.TryGetValue(connection.DbProvider, out string providerName))
+                providerName = connection.DbProvider;
+
+            var providerType = GetProviderType(providerName);
+            var providerInst = Activator.CreateInstance(providerType, true);
+            var cnxFactory = providerInst.GetType().GetMethod(nameof(DbProviderFactory.CreateConnection));
+
+            var dbConnection = cnxFactory.Invoke(providerInst, null) as DbConnection;
+            dbConnection.ConnectionString = connection.ConnectionString;
+
+            return dbConnection;
+        }
+
         public DbConnection GetConnection(string connectionName)
         {
-            var connections = settings.Connections;
-            var connectionInfo = connections
+            var connectionInfo = settings
+                .Connections
                 .Find(i => i.Name.Equals(connectionName, StringComparison.CurrentCultureIgnoreCase));
             if (connectionInfo != null)
-            {
-                if (!KnownProviders.TryGetValue(connectionInfo.DbProvider,out string providerName))
-                    providerName = connectionInfo.DbProvider;
-
-                var providerType = GetProviderType(providerName);
-                var providerInst = Activator.CreateInstance(providerType, true);
-                var cnxFactory   = providerInst.GetType().GetMethod(nameof(DbProviderFactory.CreateConnection));
-
-                var connection = cnxFactory.Invoke(providerInst, null) as DbConnection;
-                connection.ConnectionString = connectionInfo.ConnectionString;
-
-                return connection;
-            }
+                return GetConnection(connectionInfo);
             else
                 throw new ArgumentException($"Could not find connection: {connectionName}");
         }

@@ -1,3 +1,4 @@
+using System;
 using Autofac.Features.Indexed;
 using Cubes.Core.Base;
 using Cubes.Core.Configuration;
@@ -41,8 +42,9 @@ namespace Cubes.Web.Controllers
             if (configurationType == null)
                 return BadRequest($"Could not resolve type '{configurationName}");
 
-            var configurationInstance = configuration.GetSection(configurationType.Name).Get(configurationType);
-            return Ok(configurationInstance);
+            var configurationInstance = configuration.GetSection(configurationType.Name).Get(configurationType) ??
+                Activator.CreateInstance(configurationType);
+            return Ok(configurationInstance );
         }
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace Cubes.Web.Controllers
             var configurationInstance = serializer.Deserialize(configurationJson, configurationType);
             configurationWriter.Save(configurationType, configurationInstance);
 
-            return Ok($"Configuration {configurationName} saved");
+            return Ok($"Configuration {configurationType.Name} saved");
         }
     }
 }

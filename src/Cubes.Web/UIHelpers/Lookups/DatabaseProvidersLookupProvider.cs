@@ -21,11 +21,14 @@ namespace Cubes.Web.UIHelpers.Lookups
             return new Lookup
             {
                 Name  = this.Name,
-                Items = knownProviders.Select(pv => new LookupItem
-                {
-                    Value   = pv.Key,
-                    Display = knownProviderNames[pv.Key]
-                }).ToList()
+                Items = knownProviders
+                    .Select(pv => new LookupItem
+                    {
+                        Value   = pv.Key,
+                        Display = knownProviderNames[pv.Key]
+                    })
+                    .OrderBy(i => i.Display)
+                    .ToList()
             };
         }
     }

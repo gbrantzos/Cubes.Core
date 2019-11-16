@@ -16,9 +16,9 @@ namespace Cubes.Web.UIHelpers.Schema.CoreProviders
         {
             return Schema.Create(this.Name, "Database Connection")
                 .WithText("name", Validator.Required())
-                .WithText("comment")
+                .WithText("comments")
                 .WithSelect("dbProvider", "Database Provider", lookupProvider.Get().ToOptions(), Validator.Required())
-                .WithTextArea("connectionString", Validator.Required());
+                .WithTextArea("connectionString", 2, Validator.Required());
         }
     }
 }

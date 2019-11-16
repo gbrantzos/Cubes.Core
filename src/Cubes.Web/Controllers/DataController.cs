@@ -43,20 +43,20 @@ namespace Cubes.Web.Controllers
         /// Test connection
         /// </summary>
         /// <remarks>
-        /// Test if <see cref="Connection"/> named <paramref name="connectionName"/> can be used by calling OpenAsync method.
+        /// Test if <see cref="Connection"/> defined in request body can be used by calling OpenAsync method.
         /// </remarks>
-        /// <param name="connectionName">Connection name</param>
+        /// <param name="connection">Connection name</param>
         /// <returns></returns>
-        [HttpGet("connections/{connectionName}/test")]
-        public async Task<IActionResult> TestConnection(string connectionName)
+        [HttpPost("connections/test")]
+        public async Task<IActionResult> TestConnection([FromBody] Connection connection)
         {
             try
             {
-                using var cnx = this.connectionManager.GetConnection(connectionName);
+                using var cnx = this.connectionManager.GetConnection(connection);
                 await cnx.OpenAsync();
                 await cnx.CloseAsync();
 
-                return Ok(new { Message = "Connection was successful!" });
+                return Ok("Connection was successful!");
             }
             catch (ArgumentException ax)
             {
