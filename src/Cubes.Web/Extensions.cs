@@ -34,6 +34,6 @@ namespace Cubes.Web
         /// <param name="response"></param>
         /// <returns></returns>
         public static bool IsSuccess(this HttpResponse response)
-            => response.StatusCode >= 200 && response.StatusCode <= 299;
+            => response.StatusCode >= 200 && response.StatusCode <= 299 && response.StatusCode != 204;
     }
 }

@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Cubes.Core.Base;
+using Cubes.Core.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -102,11 +103,15 @@ namespace Cubes.Web.ResponseWrapping
         {
             try
             {
-                return JsonConvert.DeserializeObject(body);
+                var toReturn = body.IsJson() ?
+                    JsonConvert.DeserializeObject(body) :
+                    body;
+                return toReturn;
             }
             catch (Exception)
             {
                 // Failed to deserialize, return string
+                logger.LogWarning($"Failed to deserialize JSON string: {body}");
                 return body;
             }
         }

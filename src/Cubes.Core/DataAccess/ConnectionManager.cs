@@ -11,7 +11,7 @@ namespace Cubes.Core.DataAccess
         public static Dictionary<string, string> KnownProviders = new Dictionary<string, string>()
         {
             { "oracle", "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" },
-            { "mssql",  "System.Data.SqlClient.SqlClientFactory, System.Data" },
+            { "mssql",  "Microsoft.Data.SqlClient.SqlClientFactory, Microsoft.Data" },
             { "mysql",  "MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data" }
         };
         private readonly DataAccessSettings settings;

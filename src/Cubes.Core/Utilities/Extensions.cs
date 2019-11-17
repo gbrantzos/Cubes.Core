@@ -185,5 +185,17 @@ namespace Cubes.Core.Utilities
                 newString = Char.ToLower(newString[0]) + newString.Substring(1);
             return newString;
         }
+
+        /// <summary>
+        /// Check if given string is a valid JSON, so we can try to deserialize.
+        /// </summary>
+        /// <param name="input"><see cref="String"/> to check</param>
+        /// <returns></returns>
+        public static bool IsJson(this string input)
+        {
+            input = input.Trim();
+            return input.StartsWith("{") && input.EndsWith("}")
+                   || input.StartsWith("[") && input.EndsWith("]");
+        }
     }
 }

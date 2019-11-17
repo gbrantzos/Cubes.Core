@@ -11,11 +11,14 @@
 +------------------------------------------------------------------------------+
 
 * Data Access settings:
-    - Display and edit connections
-    - Test connection (unsaved, using full connection details)
-    - Display and edit queries
     - Execute query and Preview results
 
 * Scheduling:
     - Job definition and editing
     - Scheduler status and control
+
+* Dynamic form improvements:
+    - Support field classes
+    - Use fxLayout library
+    - Support groups
+    - Collection properties with nested schema

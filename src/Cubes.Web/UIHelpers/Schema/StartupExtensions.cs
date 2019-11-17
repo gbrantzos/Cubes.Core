@@ -9,6 +9,7 @@ namespace Cubes.Web.UIHelpers.Schema
             => services
                 .AddSingleton<ISchemaManager, SchemaManager>()
                 .AddTransient<ISchemaProvider, SmtpSettingsProfilesSchemaProvider>()
-                .AddTransient<ISchemaProvider, ConnectionSchemaProvider>();
+                .AddTransient<ISchemaProvider, ConnectionSchemaProvider>()
+                .AddTransient<ISchemaProvider, QuerySchemaProvider>();
     }
 }
