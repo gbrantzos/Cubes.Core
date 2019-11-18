@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Cubes.Core.Utilities;
 using Humanizer;
 
@@ -22,13 +21,14 @@ namespace Cubes.Web.UIHelpers.Schema
             };
         }
 
-        private static void AddItem(this Schema schema, SchemaItem item)
+        public static Schema WithItem(this Schema schema, SchemaItem item)
         {
-            var existing = schema.Items.FirstOrDefault(i => i.Key == item.Key);
-            if (existing == null)
-                schema.Items.Add(item);
-            else
-                existing = item;
+            item.Key.ThrowIfEmpty(nameof(item.Key));
+            if (string.IsNullOrEmpty(item.Label))
+                item.Label = item.Key.Humanize(LetterCasing.Title);
+
+            schema.AddItem(item);
+            return schema;
         }
 
         public static Schema WithText(this Schema schema, string key, string label, params Validator[] validators)

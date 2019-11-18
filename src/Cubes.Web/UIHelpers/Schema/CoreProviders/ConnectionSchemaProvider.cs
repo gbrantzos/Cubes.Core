@@ -13,12 +13,10 @@ namespace Cubes.Web.UIHelpers.Schema.CoreProviders
             => this.lookupProvider = lookupProviders.First(pv => pv.Name == "DbProviders");
 
         public override Schema GetSchema()
-        {
-            return Schema.Create(this.Name, "Database Connection")
+            => Schema.Create(this.Name, "Database Connection")
                 .WithText("name", Validator.Required())
                 .WithText("comments")
                 .WithSelect("dbProvider", "Database Provider", lookupProvider.Get().ToOptions(), Validator.Required())
                 .WithTextArea("connectionString", 2, Validator.Required());
-        }
     }
 }

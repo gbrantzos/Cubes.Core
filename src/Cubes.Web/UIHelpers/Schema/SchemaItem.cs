@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -24,7 +25,12 @@ namespace Cubes.Web.UIHelpers.Schema
         public int? TextareaRows { get; set; }
         public Options Options { get; set; }
         public ICollection<Validator> Validators { get; set; } = new List<Validator>();
+        public string ClassName { get; set; }
+
+        [JsonIgnore]
+        public Schema Schema { get; set; }
 
         public bool ShouldSerializeValidators() => Validators?.Count > 0;
+        public bool ShouldSerializeClassName() => !String.IsNullOrEmpty(ClassName);
     }
 }

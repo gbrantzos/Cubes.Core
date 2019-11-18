@@ -18,7 +18,6 @@
     - Scheduler status and control
 
 * Dynamic form improvements:
-    - Support field classes
     - Use fxLayout library
     - Support groups
     - Collection properties with nested schema
