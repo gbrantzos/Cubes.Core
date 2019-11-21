@@ -8,6 +8,8 @@ namespace Cubes.Core.DataAccess
 {
     public class ConnectionManager : IConnectionManager
     {
+        // Using the new Microsoft.Data.SqlClient package
+        // https://github.com/dotnet/SqlClient/wiki/Frequently-Asked-Questions#11-why-do-i-get-a-platformnotsupported-exception-when-my-application-hits-a-sqlclient-method
         public static Dictionary<string, string> KnownProviders = new Dictionary<string, string>()
         {
             { "oracle", "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" },

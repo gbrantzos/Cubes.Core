@@ -10,9 +10,6 @@
 |   Cubes Management Console (UI Shell)                                        |
 +------------------------------------------------------------------------------+
 
-* Data Access settings:
-    - Execute query and Preview results
-
 * Scheduling:
     - Job definition and editing
     - Scheduler status and control

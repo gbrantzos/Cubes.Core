@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cubes.Core.Configuration;
 using Cubes.Core.DataAccess;
+using Cubes.Core.Utilities;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -17,16 +18,19 @@ namespace Cubes.Web.Controllers
         private readonly IConfigurationWriter configurationWriter;
         private readonly IConnectionManager connectionManager;
         private readonly DataAccessSettings settings;
+        private readonly ILocalStorage localStorage;
 
         public DataController(IConnectionManager connectionManager,
             IQueryManager queryManager,
             IConfigurationWriter configurationWriter,
-            IOptionsSnapshot<DataAccessSettings> options)
+            IOptionsSnapshot<DataAccessSettings> options,
+            ILocalStorage localStorage)
         {
-            this.queryManager      = queryManager;
+            this.queryManager        = queryManager;
             this.configurationWriter = configurationWriter;
-            this.connectionManager = connectionManager;
-            this.settings          = options.Value;
+            this.connectionManager   = connectionManager;
+            this.settings            = options.Value;
+            this.localStorage        = localStorage;
         }
 
         /// <summary>
@@ -102,11 +106,20 @@ namespace Cubes.Web.Controllers
         public async Task<IActionResult> ExecuteQuery(string connectionName, [FromBody] Query query)
             => await ExecuteQueryInternal(connectionName, null, query);
 
-        [HttpPut("settings")]
-        public IActionResult SaveSettings(DataAccessSettings settings)
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet("exportSettings")]
+        public IActionResult GetExportsettings()
         {
-            configurationWriter.Save(typeof(DataAccessSettings), settings);
-            return Ok();
+            var settings = localStorage.Get<ExportSettings>(ExportSettings.StorageKey) ?? ExportSettings.Default;
+            return Ok(settings);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpPost("exportSettings")]
+        public IActionResult SaveExportSettings(ExportSettings settings)
+        {
+            localStorage.Save(ExportSettings.StorageKey, settings);
+            return Ok("Export Settings saved!");
         }
 
         private async Task<IActionResult> ExecuteQueryInternal(string connectionName, string queryName, Query query)
@@ -132,6 +145,20 @@ namespace Cubes.Web.Controllers
             {
                 return NotFound(new { Message = ax.Message });
             }
+        }
+
+        public class ExportSettings
+        {
+            public static string StorageKey => "DataAccess.ExportSettings";
+
+            public string Separator { get; set; }
+            public bool IncludeHeaders { get; set; }
+
+            public static ExportSettings Default = new ExportSettings
+            {
+                Separator = ";",
+                IncludeHeaders = true
+            };
         }
     }
 }

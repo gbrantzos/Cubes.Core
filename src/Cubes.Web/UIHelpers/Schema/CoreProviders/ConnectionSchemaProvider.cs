@@ -14,7 +14,7 @@ namespace Cubes.Web.UIHelpers.Schema.CoreProviders
 
         public override Schema GetSchema()
             => Schema.Create(this.Name, "Database Connection")
-                .WithText("name", Validator.Required())
+                .WithText("name", Validator.Required(), Validator.Pattern(@"^\S+$"))
                 .WithText("comments")
                 .WithSelect("dbProvider", "Database Provider", lookupProvider.Get().ToOptions(), Validator.Required())
                 .WithTextArea("connectionString", 2, Validator.Required());

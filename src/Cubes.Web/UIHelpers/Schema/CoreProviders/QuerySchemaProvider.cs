@@ -16,7 +16,7 @@ namespace Cubes.Web.UIHelpers.Schema.CoreProviders
             };
 
             return Schema.Create(this.Name, "Database Query")
-               .WithText("name", Validator.Required())
+               .WithText("name", Validator.Required(), Validator.Pattern(@"^\S+$"))
                .WithText("comments")
                .WithItem(queryCommand);
         }

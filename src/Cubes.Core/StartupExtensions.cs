@@ -13,10 +13,13 @@ namespace Cubes.Core
     {
         public static IServiceCollection AddCubesCore(this IServiceCollection services, IConfiguration configuration)
         {
+            var cubesConfig = configuration.GetCubesConfiguration();
+
             services.AddDataAccess(configuration)
                 .AddEmailDispatcher(configuration)
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()
+                .AddTransient<ILocalStorage>(s => new LocalStorage(cubesConfig.StorageFolder))
                 .AddSingleton<IContextProvider, ContextProvider>()
                 .AddTransient<IConfigurationWriter, ConfigurationWriter>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
