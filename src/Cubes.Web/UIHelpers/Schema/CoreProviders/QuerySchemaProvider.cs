@@ -5,20 +5,12 @@ namespace Cubes.Web.UIHelpers.Schema.CoreProviders
     public class QuerySchemaProvider : SchemaProvider<Query>
     {
         public override Schema GetSchema()
-        {
-            var queryCommand = new SchemaItem
-            {
-                Key          = "queryCommand",
-                Type         = SchemaItemType.Textarea,
-                TextareaRows = 8,
-                ClassName    = "code",
-                Validators   = new[] { Validator.Required() }
-            };
-
-            return Schema.Create(this.Name, "Database Query")
+            => Schema.Create(this.Name, "Database Query")
                .WithText("name", Validator.Required(), Validator.Pattern(@"^\S+$"))
                .WithText("comments")
-               .WithItem(queryCommand);
-        }
+               .WithItem
+                    .TextArea("queryCommand", 8, Validator.Required())
+                    .HasClass("code")
+                    .Build();
     }
 }
