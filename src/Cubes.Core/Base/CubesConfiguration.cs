@@ -17,6 +17,7 @@ namespace Cubes.Core.Base
         public string StorageFolder             { get; set; }
         public string TempFolder                { get; set; }
         public string StaticContentFolder       { get; set; }
+        public string BinariesFolder            { get; set; }
 
         public IEnumerable<string> SwaggerFiles { get; set; }
         public IEnumerable<string> AssembliesWithControllers { get; set; }
@@ -37,6 +38,7 @@ namespace Cubes.Core.Base
                     { $"{CubesConstants.Configuration_Section}:StorageFolder"      , cubes.GetStorageFolder() },
                     { $"{CubesConstants.Configuration_Section}:TempFolder"         , cubes.GetFolder(CubesFolderKind.Temp) },
                     { $"{CubesConstants.Configuration_Section}:StaticContentFolder", cubes.GetFolder(CubesFolderKind.Content) },
+                    { $"{CubesConstants.Configuration_Section}:BinariesFolder"     , cubes.GetBinariesFolder() },
                 };
             var swaggerFiles = cubes
                 .GetSwaggerFiles()

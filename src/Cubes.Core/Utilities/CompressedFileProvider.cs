@@ -15,18 +15,25 @@ namespace Cubes.Core.Utilities
         private readonly string rootFolder;
         private readonly string filePath;
 
-        private ConcurrentDictionary<string, IFileInfo> cache = new ConcurrentDictionary<string, IFileInfo>();
+        private ConcurrentDictionary<string, IFileInfo> cache;
         private MemoryStream inMemoryZip;
         private ZipArchive archive;
         private List<ZipArchiveEntry> entries;
+        private FileSystemWatcher fileWatcher;
         private bool disposedValue = false;
 
         public CompressedFileProvider(string filePath,string rootFolder)
         {
-            this.rootFolder = rootFolder.ThrowIfEmpty(nameof(filePath));
-            this.filePath   = filePath.ThrowIfNull(nameof(rootFolder));
+            this.filePath   = filePath.ThrowIfEmpty(nameof(filePath));
+            this.rootFolder = rootFolder.ThrowIfNull(nameof(rootFolder));
 
             Initialize();
+
+            var actualPath = Path.GetFullPath(filePath);
+            fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(actualPath), Path.GetFileName(actualPath));
+            fileWatcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
+            fileWatcher.Changed += (s, e) => { Initialize(); };
+            fileWatcher.EnableRaisingEvents = true;
         }
 
         public CompressedFileProvider(string filePath) : this(filePath, String.Empty) { }
@@ -38,6 +45,7 @@ namespace Cubes.Core.Utilities
             fileStream.CopyTo(inMemoryZip);
 
             archive = new ZipArchive(inMemoryZip, ZipArchiveMode.Read);
+            cache   = new ConcurrentDictionary<string, IFileInfo>();
             entries = archive.Entries.ToList();
         }
 
@@ -47,6 +55,7 @@ namespace Cubes.Core.Utilities
                 subpath = subpath[1..];
             if (!String.IsNullOrEmpty(rootFolder))
                 subpath = $"{rootFolder}/{subpath}";
+            subpath = subpath.Replace('/', Path.DirectorySeparatorChar);
 
             if (!cache.TryGetValue(subpath, out var fi))
             {
@@ -81,10 +90,10 @@ namespace Cubes.Core.Utilities
             {
                 if (disposing)
                 {
+                    fileWatcher?.Dispose();
                     archive?.Dispose();
                     inMemoryZip?.Dispose();
                 }
-
                 disposedValue = true;
             }
         }

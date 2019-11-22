@@ -83,11 +83,28 @@ namespace Cubes.Web.StaticContent
             return app;
         }
 
-        public static IApplicationBuilder UseAdminPage(this IApplicationBuilder app, IConfiguration configuration)
+        public static IApplicationBuilder UseAdminPage(this IApplicationBuilder app,
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory)
         {
             var zipPath     = configuration.GetValue(CubesConstants.Config_HostManagementAppPackage, String.Empty);
             var zipRoot     = configuration.GetValue(CubesConstants.Config_HostManagementAppPackageRoot, String.Empty);
             var requestPath = configuration.GetValue(CubesConstants.Config_HostManagementAppRequestPath, String.Empty);
+            var logger      = loggerFactory.CreateLogger<Content>();
+
+            if (zipPath.StartsWith("~"))
+            {
+                // Path relative to bin path
+                var binariesPath = configuration.GetCubesConfiguration().BinariesFolder;
+                zipPath = zipPath[1..];
+
+                zipPath = Path.Combine(binariesPath, zipPath);
+            }
+            if (!File.Exists(zipPath))
+            {
+                logger.LogWarning($"Could not load CubesManagement application from path: {zipPath}");
+                return app;
+            }
 
             var zfs     = new CompressedFileProvider(zipPath, zipRoot);
             var options = new FileServerOptions
