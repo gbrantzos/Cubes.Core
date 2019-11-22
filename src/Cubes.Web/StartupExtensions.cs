@@ -74,6 +74,7 @@ namespace Cubes.Web
 
             return app
                 .UseHomePage()
+                .UseAdminPage(configuration)
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
                 .UseCubesMiddleware(loggerFactory, responseBuilder)

@@ -1,6 +1,8 @@
+using System;
 using System.IO;
 using System.Linq;
 using Cubes.Core.Base;
+using Cubes.Core.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -46,6 +48,7 @@ namespace Cubes.Web.StaticContent
                             RequestPath        = "",
                             EnableDefaultFiles = true
                         };
+                        fsOptions.DefaultFilesOptions.DefaultFileNames.Clear();
                         fsOptions.DefaultFilesOptions.DefaultFileNames.Add(item.DefaultFile);
                         fsOptions.StaticFileOptions.ServeUnknownFileTypes = item.ServeUnknownFileTypes;
                         builder.UseFileServer(fsOptions);
@@ -76,6 +79,41 @@ namespace Cubes.Web.StaticContent
             };
             fsOptions.DefaultFilesOptions.DefaultFileNames.Add("index.html");
             app.UseFileServer(fsOptions);
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseAdminPage(this IApplicationBuilder app, IConfiguration configuration)
+        {
+            var zipPath     = configuration.GetValue(CubesConstants.Config_HostManagementAppPackage, String.Empty);
+            var zipRoot     = configuration.GetValue(CubesConstants.Config_HostManagementAppPackageRoot, String.Empty);
+            var requestPath = configuration.GetValue(CubesConstants.Config_HostManagementAppRequestPath, String.Empty);
+
+            var zfs     = new CompressedFileProvider(zipPath, zipRoot);
+            var options = new FileServerOptions
+            {
+                FileProvider       = new CompressedFileProvider(zipPath, zipRoot),
+                RequestPath        = "",
+                EnableDefaultFiles = true,
+            };
+            options.DefaultFilesOptions.DefaultFileNames.Clear();
+            options.DefaultFilesOptions.DefaultFileNames.Add("index.html");
+
+            app.Map(new PathString(requestPath), builder =>
+            {
+                builder.UseFileServer(options);
+                builder.Use(async (context, next) =>
+                {
+                    await next();
+                    var fullRequest = context.Request.PathBase.Value + context.Request.Path.Value;
+                    if (context.Response.StatusCode == 404 && !Path.HasExtension(fullRequest))
+                    {
+                        // Fall back to SPA entry point
+                        await zfs.GetFileInfo("index.html").CreateReadStream().CopyToAsync(context.Response.Body);
+                    }
+                });
+            });
+            app.UseFileServer(options);
 
             return app;
         }
