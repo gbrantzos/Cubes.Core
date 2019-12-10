@@ -38,19 +38,19 @@ function Finish {
     exit $code
 }
 
-# Confirm working on dirty repo
+# Confirm working on dirty repository
 function CheckForDirtyRepo {
     Log "Working on $workingPath"
 
     $tgtPath = Join-Path -Path $workingPath -ChildPath '..'
     if (UnsavedChanges $tgtPath) {
-        $message  = 'Uncommited Changes'
-        $question = 'There are uncommited files on workspace, continue?'
+        $message  = 'Uncommitted Changes'
+        $question = 'There are uncommitted files on workspace, continue?'
         $choices  = '&Yes', '&No'
 
         $decision = $Host.UI.PromptForChoice($message, $question, $choices, 1)
         if ($decision -eq 1) {
-            Log "There are uncommited files on workspace, aborting!"
+            Log "There are uncommitted files on workspace, aborting!"
             Exit 1
         }
     }

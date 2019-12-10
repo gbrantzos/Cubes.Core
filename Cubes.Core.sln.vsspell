@@ -15,8 +15,10 @@
     <Ignore>mssql</Ignore>
     <Ignore>mysql</Ignore>
     <Ignore>serializer</Ignore>
-    <Ignore>unhandled</Ignore>
     <Ignore>serializers</Ignore>
+    <Ignore>unhandled</Ignore>
+    <Ignore>src</Ignore>
+    <Ignore>tmp</Ignore>
   </IgnoredWords>
   <InheritExclusionExpressions>True</InheritExclusionExpressions>
   <InheritIgnoredFilePatterns>True</InheritIgnoredFilePatterns>

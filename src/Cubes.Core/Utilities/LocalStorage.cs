@@ -23,14 +23,12 @@ namespace Cubes.Core.Utilities
 
         public object Get(string key)
         {
-            using (var db = new LiteDatabase(this.dbPath))
-            {
-                var collection = db.GetCollection<LocaStorageItem>();
-                var existing = collection
-                    .Find(i => i.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
-                    .FirstOrDefault();
-                return existing?.Value;
-            }
+            using var db = new LiteDatabase(this.dbPath);
+            var collection = db.GetCollection<LocaStorageItem>();
+            var existing = collection
+                .Find(i => i.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
+            return existing?.Value;
         }
 
         public T Get<T>(string key) where T : class
@@ -38,24 +36,22 @@ namespace Cubes.Core.Utilities
 
         public void Save<T>(string key, T value)
         {
-            using (var db = new LiteDatabase(this.dbPath))
-            {
-                var collection = db.GetCollection<LocaStorageItem>();
-                var existing = collection
-                    .Find(i => i.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
-                    .FirstOrDefault();
-                if (existing != null)
-                    collection.Delete(existing.ID);
+            using var db = new LiteDatabase(this.dbPath);
+            var collection = db.GetCollection<LocaStorageItem>();
+            var existing = collection
+                .Find(i => i.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
+            if (existing != null)
+                collection.Delete(existing.ID);
 
-                var item = new LocaStorageItem
-                {
-                    AddedAt = DateTime.Now,
-                    Key = key,
-                    Value = value
-                };
-                collection.Insert(item);
-                collection.EnsureIndex(nameof(key), true);
-            }
+            var item = new LocaStorageItem
+            {
+                AddedAt = DateTime.Now,
+                Key = key,
+                Value = value
+            };
+            collection.Insert(item);
+            collection.EnsureIndex(nameof(key), true);
         }
 
         public void Clear(string key)

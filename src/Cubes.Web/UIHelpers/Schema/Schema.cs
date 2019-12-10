@@ -11,7 +11,7 @@ namespace Cubes.Web.UIHelpers.Schema
         public string Label { get; set; }
 
         private List<SchemaItem> items = new List<SchemaItem>();
-        public IEnumerable<SchemaItem> Items { get => items.AsEnumerable(); }
+        public IEnumerable<SchemaItem> Items => items.AsEnumerable();
 
         // Helper for Fluent API
         public SchemaItem WithItem
