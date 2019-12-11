@@ -157,7 +157,7 @@ namespace Cubes.Core.Scheduling
                 {
                     Name                      = name,
                     Active                    = triggerActive,
-                    JobType                   = jobDetail.JobType.Name,
+                    JobType                   = jobDetail.JobType.FullName,
                     CronExpression            = cronExpression,
                     PreviousFireTime          = trigger?.GetPreviousFireTimeUtc()?.ToLocalTime().DateTime,
                     NextFireTime              = trigger?.GetNextFireTimeUtc()?.ToLocalTime().DateTime

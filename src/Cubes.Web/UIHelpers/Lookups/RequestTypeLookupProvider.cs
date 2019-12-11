@@ -6,7 +6,7 @@ using Cubes.Core.Utilities;
 
 namespace Cubes.Web.UIHelpers.Lookups
 {
-    public class RequestTypeLokkupProvider : ILookupProvider
+    public class RequestTypeLookupProvider : ILookupProvider
     {
         private static readonly string ProviderName = "RequestTypes";
 
