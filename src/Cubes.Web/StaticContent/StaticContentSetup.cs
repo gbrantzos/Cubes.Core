@@ -99,6 +99,7 @@ namespace Cubes.Web.StaticContent
                 zipPath = zipPath[1..];
 
                 zipPath = Path.Combine(binariesPath, zipPath);
+                zipPath = Path.GetFullPath(zipPath);
             }
             if (!File.Exists(zipPath))
             {

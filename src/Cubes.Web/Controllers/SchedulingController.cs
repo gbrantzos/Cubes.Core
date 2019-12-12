@@ -29,7 +29,7 @@ namespace Cubes.Web.Controllers
         /// </remarks>
         /// <param name="jobName">Name of Job</param>
         /// <returns></returns>
-        [HttpPost, Route("{jobName}")]
+        [HttpPost, Route("execute/{jobName}")]
         public ActionResult Execute(string jobName)
         {
             try
@@ -66,7 +66,7 @@ namespace Cubes.Web.Controllers
             if (command == "reload")
                 await scheduler.Reload();
 
-            return Ok(scheduler.GetStatus());
+            return Ok(await scheduler.GetStatus());
         }
     }
 }
