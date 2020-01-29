@@ -105,7 +105,7 @@ namespace Cubes.Core.Scheduling.Jobs
                 if (email != null)
                 {
                     // Results can contain an instance of SmtpSettings to use
-                    var settings = response.GetPropertyByType<SmtpSettings>() ?? smtpProfiles.Profiles.First();
+                    var settings = response.GetPropertyByType<SmtpSettings>() ?? smtpProfiles.Profiles.FirstOrDefault();
                     settings.ThrowIfNull("SmtpSettings");
                     dispatcher.DispatchEmail(email, settings);
                 }

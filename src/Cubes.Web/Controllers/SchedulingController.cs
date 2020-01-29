@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cubes.Core.Base;
+using Cubes.Core.Configuration;
 using Cubes.Core.Scheduling;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,8 +12,17 @@ namespace Cubes.Web.Controllers
     public class SchedulingController : ControllerBase
     {
         private readonly IScheduler scheduler;
+        private readonly ICubesEnvironment cubesEnvironment;
+        private readonly IConfigurationWriter configurationWriter;
 
-        public SchedulingController(IScheduler scheduler) => this.scheduler = scheduler;
+        public SchedulingController(IScheduler scheduler,
+            ICubesEnvironment cubesEnvironment,
+            IConfigurationWriter configurationWriter)
+        {
+            this.scheduler           = scheduler;
+            this.cubesEnvironment    = cubesEnvironment;
+            this.configurationWriter = configurationWriter;
+        }
 
         /// <summary>
         /// Scheduler status
@@ -67,6 +78,29 @@ namespace Cubes.Web.Controllers
                 await scheduler.Reload();
 
             return Ok(await scheduler.GetStatus());
+        }
+
+        /// <summary>
+        /// Save scheduler jobs
+        /// </summary>
+        /// <param name="jobs">Array of <see cref="SchedulerJob"/></param>
+        /// <remarks>
+        /// Save scheduler jobs to the corresponding configuration file.
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost, Route("save")]
+        public IActionResult SaveJob([FromBody] SchedulerJob[] jobs)
+        {
+            var settings = new SchedulerSettings { Jobs = jobs };
+            try
+            { settings.Validate(); }
+            catch (Exception x)
+            {
+                return BadRequest(x.ToString());
+            }
+            this.configurationWriter.Save(settings);
+
+            return Ok("Scheduler settings saved!");
         }
     }
 }

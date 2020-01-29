@@ -160,7 +160,10 @@ namespace Cubes.Core.Scheduling
                     JobType                   = jobDetail.JobType.FullName,
                     CronExpression            = cronExpression,
                     PreviousFireTime          = trigger?.GetPreviousFireTimeUtc()?.ToLocalTime().DateTime,
-                    NextFireTime              = trigger?.GetNextFireTimeUtc()?.ToLocalTime().DateTime
+                    NextFireTime              = trigger?.GetNextFireTimeUtc()?.ToLocalTime().DateTime,
+                    JobParameters             = jobDetail
+                        .JobDataMap
+                        .ToDictionary(p => p.Key, p =>p.Value.ToString())
                 };
                 if (!String.IsNullOrEmpty(jobStatus.CronExpression))
                 {
@@ -225,8 +228,8 @@ namespace Cubes.Core.Scheduling
 
                 // Load configuration
                 var settings = schedulerConfiguration
-                        .GetSection(nameof(SchedulerSettings))
-                        .Get<SchedulerSettings>();
+                    .GetSection(nameof(SchedulerSettings))
+                    .Get<SchedulerSettings>();
                 if (settings == null)
                     throw new ArgumentException("Scheduler settings cannot be null!");
                 await quartzScheduler.Clear();

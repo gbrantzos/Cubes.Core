@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cubes.Core.Base;
+using Cubes.Core.Configuration;
 using Cubes.Core.Scheduling.Jobs;
 using Quartz;
 
 namespace Cubes.Core.Scheduling
 {
+    [ConfigurationStore(CubesConstants.Files_Scheduling)]
     public class SchedulerSettings
     {
         public ICollection<SchedulerJob> Jobs { get; set; } = new HashSet<SchedulerJob>();

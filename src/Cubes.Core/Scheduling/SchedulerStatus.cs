@@ -35,6 +35,8 @@ namespace Cubes.Core.Scheduling
         // https://github.com/dotnet/corefx/issues/40600
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string FailureMessage { get; set; }
+
+        public Dictionary<string, string> JobParameters { get; set; }
     }
 
 }
