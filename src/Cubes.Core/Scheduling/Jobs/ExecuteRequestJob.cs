@@ -43,7 +43,7 @@ namespace Cubes.Core.Scheduling.Jobs
             this.smtpProfiles     = options.Value;
         }
 
-        public override async Task ExecuteInternal(IJobExecutionContext context)
+        protected override async Task ExecuteInternal(IJobExecutionContext context)
         {
             var jobParams = context
                 .JobDetail
@@ -68,9 +68,8 @@ namespace Cubes.Core.Scheduling.Jobs
             logger.LogInformation($"Executing '{requestType.Name}', {requestInstance} ...");
             var requestResponse = await mediator.Send(requestInstance);
 
-            if (requestResponse is IResult)
+            if (requestResponse is IResult result)
             {
-                var result = requestResponse as IResult;
                 if (result.HasErrors)
                 {
                     if (result.ExceptionThrown == null)

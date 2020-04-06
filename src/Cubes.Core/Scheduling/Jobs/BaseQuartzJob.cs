@@ -19,6 +19,6 @@ namespace Cubes.Core.Scheduling.Jobs
             }
         }
 
-        public abstract Task ExecuteInternal(IJobExecutionContext context);
+        protected abstract Task ExecuteInternal(IJobExecutionContext context);
     }
 }

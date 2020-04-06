@@ -53,8 +53,8 @@ namespace Cubes.Web.Controllers
                 PeakWorkingSet   = Math.Round(proc.PeakWorkingSet64 / 1024M / 1024M, 2),
                 Threads          = proc.Threads.Count,
                 LoadedAssemblies = cubesEnvironment.GetLoadedAssemblies(),
-                ConfiguredApps   = cubesEnvironment.GetApplications(),
-                ActivatedApps    = cubesEnvironment.GetActivatedApplications().Select(app => app.GetType().Name)
+                ConfiguredApps   = cubesEnvironment.GetLoadedeApplications(),
+                ActivatedApps    = cubesEnvironment.GetApplicationInstances().Select(app => app.GetType().Name)
             };
             return Ok(info);
         }

@@ -26,6 +26,7 @@ function UnsavedChanges {
     $changedFiles = $(git status --porcelain | Measure-Object | Select-Object -expand Count)
     Set-Location $currentPath
 
+
     $ChangedFiles -gt 0
 }
 

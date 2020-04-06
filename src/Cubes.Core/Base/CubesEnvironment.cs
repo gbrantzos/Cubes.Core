@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using Autofac;
 using Cubes.Core.DataAccess;
@@ -36,48 +36,72 @@ namespace Cubes.Core.Base
             return type.GetMethod("Create").Invoke(null, null);
         }
 
+        private readonly static string Platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "win" : "unix";
         private readonly string rootFolder;
+        private readonly IEnumerable<ApplicationManifest> applicationManifests;
         private readonly ILogger logger;
-        private readonly CubesEnvironmentInfo environmentInformation;
         private readonly IFileSystem fileSystem;
-        private readonly List<LoadedAssembly> loadedAssemblies;
-        private readonly List<ApplicationInfo> definedApplications;
-        private readonly List<IApplication> activatedApplications;
-        private readonly List<string> swaggerFiles;
+
+        private readonly CubesEnvironmentInfo environmentInformation;
+        private readonly List<AssemblyDetails> loadedAssemblies;
+        private readonly List<ApplicationManifest> loadedApplications;
+
+        // TODO: Needed ????
+        private readonly IList<string> swaggerFiles;
+        private readonly IList<IApplication> applicationInstances;
 
         /// <summary>
         /// Constructor that accepts <see cref="IFileSystem"/> to support unit testing.
         /// </summary>
-        /// <param name="rootFolder"></param>
-        /// <param name="logger"></param>
+        /// <param name="rootFolder">Cubes root folder.</param>
+        /// <param name="applications">Application manifests defined using environment variables or command line parameters.
+        /// <param name="logger">The logger to use</param>
         /// <param name="fileSystem"></param>
-        public CubesEnvironment(string rootFolder, ILogger logger, IFileSystem fileSystem)
+        public CubesEnvironment(string rootFolder,
+            IEnumerable<ApplicationManifest> applications,
+            ILogger logger,
+            IFileSystem fileSystem)
         {
             this.rootFolder             = rootFolder;
             this.logger                 = logger;
             this.fileSystem             = fileSystem;
-            this.environmentInformation = new CubesEnvironmentInfo(rootFolder);
-            this.loadedAssemblies       = new List<LoadedAssembly>();
-            this.definedApplications    = new List<ApplicationInfo>();
-            this.activatedApplications  = new List<IApplication>();
 
-            var assemblyPath            = fileSystem.Path.GetDirectoryName(this.GetType().Assembly.Location);
-            this.swaggerFiles           = new List<string>
+            this.environmentInformation = new CubesEnvironmentInfo(rootFolder);
+            this.applicationManifests   = applications;
+
+            this.applicationInstances   = new List<IApplication>();
+            this.loadedAssemblies       = new List<AssemblyDetails>();
+            this.loadedApplications     = new List<ApplicationManifest>();
+
+            CheckRootFolderExistance(rootFolder);
+
+            // TODO to be moved on PrepareHost method
+            var assemblyPath = fileSystem.Path.GetDirectoryName(this.GetType().Assembly.Location);
+            this.swaggerFiles = new List<string>
             {
                 fileSystem.Path.Combine(assemblyPath, "Cubes.Core.xml"),
                 fileSystem.Path.Combine(assemblyPath, "Cubes.Web.xml")
             };
 
-            var figgle    = FiggleFonts.Slant.Render(" Cubes v5");
+            // Cubes information
+            var figgle = FiggleFonts.Slant.Render(" Cubes v5");
             var buildInfo = $"Git Commit #{environmentInformation.GitHash}, build time {environmentInformation.BuildDateTime}";
-            var version   = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode}";
-            var message   = $"Starting Cubes, version {version} build [{buildInfo}]{Environment.NewLine}{figgle}";
-            logger.LogInformation(new String('-',100));
+            var version = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode}";
+            var message = $"Starting Cubes, version {version} build [{buildInfo}]{Environment.NewLine}{figgle}";
+
+            logger.LogInformation(new String('-', 100));
             logger.LogInformation(message);
             logger.LogInformation($"Cubes root folder: {rootFolder}");
         }
 
-        public CubesEnvironment(string rootFolder, ILogger logger) : this(rootFolder, logger, new FileSystem()) { }
+        /// <summary>
+        /// Create a CubesEnvironment.
+        /// </summary>
+        /// <param name="rootFolder">Cubes root folder.</param>
+        /// <param name="applications">Application manifests defined using environment variables or command line parameters.
+        /// <param name="logger">The logger to use</param>
+        public CubesEnvironment(string rootFolder, IEnumerable<ApplicationManifest> applications, ILogger logger)
+            : this(rootFolder, applications, logger, new FileSystem()) { }
 
         #region ICubesEnvironment implementation
         public string GetBinariesFolder()
@@ -88,11 +112,12 @@ namespace Cubes.Core.Base
 
         public CubesEnvironmentInfo GetEnvironmentInformation() => this.environmentInformation;
 
-        public IEnumerable<LoadedAssembly> GetLoadedAssemblies() => this.loadedAssemblies;
+        public IEnumerable<AssemblyDetails> GetLoadedAssemblies() => this.loadedAssemblies.AsReadOnly();
 
-        public IEnumerable<ApplicationInfo> GetApplications() => this.definedApplications;
+        public IEnumerable<ApplicationManifest> GetLoadedeApplications() => this.loadedApplications.AsReadOnly();
 
-        public IEnumerable<IApplication> GetActivatedApplications() => this.activatedApplications;
+
+        public IEnumerable<IApplication> GetApplicationInstances() => this.applicationInstances;
 
         public void RegisterSwaggerXmlFile(string xmlFile)
         {
@@ -117,6 +142,7 @@ namespace Cubes.Core.Base
             CreateSettingsFile();
         }
 
+        // TODO We shall keep this until we can provide a centralized IConfiguration with write capabilities!
         private void CreateSettingsFile()
         {
             var serializer = new SerializerBuilder().Build();
@@ -133,6 +159,7 @@ namespace Cubes.Core.Base
             }
         }
 
+        // Create all needed folders
         private void CreateFolders()
         {
             var enumValues = Enum
@@ -143,120 +170,111 @@ namespace Cubes.Core.Base
                 fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(rootFolder, value.ToString()));
         }
 
-        private void LoadApplications()
+        // Gather application assemblies to be loaded, including libraries folder
+        private IEnumerable<ApplicationManifest> DiscoverApplications()
         {
-            var applications = new List<ApplicationInfo>();
+            var discoveredApplications = new List<ApplicationManifest>();
 
-            // Check if applications file exists
-            var applicationsFile = fileSystem.Path.Combine(this.GetBinariesFolder(), CubesConstants.Files_Applications);
-            if (fileSystem.File.Exists(applicationsFile))
+            // Add default application
+            var defaultApplication = new ApplicationManifest
             {
-                var fileContents = fileSystem.File.ReadAllText(applicationsFile);
-                var deserializer = new Deserializer();
-                applications = deserializer.Deserialize<List<ApplicationInfo>>(fileContents);
-            }
+                Name = "Default",
+                Active = true,
+                Assemblies = GetCommonAssemblies()
+            };
+            discoveredApplications.Add(defaultApplication);
 
-            // Load common assemblies
-            var commonPath = fileSystem.Path.Combine(this.GetAppsFolder(), CubesConstants.Folders_Common);
-            if (fileSystem.Directory.Exists(commonPath))
-                LoadAssemblies(fileSystem.Directory.GetFiles(commonPath, "*.dll"));
-
-            // Get applications from Applications Folder
-            var appsFolders = fileSystem.Directory
-                .GetDirectories(this.GetAppsFolder())
-                .Where(directory => !directory.Equals(commonPath))
-                .ToList();
-            foreach (var folder in appsFolders)
+            // Process applications to load
+            foreach (var application in applicationManifests)
             {
-                var appInfo = GetApplicationInfo(folder);
-                if (appInfo != null)
+                if (application.Active)
                 {
-                    var existing = this
-                        .definedApplications
-                        .FirstOrDefault(a => a.Name.Equals(appInfo.Name, StringComparison.CurrentCultureIgnoreCase));
-                    if (existing == null)
-                        this.definedApplications.Add(appInfo);
-                    else
-                        logger.LogError("Application already defined: {application}", appInfo.Name);
+                    var applicationAssemblies = new List<string>();
+                    foreach (var assemblyPath in application.Assemblies)
+                    {
+                        var temp = assemblyPath;
+
+                        // Check for platform filter
+                        if (temp.StartsWith("{os:"))
+                        {
+                            if (!temp.StartsWith($"{{os:{CubesEnvironment.Platform}}}"))
+                                continue;
+                            temp = temp.Substring(assemblyPath.IndexOf('}') + 1);
+                        }
+
+                        // Make assembly paths absolute
+                        var actualPath = fileSystem.File.Exists(temp) ?
+                            temp :
+                            fileSystem.Path.Combine(application.BasePath, temp);
+                        applicationAssemblies.Add(actualPath);
+                    }
+
+                    var toLoad = new ApplicationManifest
+                    {
+                        Name = application.Name,
+                        Active = true,
+                        BasePath = application.BasePath,
+                        Assemblies = applicationAssemblies
+                    };
+                    discoveredApplications.Add(toLoad);
                 }
             }
-            this.definedApplications.AddRange(applications);
+            return discoveredApplications;
+        }
 
-            // Load all applications assemblies
-            var allAssemblies = this.definedApplications
-                .Where(app => app.Active)
-                .SelectMany(app => app.Assemblies.Select(a => fileSystem.Path.Combine(app.Path, a)))
+        // Load applications, instantiate instances
+        private void LoadApplications()
+        {
+            // Get applications to load details
+            var toLoad = DiscoverApplications();
+
+            // Load all assemblies defined
+            var allAssemblies = toLoad
+                .SelectMany(app => app.Assemblies)
                 .ToArray();
             LoadAssemblies(allAssemblies);
 
-            // Create an instance of each application
-            foreach (var app in this.definedApplications.Where(a => a.Active).ToList())
+            // Instantiate application instances
+            var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            var loadedAssembliesNames = this.loadedAssemblies.Select(i => i.AssemblyName).ToList();
+            var applicationTypes = domainAssemblies
+                .Where(l => loadedAssembliesNames.Contains(l.FullName))
+                .SelectMany(asm => asm.GetTypes())
+                .Where(t => typeof(IApplication).IsAssignableFrom(t))
+                .ToList();
+            foreach (var applicationType in applicationTypes)
             {
-                foreach (var asm in app.Assemblies)
-                {
-                    try
-                    {
-                        var assemblyName = AssemblyName.GetAssemblyName(fileSystem.Path.Combine(app.Path, asm)).Name;
-                        var loadedAsm = AppDomain
-                            .CurrentDomain
-                            .GetAssemblies()
-                            .FirstOrDefault(a => a.GetName().Name == assemblyName);
-                        if (loadedAsm != null)
-                        {
-                            var applicationType = loadedAsm
-                                .GetTypes()
-                                .FirstOrDefault(t => typeof(IApplication).IsAssignableFrom(t));
-                            if (applicationType != null)
-                            {
-                                var existing = this
-                                    .activatedApplications
-                                    .FirstOrDefault(app => app.GetType().Name == applicationType.Name);
-                                if (existing != null)
-                                {
-                                    logger.LogError("Already instantiated application of type: {applicationType}", applicationType.Name);
-                                    logger.LogError("Please check application setup!");
-                                    continue;
-                                }
-                                var instance = Activator.CreateInstance(applicationType) as IApplication;
-                                this.activatedApplications.Add(instance);
-                                logger.LogInformation("Application instantiated: {application}", app.Name);
-
-                                // Add Swagger file
-                                this.RegisterSwaggerXmlFile(instance.SwaggerXmlFile);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Failed to instantiate application {application}", app.Name);
-                    }
-                }
+                var instance = Activator.CreateInstance(applicationType) as IApplication;
+                this.applicationInstances.Add(instance);
+                logger.LogInformation("Instantiated application \"{application}\", from {path}.",
+                    applicationType.Name,
+                    applicationType.Assembly.Location);
             }
+
+            // Expose loaded applications details
+            this.loadedApplications.AddRange(toLoad);
         }
 
-        private ApplicationInfo GetApplicationInfo(string folder)
+        // Get common assemblies, respect platform sub-folders
+        private IEnumerable<string> GetCommonAssemblies()
         {
-            var application = new ApplicationInfo();
-            var infoFile = fileSystem.Path.Combine(folder, CubesConstants.Files_Application);
-            if (fileSystem.File.Exists(infoFile))
-            {
-                var fileContents   = fileSystem.File.ReadAllText(infoFile);
-                var deserializer   = new Deserializer();
-                application        = deserializer.Deserialize<ApplicationInfo>(fileContents);
-            }
-            else
-            {
-                application.Active = true;
-                application.Name   = new DirectoryInfo(folder).Name;
-            }
-            application.Path = folder;
+            var toReturn = new List<string>();
 
-            if (application.Active && (application.Assemblies == null || application.Assemblies.Count == 0))
-                application.Assemblies = fileSystem.Directory.GetFiles(folder, "*.dll");
+            // Load common assemblies
+            var libraries = fileSystem.Directory.GetFiles(this.GetFolder(CubesFolderKind.Libraries));
+            toReturn.AddRange(libraries);
 
-            return application;
+            // Load common assemblies for current platform
+            var platfromPath = fileSystem.Path.Combine(this.GetFolder(CubesFolderKind.Libraries), CubesEnvironment.Platform);
+            if (fileSystem.Directory.Exists(platfromPath))
+            {
+                var platformLibraries = fileSystem.Directory.GetFiles(platfromPath);
+                toReturn.AddRange(platformLibraries);
+            }
+            return toReturn;
         }
 
+        // Load assemblies
         private void LoadAssemblies(string[] assemblies)
         {
             foreach (var file in assemblies)
@@ -276,17 +294,33 @@ namespace Cubes.Core.Base
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
                     logger.LogInformation($"Loaded assembly: {asm.FullName}");
 
-                    loadedAssemblies.Add(new LoadedAssembly
+                    this.loadedAssemblies.Add(new AssemblyDetails
                     {
                         Filename        = fileSystem.Path.GetFileName(file),
                         Path            = file,
-                        AssemblyName    = asm.GetName().Name,
+                        AssemblyName    = asm.FullName,
                         AssemblyVersion = asm.GetName().Version.ToString()
                     });
                 }
                 catch (Exception x)
                 {
                     logger.LogError(x, $"Could not load assembly {file}");
+                }
+            }
+        }
+
+        // Make sure root folder exists
+        private void CheckRootFolderExistance(string rootFolder)
+        {
+            if (!this.fileSystem.Directory.Exists(rootFolder))
+            {
+                try
+                {
+                    this.fileSystem.Directory.CreateDirectory(rootFolder);
+                }
+                catch (Exception x)
+                {
+                    throw new ArgumentException($"Root folder must be writable by cubes process: \"{rootFolder}\"!", x);
                 }
             }
         }

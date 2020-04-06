@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Cubes.Core.Base
 {
+    // TODO Check that all settings are present
     /// <summary>
     /// Exposes Cubes environment and settings information through <see cref="IConfiguration"/>.
     /// </summary>
@@ -11,7 +12,7 @@ namespace Cubes.Core.Base
     {
         public string Version                   { get; set; }
         public string RootFolder                { get; set; }
-        public string AppsFolder                { get; set; }
+        public string LibrariesFolder           { get; set; }
         public string LogsFolder                { get; set; }
         public string SettingsFolder            { get; set; }
         public string StorageFolder             { get; set; }
@@ -32,7 +33,7 @@ namespace Cubes.Core.Base
                 {
                     { $"{CubesConstants.Configuration_Section}:Version"            , cubes.GetEnvironmentInformation().FullVersion },
                     { $"{CubesConstants.Configuration_Section}:RootFolder"         , cubes.GetRootFolder() },
-                    { $"{CubesConstants.Configuration_Section}:AppsFolder"         , cubes.GetAppsFolder() },
+                    { $"{CubesConstants.Configuration_Section}:LibrariesFolder"    , cubes.GetFolder(CubesFolderKind.Libraries) },
                     { $"{CubesConstants.Configuration_Section}:LogsFolder"         , cubes.GetFolder(CubesFolderKind.Logs) },
                     { $"{CubesConstants.Configuration_Section}:SettingsFolder"     , cubes.GetSettingsFolder() },
                     { $"{CubesConstants.Configuration_Section}:StorageFolder"      , cubes.GetStorageFolder() },
@@ -48,7 +49,7 @@ namespace Cubes.Core.Base
                 cubesConfig.Add(item.Key, item.Value);
 
             var allAssembliesWithControllers = cubes
-                .GetActivatedApplications()
+                .GetApplicationInstances()
                 .SelectMany(app => app.AssembliesWithControllers.ToList())
                 .Select((f, i) => new KeyValuePair<string, string>($"{CubesConstants.Configuration_Section}:AssembliesWithControllers:{i}", f))
                 .ToList();

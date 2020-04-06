@@ -16,11 +16,14 @@
     <Ignore>mysql</Ignore>
     <Ignore>serializer</Ignore>
     <Ignore>serializers</Ignore>
-    <Ignore>unhandled</Ignore>
     <Ignore>src</Ignore>
     <Ignore>tmp</Ignore>
+    <Ignore>unhandled</Ignore>
+    <Ignore>unix</Ignore>
+    <Ignore>os</Ignore>
   </IgnoredWords>
   <InheritExclusionExpressions>True</InheritExclusionExpressions>
   <InheritIgnoredFilePatterns>True</InheritIgnoredFilePatterns>
   <InheritXmlSettings>True</InheritXmlSettings>
+  <IgnoredWordsFile></IgnoredWordsFile>
 </SpellCheckerConfiguration>

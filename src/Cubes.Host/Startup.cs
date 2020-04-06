@@ -61,6 +61,9 @@ namespace Cubes.Host
                 app.UseHttpsRedirection();
             }
 
+            // Server files from WebRoot folder
+            app.UseStaticFiles();
+
             // Should be called as soon as possible.
             app.UseCubesApi(configuration, env, responseBuilder, loggerFactory);
 

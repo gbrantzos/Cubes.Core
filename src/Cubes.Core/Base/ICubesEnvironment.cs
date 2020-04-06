@@ -27,29 +27,31 @@ namespace Cubes.Core.Base
         CubesEnvironmentInfo GetEnvironmentInformation();
 
         /// <summary>
+        /// All applications found during host startup that are active.
+        /// </summary>
+        /// <returns><see cref="IEnumerable{ApplicationManifest}"/></returns>
+        IEnumerable<ApplicationManifest> GetLoadedeApplications();
+
+        /// <summary>
         /// All assemblies loaded during host startup.
         /// </summary>
         /// <returns><see cref="IEnumerable{LoadedAssembly}"/></returns>
-        IEnumerable<LoadedAssembly> GetLoadedAssemblies();
+        IEnumerable<AssemblyDetails> GetLoadedAssemblies();
 
         /// <summary>
-        /// All applications found during host startup.
-        /// </summary>
-        /// <returns><see cref="IEnumerable{ApplicationInfo}"/></returns>
-        IEnumerable<ApplicationInfo> GetApplications();
-
-        /// <summary>
-        /// All applications that are activated.
+        /// All instantiated applications.
         /// </summary>
         /// <returns><see cref="IEnumerable{IApplication}"/></returns>
-        IEnumerable<IApplication> GetActivatedApplications();
+        IEnumerable<IApplication> GetApplicationInstances();
 
+        // TODO Redesign
         /// <summary>
         /// Add an XML file for Swagger documentation.
         /// </summary>
         /// <param name="xmlFile">XML file path</param>
         void RegisterSwaggerXmlFile(string xmlFile);
 
+        // TODO Redesign
         /// <summary>
         /// Get all Swagger registered XML files.
         /// </summary>
@@ -57,7 +59,7 @@ namespace Cubes.Core.Base
         IEnumerable<string> GetSwaggerFiles();
     }
 
-    public class LoadedAssembly
+    public class AssemblyDetails
     {
         public string Filename        { get; set; }
         public string Path            { get; set; }
@@ -65,32 +67,22 @@ namespace Cubes.Core.Base
         public string AssemblyVersion { get; set; }
     }
 
-    public class ApplicationInfo
-    {
-        public string Name                    { get; set; } = String.Empty;
-        public bool Active                    { get; set; } = true;
-        public string Path                    { get; set; } = String.Empty;
-        public string UIPath                  { get; set; } = String.Empty;
-        public ICollection<string> Assemblies { get; set; }
-    }
-
     public enum CubesFolderKind
     {
         Root,
-        Apps,
         Content,
+        Libraries,
         Logs,
         Settings,
         Storage,
-        Temp
+        Temp,
+        WebRoot
     }
 
     public static class CubesEnvironmentExtentions
     {
         public static string GetRootFolder(this ICubesEnvironment cubesEnvironment)
             => cubesEnvironment.GetFolder(CubesFolderKind.Root);
-        public static string GetAppsFolder(this ICubesEnvironment cubesEnvironment)
-            => cubesEnvironment.GetFolder(CubesFolderKind.Apps);
         public static string GetSettingsFolder(this ICubesEnvironment cubesEnvironment)
             => cubesEnvironment.GetFolder(CubesFolderKind.Settings);
         public static string GetStorageFolder(this ICubesEnvironment cubesEnvironment)

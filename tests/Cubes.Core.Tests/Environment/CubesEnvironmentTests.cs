@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Cubes.Core.Tests.Environment
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "<Pending>")]
     public class CubesEnvironmentTests : IDisposable
     {
         private MockRepository mockRepository;
@@ -30,7 +31,7 @@ namespace Cubes.Core.Tests.Environment
                     It.IsAny<Exception>(),
                     It.IsAny<Func<Object, Exception, string>>()))
                 .Verifiable();
-            var unitUnderTest = new CubesEnvironment("C:\\Cubes", loggerMock.Object, fileSystem);
+            var unitUnderTest = new CubesEnvironment("C:\\Cubes", new ApplicationManifest[] { }, loggerMock.Object, fileSystem);
 
             // Act
             unitUnderTest.PrepareHost();
@@ -43,7 +44,6 @@ namespace Cubes.Core.Tests.Environment
                     It.IsAny<Exception>(),
                     It.IsAny<Func<Object, Exception, string>>()), Times.Exactly(2));
 
-            Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetAppsFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetStorageFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetSettingsFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Content)));

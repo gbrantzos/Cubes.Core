@@ -52,7 +52,7 @@ namespace Cubes.Core
             ICubesEnvironment cubes)
         {
             services.AddSingleton(cubes);
-            foreach (var application in cubes.GetActivatedApplications())
+            foreach (var application in cubes.GetApplicationInstances())
                 application.ConfigureServices(services);
 
             return services;
@@ -61,7 +61,7 @@ namespace Cubes.Core
         public static IConfigurationBuilder AddApplicationsConfiguration(this IConfigurationBuilder configuration,
             ICubesEnvironment cubes)
         {
-            foreach (var application in cubes.GetActivatedApplications())
+            foreach (var application in cubes.GetApplicationInstances())
                 application.ConfigureAppConfiguration(configuration);
 
             return configuration;

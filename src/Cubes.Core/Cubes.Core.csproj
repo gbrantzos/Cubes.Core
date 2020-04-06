@@ -51,6 +51,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Web\" />
+  </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="PowerShell -NoProfile -Command &quot;&amp; {Get-Date -Format 'yyyy/MM/dd HH:mm:ss' | Out-File -FilePath BuildDate.txt  }&quot;" />
   </Target>

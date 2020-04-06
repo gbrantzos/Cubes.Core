@@ -51,7 +51,7 @@ namespace Cubes.Core
 
         public static ContainerBuilder RegisterApplicationServices(this ContainerBuilder builder, ICubesEnvironment cubes)
         {
-            foreach (var application in cubes.GetActivatedApplications())
+            foreach (var application in cubes.GetApplicationInstances())
                 application.RegisterServices(builder);
 
             return builder;

@@ -20,11 +20,11 @@ using System.Runtime.InteropServices;
 
 namespace Cubes.Host
 {
-    public class Program
+    public static class Program
     {
 #if DEBUG
         [DllImport("user32.dll")]
-        public static extern bool ShowWindow(IntPtr hWnd, int cmdShow);
+        private static extern bool ShowWindow(IntPtr hWnd, int cmdShow);
         private const int HIDE = 0;
         private const int MAXIMIZE = 3;
         private const int MINIMIZE = 6;
@@ -39,10 +39,14 @@ namespace Cubes.Host
 #endif
             try
             {
-                var rootFolder = GetRootFolder();
+                var rootFolder   = CubesEnvironmentHelpers.GetRootFolder(args);
+                var applications = CubesEnvironmentHelpers.GetApplications(rootFolder, args);
                 using ILoggerProvider loggerProvider = GetNLogProvider(rootFolder);
-                var cubesEnvironment = new CubesEnvironment(rootFolder,
-                    loggerProvider.CreateLogger(typeof(CubesEnvironment).FullName));
+
+                var cubesEnvironment = new CubesEnvironment(
+                    rootFolder   : rootFolder,
+                    applications : applications,
+                    logger       : loggerProvider.CreateLogger(typeof(CubesEnvironment).FullName));
                 cubesEnvironment.PrepareHost();
 
                 CreateHostBuilder(args, cubesEnvironment)
@@ -57,6 +61,10 @@ namespace Cubes.Host
                 new NLogLoggerProvider()
                     .CreateLogger(typeof(CubesEnvironment).FullName)
                     .LogError(ex, "Cubes Host stopped because of exception!");
+#if DEBUG
+                Console.WriteLine("Press any key to continue ...");
+                Console.ReadKey(true);
+#endif
             }
             finally
             {
@@ -64,16 +72,6 @@ namespace Cubes.Host
                 // before application-exit (Avoid segmentation fault on Linux)
                 NLog.LogManager.Shutdown();
             }
-        }
-
-        private static string GetRootFolder()
-        {
-            // Check for environment variable, else get executing assembly path
-            // We should support starting from script and Cubes folder are outside
-            // binaries folder.
-            var rootFolder = Environment.GetEnvironmentVariable("CUBES_ROOTFOLDER");
-            return String.IsNullOrEmpty(rootFolder) ?
-                Path.GetDirectoryName(typeof(Program).Assembly.Location) : rootFolder;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubes)
@@ -118,10 +116,11 @@ namespace Cubes.Host
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls(urls);
-                    webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.Content));
+                    webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.WebRoot));
                 });
         }
 
+        // This is the only Host specific method, and can be changed with no Core changes!
         private static ILoggerProvider GetNLogProvider(string basedir)
         {
             var programPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
@@ -132,7 +131,7 @@ namespace Cubes.Host
                 File.Copy(sampleFile, configFile);
             }
             NLogBuilder.ConfigureNLog(configFile);
-            NLog.LogManager.Configuration.Variables["basedir"] = basedir;
+            NLog.LogManager.Configuration.Variables["cubesRoot"] = basedir;
 
             return new NLogLoggerProvider();
         }
