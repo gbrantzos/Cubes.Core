@@ -21,8 +21,5 @@ namespace Cubes.Core.Base
 
         public virtual string SwaggerXmlFile
             => String.Empty;
-
-        public virtual string[] AssembliesWithControllers
-            => Array.Empty<string>();
     }
 }

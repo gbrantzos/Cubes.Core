@@ -30,14 +30,10 @@ namespace Cubes.Core.Base
         /// <returns></returns>
         ContainerBuilder RegisterServices(ContainerBuilder builder);
 
+        // TODO Redesign
         /// <summary>
         /// File to be used for Swagger documentation
         /// </summary>
         string SwaggerXmlFile { get; }
-
-        /// <summary>
-        /// Comma separated list of assemblies that contain Controllers
-        /// </summary>
-        string[] AssembliesWithControllers { get; }
     }
 }

@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
-namespace Cubes.Web.Controllers
+namespace Cubes.Core.Web.Controllers
 {
     [ApiController, Route("api/[controller]")]
     public class RequestsController : ControllerBase
@@ -76,6 +76,7 @@ namespace Cubes.Web.Controllers
             if (instance == null)
                 return BadRequest($"Given instance is not a valid JSON object of type '{requestType}'");
 
+            // TODO Check this
             IResult result = await mediator.Send(instance) as IResult;
             if (result.ExceptionThrown != null)
                 throw new Exception($"Request execution failed!{Environment.NewLine}{requestInst}", result.ExceptionThrown);

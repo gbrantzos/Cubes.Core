@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
 using NLog.Extensions.Logging;
+using Cubes.Core.Web;
 
 #if DEBUG
 using System.Diagnostics;

@@ -9,18 +9,21 @@
   <InheritIgnoredWords>True</InheritIgnoredWords>
   <IgnoredWords>
     <Ignore>api</Ignore>
+    <Ignore>Autofac</Ignore>
     <Ignore>basedir</Ignore>
     <Ignore>deserialize</Ignore>
     <Ignore>json</Ignore>
     <Ignore>mssql</Ignore>
     <Ignore>mysql</Ignore>
+    <Ignore>os</Ignore>
     <Ignore>serializer</Ignore>
     <Ignore>serializers</Ignore>
     <Ignore>src</Ignore>
     <Ignore>tmp</Ignore>
     <Ignore>unhandled</Ignore>
     <Ignore>unix</Ignore>
-    <Ignore>os</Ignore>
+    <Ignore>Giorgos</Ignore>
+    <Ignore>Brantzos</Ignore>
   </IgnoredWords>
   <InheritExclusionExpressions>True</InheritExclusionExpressions>
   <InheritIgnoredFilePatterns>True</InheritIgnoredFilePatterns>

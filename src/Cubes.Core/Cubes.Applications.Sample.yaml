@@ -1,7 +1,0 @@
-# Applications Definitions
-
--   Name: ApplicationName
-    Path: C:\Code\some\path\to\assemblies
-    Assemblies:
-        -   Cubes.Pharmex.dll
-    Active: false

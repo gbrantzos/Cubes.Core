@@ -1,16 +1,16 @@
 using System;
 using System.Linq;
-using Autofac.Features.AttributeFilters;
 using Cubes.Core.Base;
-using Cubes.Web;
-using Cubes.Web.ResponseWrapping;
+using Cubes.Core.Web.ResponseWrapping;
+using Cubes.Core.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Cubes.Host
+namespace Cubes.Core.Web
 {
     public class Startup
     {
@@ -21,15 +21,10 @@ namespace Cubes.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Cubes Configuration
-            var cubesAssemblies = configuration
-                .GetCubesConfiguration()
-                .AssembliesWithControllers ?? Array.Empty<string>();
-
             var assemblies = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
-                .Where(asm => cubesAssemblies.Contains(asm.GetName().Name))
+                .Where(asm => asm.GetTypes().Any(t => t.IsSubclassOf(typeof(Controller))))
                 .ToList();
 
             // Setup WebAPI
@@ -43,7 +38,7 @@ namespace Cubes.Host
                 mvcBuilder.AddApplicationPart(asm);
 
             // Setup Cubes
-            services.AddCubesWeb(configuration, mvcBuilder);
+            // TODO services.AddCubesWeb(configuration, mvcBuilder);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,7 +60,7 @@ namespace Cubes.Host
             app.UseStaticFiles();
 
             // Should be called as soon as possible.
-            app.UseCubesApi(configuration, env, responseBuilder, loggerFactory);
+            // TODO app.UseCubesApi(configuration, env, responseBuilder, loggerFactory);
 
             // Routing
             app.UseRouting();
