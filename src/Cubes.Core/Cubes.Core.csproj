@@ -26,11 +26,13 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
+  <PropertyGroup>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+  </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="BuildDate.txt" />
-    <EmbeddedResource Include="Web\Resources\index.html" />
+    <EmbeddedResource Include="Web\Resources\*" />
     <EmbeddedResource Include="Web\Swagger\Themes\*" />
-    <EmbeddedResource Include="Resources/*" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.1.2" />

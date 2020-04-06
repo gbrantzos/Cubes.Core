@@ -23,7 +23,7 @@ namespace Cubes.Core.Web.Controllers
             "muted",
             "outline"
         };
-        private static string resourceRoot = "Cubes.Web.Swagger.Themes";
+        private static string resourceRoot = "Cubes.Core.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
         private readonly ISchemaManager schemaManager;
         private readonly List<ILookupProvider> lookupProviders;

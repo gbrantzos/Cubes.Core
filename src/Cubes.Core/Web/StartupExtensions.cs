@@ -9,9 +9,9 @@ using Cubes.Core.Base;
 using Cubes.Core.Web.Filters;
 using Cubes.Core.Web.Formatters;
 using Cubes.Core.Web.ResponseWrapping;
-// using Cubes.Core.Web.StaticContent;
+using Cubes.Core.Web.StaticContent;
 using Cubes.Core.Web.Swager;
-// using Cubes.Core.Web.UIHelpers;
+using Cubes.Core.Web.UIHelpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -41,7 +41,7 @@ namespace Cubes.Core.Web
             services.AddCubesSwaggerServices(configuration);
             services.AddSingleton<IApiResponseBuilder, ApiResponseBuilder>();
 
-            // TODO services.AddUIServices();
+            services.AddUIServices();
 
             mvcBuilder.AddMvcOptions(options =>
             {
@@ -73,10 +73,10 @@ namespace Cubes.Core.Web
                 app.UseCors(policy);
 
             return app
-                // TODO .UseHomePage()
-                // TODO .UseAdminPage(configuration, loggerFactory)
+                .UseHomePage()
+                .UseAdminPage(configuration, loggerFactory)
                 .UseCubesSwagger()
-                // TODO .UseStaticContent(configuration, loggerFactory)
+                .UseStaticContent(configuration, loggerFactory)
                 .UseCubesMiddleware(loggerFactory, responseBuilder)
                 .UseResponseWrapper();
         }

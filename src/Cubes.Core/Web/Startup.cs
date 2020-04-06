@@ -38,7 +38,7 @@ namespace Cubes.Core.Web
                 mvcBuilder.AddApplicationPart(asm);
 
             // Setup Cubes
-            // TODO services.AddCubesWeb(configuration, mvcBuilder);
+            services.AddCubesWeb(configuration, mvcBuilder);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,7 +60,7 @@ namespace Cubes.Core.Web
             app.UseStaticFiles();
 
             // Should be called as soon as possible.
-            // TODO app.UseCubesApi(configuration, env, responseBuilder, loggerFactory);
+            app.UseCubesApi(configuration, env, responseBuilder, loggerFactory);
 
             // Routing
             app.UseRouting();
