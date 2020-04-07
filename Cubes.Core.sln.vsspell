@@ -11,7 +11,9 @@
     <Ignore>api</Ignore>
     <Ignore>Autofac</Ignore>
     <Ignore>basedir</Ignore>
+    <Ignore>Brantzos</Ignore>
     <Ignore>deserialize</Ignore>
+    <Ignore>Giorgos</Ignore>
     <Ignore>json</Ignore>
     <Ignore>mssql</Ignore>
     <Ignore>mysql</Ignore>
@@ -22,8 +24,8 @@
     <Ignore>tmp</Ignore>
     <Ignore>unhandled</Ignore>
     <Ignore>unix</Ignore>
-    <Ignore>Giorgos</Ignore>
-    <Ignore>Brantzos</Ignore>
+    <Ignore>http</Ignore>
+    <Ignore>localhost</Ignore>
   </IgnoredWords>
   <InheritExclusionExpressions>True</InheritExclusionExpressions>
   <InheritIgnoredFilePatterns>True</InheritIgnoredFilePatterns>

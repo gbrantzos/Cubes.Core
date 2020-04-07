@@ -76,15 +76,7 @@ namespace Cubes.Host
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubes)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(cubes.GetBinariesFolder())
-                .AddJsonFile(CubesConstants.Config_AppSettings, optional: false)
-                .AddCommandLine(args)
-                .Build();
-            var urls = configuration.GetValue<string>(CubesConstants.Config_HostURLs, "http://localhost:3001");
-
-            return Microsoft.Extensions.Hosting.Host
+            => Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseWindowsService()
@@ -116,10 +108,8 @@ namespace Cubes.Host
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls(urls);
                     webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.WebRoot));
                 });
-        }
 
         // This is the only Host specific method, and can be changed with no Core changes!
         private static ILoggerProvider GetNLogProvider(string basedir)

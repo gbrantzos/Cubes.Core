@@ -78,8 +78,6 @@ function Build {
     $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
     dotnet clean -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj"
     dotnet build -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj" -p:AssemblyVersion=$baseVersion -p:FileVersion=$baseVersion -p:InformationalVersion=$version-$hash
-    dotnet clean -c $buildConfig "$srcPath/Cubes.Web/Cubes.Web.csproj"
-    dotnet build -c $buildConfig "$srcPath/Cubes.Web/Cubes.Web.csproj"   -p:AssemblyVersion=$baseVersion -p:FileVersion=$baseVersion -p:InformationalVersion=$version-$hash
     dotnet clean -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj"
     dotnet build -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj" -p:AssemblyVersion=$baseVersion -p:FileVersion=$baseVersion -p:InformationalVersion=$version-$hash
 }
