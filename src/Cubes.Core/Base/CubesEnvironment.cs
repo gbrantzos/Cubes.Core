@@ -67,9 +67,10 @@ namespace Cubes.Core.Base
 
             // Cubes information
             var figgle = FiggleFonts.Slant.Render(" Cubes v5");
-            var buildInfo = $"Git Commit #{environmentInformation.GitHash}, build time {environmentInformation.BuildDateTime}";
+            var buildInfo = environmentInformation.BuildInformation;
+            var buildLogo = $"Git Commit #{buildInfo.Commit}, build at {buildInfo.BuildAt}";
             var version = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode}";
-            var message = $"Starting Cubes, version {version} build [{buildInfo}]{Environment.NewLine}{figgle}";
+            var message = $"Starting Cubes, version {version} build [{buildLogo}]{Environment.NewLine}{figgle}";
 
             logger.LogInformation(new String('-', 100));
             logger.LogInformation(message);

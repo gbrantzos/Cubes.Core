@@ -23,8 +23,8 @@ msbuild.wrn
 deploy/
 tmp/
 
-# Build date time
-BuildDate.txt
+# Build information
+BuildInfo.txt
 
 # Visual Studio 2015
 .vs/
