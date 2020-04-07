@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
@@ -22,5 +23,11 @@ namespace Cubes.Core.Base
 
         public virtual IEnumerable<string> GetSwaggerXmlFiles()
             => Enumerable.Empty<string>();
+
+        protected string ApplicationPath()
+            => Path.GetDirectoryName(this.GetType().Assembly.Location);
+
+        protected string GetFullPathForFile(string fileName)
+            => Path.Combine(this.ApplicationPath(), fileName);
     }
 }

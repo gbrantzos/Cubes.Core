@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Cubes.Core.Base;
 using Cubes.Core.Web.ResponseWrapping;
-using Cubes.Core.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +23,7 @@ namespace Cubes.Core.Web
             var assemblies = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
-                .Where(asm => asm.GetTypes().Any(t => t.IsSubclassOf(typeof(Controller))))
+                .Where(asm => asm.GetTypes().Any(t => t.IsSubclassOf(typeof(ControllerBase))))
                 .ToList();
 
             // Setup WebAPI
@@ -35,7 +34,9 @@ namespace Cubes.Core.Web
 
             // Add applications assemblies
             foreach (var asm in assemblies)
-                mvcBuilder.AddApplicationPart(asm);
+                mvcBuilder
+                    .AddApplicationPart(asm)
+                    .AddControllersAsServices();
 
             // Setup Cubes
             services.AddCubesWeb(configuration, mvcBuilder);
