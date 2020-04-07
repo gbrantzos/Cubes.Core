@@ -10,6 +10,7 @@ using Autofac;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
 using Cubes.Core.Scheduling;
+using Cubes.Core.Web.StaticContent;
 using Figgle;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
@@ -24,17 +25,8 @@ namespace Cubes.Core.Base
             (CubesConstants.Files_DataAccess,    DataAccessSettings.Create),
             (CubesConstants.Files_Scheduling,    SchedulerSettings.Create),
             (CubesConstants.Files_SmtpSettings,  SmtpSettingsProfiles.Create),
-            (CubesConstants.Files_StaticContent, CreateStaticContentSettings)
+            (CubesConstants.Files_StaticContent, StaticContentSettings.Create)
         };
-
-        private static object CreateStaticContentSettings()
-        {
-            var asm = Assembly.Load("Cubes.Web");
-            var type = asm
-                .GetTypes()
-                .FirstOrDefault(t => t.FullName == "Cubes.Web.StaticContent.StaticContentSettings");
-            return type.GetMethod("Create").Invoke(null, null);
-        }
 
         private readonly static string Platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "win" : "unix";
         private readonly string rootFolder;
@@ -151,9 +143,10 @@ namespace Cubes.Core.Base
             var enumValues = Enum
                             .GetValues(typeof(CubesFolderKind))
                             .Cast<CubesFolderKind>()
-                            .Except(new CubesFolderKind[] { CubesFolderKind.Root });
+                            .Except(new CubesFolderKind[] { CubesFolderKind.Root })
+                            .Select(e => e.ToString());
             foreach (var value in enumValues)
-                fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(rootFolder, value.ToString()));
+                fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(rootFolder, value));
         }
 
         // Gather application assemblies to be loaded, including libraries folder
