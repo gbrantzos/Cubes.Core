@@ -20,7 +20,7 @@ namespace Cubes.Core.Web.StaticContent
             var settings = configuration
                 .GetSection(nameof(StaticContentSettings))
                 .Get<StaticContentSettings>();
-            var rootPath = configuration.GetCubesConfiguration().StaticContentFolder;
+            var rootPath = configuration.GetCubesConfiguration().ContentFolder;
             var logger   = loggerFactory.CreateLogger<Content>();
 
             if (settings == null)

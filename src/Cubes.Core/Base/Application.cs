@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,7 @@ namespace Cubes.Core.Base
         public virtual ContainerBuilder RegisterServices(ContainerBuilder builder)
             => builder;
 
-        public virtual string SwaggerXmlFile
-            => String.Empty;
+        public virtual IEnumerable<string> GetSwaggerXmlFiles()
+            => Enumerable.Empty<string>();
     }
 }

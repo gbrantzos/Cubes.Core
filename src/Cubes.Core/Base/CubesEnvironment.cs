@@ -45,16 +45,14 @@ namespace Cubes.Core.Base
         private readonly CubesEnvironmentInfo environmentInformation;
         private readonly List<AssemblyDetails> loadedAssemblies;
         private readonly List<ApplicationManifest> loadedApplications;
-
-        // TODO: Needed ????
-        private readonly IList<string> swaggerFiles;
-        private readonly IList<IApplication> applicationInstances;
+        private readonly List<IApplication> applicationInstances;
+        private readonly List<string> swaggerXmlFiles;
 
         /// <summary>
         /// Constructor that accepts <see cref="IFileSystem"/> to support unit testing.
         /// </summary>
         /// <param name="rootFolder">Cubes root folder.</param>
-        /// <param name="applications">Application manifests defined using environment variables or command line parameters.
+        /// <param name="applications">Application manifests defined using environment variables or command line parameters.</param>
         /// <param name="logger">The logger to use</param>
         /// <param name="fileSystem"></param>
         public CubesEnvironment(string rootFolder,
@@ -72,16 +70,8 @@ namespace Cubes.Core.Base
             this.applicationInstances   = new List<IApplication>();
             this.loadedAssemblies       = new List<AssemblyDetails>();
             this.loadedApplications     = new List<ApplicationManifest>();
-
+            this.swaggerXmlFiles        = new List<string>();
             CheckRootFolderExistance(rootFolder);
-
-            // TODO to be moved on PrepareHost method
-            var assemblyPath = fileSystem.Path.GetDirectoryName(this.GetType().Assembly.Location);
-            this.swaggerFiles = new List<string>
-            {
-                fileSystem.Path.Combine(assemblyPath, "Cubes.Core.xml"),
-                fileSystem.Path.Combine(assemblyPath, "Cubes.Web.xml")
-            };
 
             // Cubes information
             var figgle = FiggleFonts.Slant.Render(" Cubes v5");
@@ -98,7 +88,7 @@ namespace Cubes.Core.Base
         /// Create a CubesEnvironment.
         /// </summary>
         /// <param name="rootFolder">Cubes root folder.</param>
-        /// <param name="applications">Application manifests defined using environment variables or command line parameters.
+        /// <param name="applications">Application manifests defined using environment variables or command line parameters.</param>
         /// <param name="logger">The logger to use</param>
         public CubesEnvironment(string rootFolder, IEnumerable<ApplicationManifest> applications, ILogger logger)
             : this(rootFolder, applications, logger, new FileSystem()) { }
@@ -116,16 +106,9 @@ namespace Cubes.Core.Base
 
         public IEnumerable<ApplicationManifest> GetLoadedeApplications() => this.loadedApplications.AsReadOnly();
 
+        public IEnumerable<IApplication> GetApplicationInstances() => this.applicationInstances.AsReadOnly();
 
-        public IEnumerable<IApplication> GetApplicationInstances() => this.applicationInstances;
-
-        public void RegisterSwaggerXmlFile(string xmlFile)
-        {
-            if (!String.IsNullOrEmpty(xmlFile))
-                this.swaggerFiles.Add(xmlFile);
-        }
-
-        public IEnumerable<string> GetSwaggerFiles() => this.swaggerFiles;
+        public IEnumerable<string> GetSwaggerXmlFiles() => this.swaggerXmlFiles.AsReadOnly();
         #endregion
 
         // The following method is used for environment - server setup only.
@@ -137,6 +120,9 @@ namespace Cubes.Core.Base
 
             // Load assemblies and applications
             LoadApplications();
+
+            // Gather Swagger files
+            CollectSwaggerXmlFiles();
 
             // Create settings files
             CreateSettingsFile();
@@ -323,6 +309,15 @@ namespace Cubes.Core.Base
                     throw new ArgumentException($"Root folder must be writable by cubes process: \"{rootFolder}\"!", x);
                 }
             }
+        }
+
+        // Gather Swagger files
+        private void CollectSwaggerXmlFiles()
+        {
+            var assemblyPath = fileSystem.Path.GetDirectoryName(this.GetType().Assembly.Location);
+            this.swaggerXmlFiles.Add(fileSystem.Path.Combine(assemblyPath, "Cubes.Core.xml"));
+            foreach (var application in this.GetApplicationInstances())
+                this.swaggerXmlFiles.AddRange(application.GetSwaggerXmlFiles());
         }
     }
 }

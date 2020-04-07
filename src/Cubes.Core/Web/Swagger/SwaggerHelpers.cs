@@ -38,7 +38,7 @@ namespace Cubes.Core.Web.Swager
                 });
 
                 var swaggerFiles = cubesConfig
-                    .SwaggerFiles
+                    .SwaggerXmlFiles
                     .Where(File.Exists)
                     .ToList();
                 foreach (var xmlfile in swaggerFiles)

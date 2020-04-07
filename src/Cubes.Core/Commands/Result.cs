@@ -15,7 +15,7 @@ namespace Cubes.Core.Commands
         public string Message { get; set; }
 
         /// <summary>
-        /// The actual response of type <see cref="TResponse"/>
+        /// The actual response of type TResponse
         /// </summary>
         public TResponse Response { get; set; }
 
@@ -26,7 +26,7 @@ namespace Cubes.Core.Commands
         public Exception ExceptionThrown { get; set; }
 
         /// <summary>
-        /// The actual response of type <see cref="TResponse"/>
+        /// The actual response of type TResponse
         /// To be used when Response type is not known
         /// </summary>
         object IResult.Response { get => Response; }

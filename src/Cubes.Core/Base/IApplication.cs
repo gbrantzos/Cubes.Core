@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,10 +31,9 @@ namespace Cubes.Core.Base
         /// <returns></returns>
         ContainerBuilder RegisterServices(ContainerBuilder builder);
 
-        // TODO Redesign
         /// <summary>
         /// File to be used for Swagger documentation
         /// </summary>
-        string SwaggerXmlFile { get; }
+        IEnumerable<string> GetSwaggerXmlFiles();
     }
 }

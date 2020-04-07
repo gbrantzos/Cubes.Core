@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using Autofac;
 
 namespace Cubes.Core.Base
 {
@@ -44,19 +42,11 @@ namespace Cubes.Core.Base
         /// <returns><see cref="IEnumerable{IApplication}"/></returns>
         IEnumerable<IApplication> GetApplicationInstances();
 
-        // TODO Redesign
-        /// <summary>
-        /// Add an XML file for Swagger documentation.
-        /// </summary>
-        /// <param name="xmlFile">XML file path</param>
-        void RegisterSwaggerXmlFile(string xmlFile);
-
-        // TODO Redesign
         /// <summary>
         /// Get all Swagger registered XML files.
         /// </summary>
         /// <returns></returns>
-        IEnumerable<string> GetSwaggerFiles();
+        IEnumerable<string> GetSwaggerXmlFiles();
     }
 
     public class AssemblyDetails
