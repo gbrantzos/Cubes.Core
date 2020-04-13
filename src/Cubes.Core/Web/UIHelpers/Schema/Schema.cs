@@ -14,6 +14,7 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public IEnumerable<SchemaItem> Items => items.AsEnumerable();
 
         // Helper for Fluent API
+        [JsonIgnore]
         public SchemaItem WithItem
         {
             get

@@ -10,7 +10,7 @@ namespace Cubes.Core.Commands
         /// <summary>
         /// Send a request without knowing the result type.
         /// <para>
-        /// Although this method returns dynamic we can safely assume it will return an awaitable
+        /// Although this method returns dynamic we can safely assume it will return an await-able
         /// with <see cref="IResult"/> instance as result.
         /// </para>
         /// </summary>
@@ -40,9 +40,13 @@ namespace Cubes.Core.Commands
         /// <param name="type">The type to check</param>
         /// <returns></returns>
         public static bool IsMediatorRequest(this Type type)
-            => type.GetInterfaces().Any(i => i.IsGenericType
-            && i.GetGenericTypeDefinition().Equals(typeof(IRequest<>)))
-            && type.IsClass && !type.IsAbstract;
+            => type.GetInterfaces()
+                .Any(i =>
+                    i.IsGenericType &&
+                    i.GetGenericTypeDefinition().Equals(typeof(IRequest<>))
+                )
+                && type.IsClass
+                && !type.IsAbstract;
 
         /// <summary>
         /// Get corresponding response type from given request type
@@ -52,8 +56,7 @@ namespace Cubes.Core.Commands
         private static Type GetRequestType(this Type requestType)
             => requestType
                 .GetInterfaces()
-                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequest<>))
-                .FirstOrDefault()?
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequest<>))?
                 .GetGenericArguments()?
                 .FirstOrDefault();
     }
