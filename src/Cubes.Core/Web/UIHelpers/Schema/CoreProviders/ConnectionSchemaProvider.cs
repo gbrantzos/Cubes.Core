@@ -17,6 +17,6 @@ namespace Cubes.Core.Web.UIHelpers.Schema.CoreProviders
                 .WithText("name", Validator.Required(), Validator.Pattern(@"^\S+$"))
                 .WithText("comments")
                 .WithSelect("dbProvider", "Database Provider", lookupProvider.Get().ToOptions(), Validator.Required())
-                .WithTextArea("connectionString", 2, Validator.Required());
+                .WithTextArea("connectionString", 3, Validator.Required());
     }
 }
