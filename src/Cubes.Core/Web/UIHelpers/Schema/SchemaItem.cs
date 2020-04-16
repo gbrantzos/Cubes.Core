@@ -10,7 +10,8 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         Textarea,
         Select,
         Checkbox,
-        Datepicker
+        Datepicker,
+        Password
     }
 
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
@@ -23,6 +24,7 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public SchemaItemType Type { get; set; }
 
         public int? TextareaRows { get; set; }
+        public int? TextareaMaxRows { get; set; }
         public Options Options { get; set; }
         public ICollection<Validator> Validators { get; set; } = new List<Validator>();
         public string ClassName { get; set; }

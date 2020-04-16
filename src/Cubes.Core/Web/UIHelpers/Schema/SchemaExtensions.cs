@@ -90,5 +90,16 @@ namespace Cubes.Core.Web.UIHelpers.Schema
 
         public static Schema WithSelect(this Schema schema, string key, Options options, params Validator[] validators)
             => schema.WithSelect(key, String.Empty, options, validators);
+
+        public static Schema WithPassword(this Schema schema, string key, string label, params Validator[] validators)
+        {
+            var item = CreateItem(key, label, SchemaItemType.Password, validators);
+            schema.AddItem(item);
+
+            return schema;
+        }
+
+        public static Schema WithPassword(this Schema schema, string key, params Validator[] validators)
+            => schema.WithPassword(key, String.Empty, validators);
     }
 }

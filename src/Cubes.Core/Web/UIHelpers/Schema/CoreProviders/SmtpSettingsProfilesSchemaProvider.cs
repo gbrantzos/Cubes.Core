@@ -14,6 +14,6 @@ namespace Cubes.Core.Web.UIHelpers.Schema.CoreProviders
                 .WithText("sender", Validator.Required())
                 .WithCheckbox("useSsl", "Use SSL")
                 .WithText("userName")
-                .WithText("password");
+                .WithPassword("password");
     }
 }

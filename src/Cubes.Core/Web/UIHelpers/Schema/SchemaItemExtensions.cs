@@ -31,16 +31,17 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public static SchemaItem Text(this SchemaItem item, string key, params Validator[] validators)
             => item.Text(key, String.Empty, validators);
 
-        public static SchemaItem TextArea(this SchemaItem item, string key, string label, int rows = 4, params Validator[] validators)
+        public static SchemaItem TextArea(this SchemaItem item, string key, string label, int rows = 4, int maxRows = 4, params Validator[] validators)
         {
             ApplyProperties(item, key, label, SchemaItemType.Textarea, validators);
             item.TextareaRows = rows;
+            item.TextareaMaxRows = maxRows;
 
             return item;
         }
 
-        public static SchemaItem TextArea(this SchemaItem item, string key, int rows = 4, params Validator[] validators)
-            => item.TextArea(key, String.Empty, rows, validators);
+        public static SchemaItem TextArea(this SchemaItem item, string key, int rows = 4, int maxRows = 4, params Validator[] validators)
+            => item.TextArea(key, String.Empty, rows, maxRows, validators);
 
         public static SchemaItem Checkbox(this SchemaItem item, string key, string label, params Validator[] validators)
         {

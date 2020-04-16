@@ -9,7 +9,7 @@ namespace Cubes.Core.Web.UIHelpers.Schema.CoreProviders
                .WithText("name", Validator.Required(), Validator.Pattern(@"^\S+$"))
                .WithText("comments")
                .WithItem
-                    .TextArea("queryCommand", 8, Validator.Required())
+                    .TextArea("queryCommand", 8, 30, Validator.Required())
                     .HasClass("code")
                     .Build();
     }
