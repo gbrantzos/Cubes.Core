@@ -31,6 +31,7 @@ namespace Cubes.Core.Email
     public class SmtpSettings
     {
         public string Name                 { get; set; }
+        public string Comments             { get; set; }
         public string Host                 { get; set; }
         public int Port                    { get; set; }
         public int Timeout                 { get; set; }
@@ -39,11 +40,12 @@ namespace Cubes.Core.Email
         public SmtpCredentials Credentials { get; set; }
         public SmtpSettings()
         {
-            Name    = "Default";
-            Host    = "localhost";
-            Port    = 25;
-            Timeout = 600;
-            Sender  = "no-reply@somewhere.com";
+            Name     = "Default";
+            Comments = "Default SMTP profile";
+            Host     = "localhost";
+            Port     = 25;
+            Timeout  = 600;
+            Sender   = "no-reply@somewhere.com";
 
             /*Credentials = new SmtpCredentials
             {

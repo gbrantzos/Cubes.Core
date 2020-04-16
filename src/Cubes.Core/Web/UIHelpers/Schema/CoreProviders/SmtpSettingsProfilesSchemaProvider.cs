@@ -6,7 +6,8 @@ namespace Cubes.Core.Web.UIHelpers.Schema.CoreProviders
     {
         public override Schema GetSchema()
             => Schema.Create(this.Name, "SMTP Profiles")
-                .WithText("name", Validator.Required())
+                .WithText("name", Validator.Required(), Validator.Pattern(@"^\S+$"))
+                .WithText("comments")
                 .WithText("host", Validator.Required())
                 .WithText("port", Validator.Required(), Validator.Min(25))
                 .WithText("timeout", Validator.Required())
