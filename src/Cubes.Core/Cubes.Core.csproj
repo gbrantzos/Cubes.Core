@@ -14,6 +14,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="BuildDate.txt" />
+    <None Remove="Web\Resources\daffy-duck.png" />
     <None Remove="Web\Resources\index.html" />
     <None Remove="Web\Swagger\Themes\theme-feeling-blue.css" />
     <None Remove="Web\Swagger\Themes\theme-flattop.css" />

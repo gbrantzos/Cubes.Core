@@ -99,7 +99,7 @@ namespace Cubes.Core.Utilities
         }
 
         // This code added to correctly implement the disposable pattern.
-        public void Dispose() => Dispose(true);
+        public void Dispose() { Dispose(true); }
         #endregion
     }
 
