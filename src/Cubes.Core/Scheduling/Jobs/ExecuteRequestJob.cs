@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
+using Cubes.Core.Base;
 using Cubes.Core.Commands;
 using Cubes.Core.Email;
-using Cubes.Core.Base;
 using Cubes.Core.Utilities;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -14,6 +13,7 @@ using Quartz;
 
 namespace Cubes.Core.Scheduling.Jobs
 {
+    [Display("Execute Request")]
     public class ExecuteRequestJob : BaseQuartzJob
     {
         private static readonly string Request_Type          = "RequestType";

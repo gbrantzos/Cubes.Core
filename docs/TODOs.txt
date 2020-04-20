@@ -10,10 +10,6 @@
 |   Cubes Management Console (UI Shell)                                        |
 +------------------------------------------------------------------------------+
 
-* Scheduling:
-    - Job definition and editing
-    - Scheduler status and control
-
 * Dynamic form improvements:
     - Use fxLayout library
     - Support groups

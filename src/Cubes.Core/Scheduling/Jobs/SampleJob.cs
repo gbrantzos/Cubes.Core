@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Cubes.Core.Utilities;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
@@ -7,6 +8,7 @@ namespace Cubes.Core.Scheduling.Jobs
 {
     // Sample Job for testing
     [DisallowConcurrentExecution]
+    [Display("Sample Job")]
     public class SampleJob : IJob
     {
         private readonly ILogger<SampleJob> logger;
