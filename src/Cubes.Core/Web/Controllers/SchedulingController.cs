@@ -89,7 +89,7 @@ namespace Cubes.Core.Web.Controllers
         /// </remarks>
         /// <returns></returns>
         [HttpPost, Route("save")]
-        public IActionResult SaveJob([FromBody] SchedulerJob[] jobs)
+        public async Task<IActionResult> SaveJob([FromBody] SchedulerJob[] jobs)
         {
             var settings = new SchedulerSettings { Jobs = jobs };
             try
@@ -100,7 +100,11 @@ namespace Cubes.Core.Web.Controllers
             }
             this.configurationWriter.Save(settings);
 
-            return Ok("Scheduler settings saved!");
+            // Give some time to IConfiguration to grab changes!
+            await Task.Delay(1500);
+            await scheduler.Reload();
+
+            return Ok(await scheduler.GetStatus());
         }
     }
 }
