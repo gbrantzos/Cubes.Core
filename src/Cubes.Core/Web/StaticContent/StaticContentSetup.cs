@@ -57,9 +57,12 @@ namespace Cubes.Core.Web.StaticContent
                         {
                             await next();
                             var fullRequest = context.Request.PathBase.Value + context.Request.Path.Value;
-                            if (context.Response.StatusCode == 404 && !Path.HasExtension(fullRequest))
+                            if (context.Response.StatusCode == 404
+                                && !Path.HasExtension(fullRequest)
+                                && !Directory.Exists(fullRequest))
                             {
                                 // Fall back to SPA entry point
+                                context.Response.StatusCode = 200;
                                 await context.Response.SendFileAsync(Path.Combine(rootPath, item.FileSystemPath, item.DefaultFile));
                             }
                         });
@@ -117,9 +120,12 @@ namespace Cubes.Core.Web.StaticContent
                 {
                     await next();
                     var fullRequest = context.Request.PathBase.Value + context.Request.Path.Value;
-                    if (context.Response.StatusCode == 404 && !Path.HasExtension(fullRequest))
+                    if (context.Response.StatusCode == 404
+                        && !Path.HasExtension(fullRequest)
+                        && !Directory.Exists(fullRequest))
                     {
                         // Fall back to SPA entry point
+                        context.Response.StatusCode = 200;
                         await zfs.GetFileInfo("index.html")
                             .CreateReadStream()
                             .CopyToAsync(context.Response.Body);
