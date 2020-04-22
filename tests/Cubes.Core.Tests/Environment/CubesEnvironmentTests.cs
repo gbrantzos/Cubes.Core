@@ -31,7 +31,7 @@ namespace Cubes.Core.Tests.Environment
                     It.IsAny<Exception>(),
                     It.IsAny<Func<Object, Exception, string>>()))
                 .Verifiable();
-            var unitUnderTest = new CubesEnvironment("C:\\Cubes", new ApplicationManifest[] { }, loggerMock.Object, fileSystem);
+            var unitUnderTest = new CubesEnvironment("C:\\Cubes", "", new ApplicationManifest[] { }, loggerMock.Object, fileSystem);
 
             // Act
             unitUnderTest.PrepareHost();
