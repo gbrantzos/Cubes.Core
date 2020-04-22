@@ -20,12 +20,13 @@ namespace Cubes.Core.Scheduling
         public static readonly string MessageKey = "CubesScheduling::JobResult";
         private class SchedulerJobDetails
         {
-            public string Name { get; set; }
-            public string CronExpression { get; set; }
-            public JobKey JobKey { get; set; }
+            public string Name                      { get; set; }
+            public string CronExpression            { get; set; }
+            public bool RefireIfMissed              { get; set; }
+            public JobKey JobKey                    { get; set; }
             public Exception LastExecutionException { get; set; }
-            public bool LastExecutionFailed { get; set; }
-            public string LastExecutionMessage { get; set; }
+            public bool LastExecutionFailed         { get; set; }
+            public string LastExecutionMessage      { get; set; }
         }
 
         private readonly IJobFactory jobFactory;
@@ -158,7 +159,7 @@ namespace Cubes.Core.Scheduling
                 {
                     Name                 = name,
                     Active               = triggerActive,
-                    RefireIfMissed       = trigger?.MisfireInstruction == 1,
+                    RefireIfMissed       = internalDetail.RefireIfMissed,
                     JobType              = jobDetail.JobType.FullName,
                     CronExpression       = cronExpression,
                     PreviousFireTime     = trigger?.GetPreviousFireTimeUtc()?.ToLocalTime().DateTime,
@@ -250,6 +251,7 @@ namespace Cubes.Core.Scheduling
                         await quartzScheduler.AddJob(quartzJob, true, true, cancellationToken);
 
                     details.JobKey = quartzJob.Key;
+                    details.RefireIfMissed = job.RefireIfMissed;
                     internalDetails.Add(details);
                 }
 
