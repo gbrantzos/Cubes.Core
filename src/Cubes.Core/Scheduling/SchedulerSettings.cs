@@ -38,6 +38,7 @@ namespace Cubes.Core.Scheduling
             {
                 Name           = "Sample Job",
                 Active         = false,
+                RefireIfMissed = true,
                 JobType        = typeof(SampleJob).FullName,
                 CronExpression = "0/45 * * * * ?",
             });
@@ -49,6 +50,7 @@ namespace Cubes.Core.Scheduling
     {
         public string Name                           { get; set; }
         public bool Active                           { get; set; } = true;
+        public bool RefireIfMissed                   { get; set; } = true;
         public string CronExpression                 { get; set; }
         public string JobType                        { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
@@ -89,7 +91,13 @@ namespace Cubes.Core.Scheduling
                 .Create()
                 .WithIdentity($"{Name} - {jobType.FullName}.Trigger")
                 .WithDescription(CronExpression)
-                .WithCronSchedule(CronExpression)
+                .WithCronSchedule(CronExpression, i =>
+                {
+                    if (RefireIfMissed)
+                        i.WithMisfireHandlingInstructionFireAndProceed();
+                    else
+                        i.WithMisfireHandlingInstructionDoNothing();
+                })
                 .Build();
         }
 

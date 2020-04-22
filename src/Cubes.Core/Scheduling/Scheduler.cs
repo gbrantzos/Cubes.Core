@@ -17,12 +17,15 @@ namespace Cubes.Core.Scheduling
 {
     public class Scheduler : IScheduler
     {
+        public static readonly string MessageKey = "CubesScheduling::JobResult";
         private class SchedulerJobDetails
         {
             public string Name { get; set; }
             public string CronExpression { get; set; }
             public JobKey JobKey { get; set; }
             public Exception LastExecutionException { get; set; }
+            public bool LastExecutionFailed { get; set; }
+            public string LastExecutionMessage { get; set; }
         }
 
         private readonly IJobFactory jobFactory;
@@ -124,7 +127,7 @@ namespace Cubes.Core.Scheduling
             var result = new SchedulerStatus
             {
                 ServerTime = DateTime.Now,
-                Jobs       = new List<SchedulerJobStatus>()
+                Jobs = new List<SchedulerJobStatus>()
             };
             if (failedToLoad)
             {
@@ -140,12 +143,12 @@ namespace Cubes.Core.Scheduling
             var jobKeys = await quartzScheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
             foreach (var key in jobKeys)
             {
-                var jobDetail      = await quartzScheduler.GetJobDetail(key, cancellationToken);
-                var triggers       = await quartzScheduler.GetTriggersOfJob(key, cancellationToken);
-                var trigger        = triggers.FirstOrDefault();
+                var jobDetail = await quartzScheduler.GetJobDetail(key, cancellationToken);
+                var triggers = await quartzScheduler.GetTriggersOfJob(key, cancellationToken);
+                var trigger = triggers.FirstOrDefault();
 
                 var internalDetail = internalDetails.First(dt => dt.JobKey.Equals(jobDetail.Key));
-                var name           = internalDetail.Name;
+                var name = internalDetail.Name;
                 var cronExpression = internalDetail.CronExpression;
 
                 var triggerActive = trigger != null &&
@@ -153,29 +156,24 @@ namespace Cubes.Core.Scheduling
 
                 var jobStatus = new SchedulerJobStatus
                 {
-                    Name                      = name,
-                    Active                    = triggerActive,
-                    JobType                   = jobDetail.JobType.FullName,
-                    CronExpression            = cronExpression,
-                    PreviousFireTime          = trigger?.GetPreviousFireTimeUtc()?.ToLocalTime().DateTime,
-                    NextFireTime              = trigger?.GetNextFireTimeUtc()?.ToLocalTime().DateTime,
-                    JobParameters             = jobDetail
+                    Name                 = name,
+                    Active               = triggerActive,
+                    RefireIfMissed       = trigger?.MisfireInstruction == 1,
+                    JobType              = jobDetail.JobType.FullName,
+                    CronExpression       = cronExpression,
+                    PreviousFireTime     = trigger?.GetPreviousFireTimeUtc()?.ToLocalTime().DateTime,
+                    NextFireTime         = trigger?.GetNextFireTimeUtc()?.ToLocalTime().DateTime,
+                    JobParameters        = jobDetail
                         .JobDataMap
-                        .ToDictionary(p => p.Key, p =>p.Value.ToString())
+                        .ToDictionary(p  => p.Key, p => p.Value.ToString()),
+                    LastExecutionFailed  = internalDetail.LastExecutionFailed,
+                    LastExecutionMessage = internalDetail.LastExecutionMessage
                 };
                 if (!String.IsNullOrEmpty(jobStatus.CronExpression))
                 {
                     jobStatus.CronExpressionDescription = ExpressionDescriptor
                         .GetDescription(jobStatus.CronExpression)
                         .ToLowerFirstChar();
-                }
-
-                if (internalDetail.LastExecutionException != null)
-                {
-                    var all = internalDetail
-                        .LastExecutionException
-                        .GetAllMessages();
-                    jobStatus.FailureMessage = String.Join(Environment.NewLine, all);
                 }
 
                 result.Jobs.Add(jobStatus);
@@ -265,7 +263,7 @@ namespace Cubes.Core.Scheduling
             }
         }
 
-        internal void AddExecutionResults(JobKey jobKey, Exception exception)
+        internal void AddExecutionResults(JobKey jobKey, Exception exception, string message)
         {
             var internalDetail = internalDetails
                 .FirstOrDefault(dt => dt.JobKey.Equals(jobKey));
@@ -273,6 +271,16 @@ namespace Cubes.Core.Scheduling
                 throw new ArgumentException($"Invalid job key: {jobKey}");
 
             internalDetail.LastExecutionException = exception;
+            internalDetail.LastExecutionFailed = exception == null;
+            if (exception != null)
+            {
+                var allMesages = exception.GetAllMessages();
+                internalDetail.LastExecutionMessage = String.Join(Environment.NewLine, allMesages);
+            }
+            else
+                internalDetail.LastExecutionMessage = String.IsNullOrEmpty(message)
+                    ? "Execution was successful!"
+                    : message;
         }
 
         private class JobListener : IJobListener
@@ -291,7 +299,14 @@ namespace Cubes.Core.Scheduling
 
             public Task JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException, CancellationToken cancellationToken = default)
             {
-                scheduler.AddExecutionResults(context.JobDetail.Key, jobException);
+                string message = String.Empty;
+                try
+                { message = context.Get(Scheduler.MessageKey).ToString(); }
+                catch { /* No big deal, just swallow and continue */}
+
+                if (String.IsNullOrEmpty(message) && context.Result != null)
+                    message = context.Result?.ToString();
+                scheduler.AddExecutionResults(context.JobDetail.Key, jobException, message);
                 return Task.CompletedTask;
             }
         }
