@@ -49,8 +49,6 @@ namespace Cubes.Core.Scheduling
             schedulerConfiguration = new ConfigurationBuilder()
                 .AddYamlFile(configurationPath, optional: true, reloadOnChange: true)
                 .Build();
-
-            schedulerConfiguration.OnChange(async () => await Reload());
         }
 
         #region IJobScheduler methods

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Cubes.Core.Configuration;
@@ -134,8 +135,24 @@ namespace Cubes.Core.Web.Controllers
                 var dynamicParameters = new DynamicParameters();
                 if (Request.Query.Count > 0)
                 {
+                    var nullValues = Request.Query.ContainsKey("nulls") ?
+                        Request.Query["nulls"].ToArray() :
+                        Enumerable.Empty<string>();
                     foreach (var item in Request.Query)
-                        dynamicParameters.Add(item.Key, item.Value.FirstOrDefault());
+                    {
+                        if (item.Key == "nulls") continue;
+                        var prm = query.Parameters.FirstOrDefault(p => p.Name == item.Key);
+
+                        if (prm == null)
+                            throw new ArgumentException($"Parameter '{item.Key}' is not defined in the query!");
+                        if (!Enum.TryParse(typeof(DbType), prm.DbType, out var dbType))
+                            throw new ArgumentOutOfRangeException($"{prm.DbType} is not a valid DbType");
+
+                        if (nullValues.Contains(item.Key))
+                            dynamicParameters.Add(item.Key, DBNull.Value, (DbType)dbType);
+                        else
+                            dynamicParameters.Add(item.Key, item.Value.FirstOrDefault(), (DbType)dbType);
+                    }
                 }
                 var result = cnx.Query<dynamic>(query.QueryCommand, dynamicParameters);
 
