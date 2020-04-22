@@ -21,6 +21,7 @@ namespace Cubes.Core.Utilities
         private ZipArchive archive;
         private List<ZipArchiveEntry> entries;
         private FileSystemWatcher fileWatcher;
+        private PhysicalFileProvider physicalFileProvider;
         private char pathSeparator = '/';
         private int readTries = 0;
         private bool disposedValue = false;
@@ -42,6 +43,8 @@ namespace Cubes.Core.Utilities
             fileWatcher.Created += (s, e) => debouncer.Debouce(() => ProcessZip());
             fileWatcher.Renamed += (s, e) => debouncer.Debouce(() => ProcessZip());
             fileWatcher.EnableRaisingEvents = true;
+
+            physicalFileProvider = new PhysicalFileProvider(fileWatcher.Path);
         }
 
         public CompressedFileProvider(string filePath) : this(filePath, String.Empty) { }
@@ -107,10 +110,7 @@ namespace Cubes.Core.Utilities
             return new CompressedDirectoryContents(contents);
         }
 
-        public IChangeToken Watch(string filter)
-        {
-            throw new NotImplementedException();
-        }
+        public IChangeToken Watch(string filter) => physicalFileProvider.Watch(filter);
 
         #region IDisposable Support
         protected virtual void Dispose(bool disposing)

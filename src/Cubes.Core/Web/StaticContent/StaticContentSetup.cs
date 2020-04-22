@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+using OfficeOpenXml.Packaging.Ionic.Zip;
 
 namespace Cubes.Core.Web.StaticContent
 {
@@ -95,12 +97,12 @@ namespace Cubes.Core.Web.StaticContent
 
             if (!File.Exists(zipPath))
             {
-                logger.LogWarning($"Could not load Cubes Management application from path: {zipPath}");
+                logger.LogWarning($"Could not load 'Cubes Management' application from path: {zipPath}");
                 return app;
             }
             else
             {
-                logger.LogInformation($"Serving Cubes management from {zipPath}, request path '/admin'.");
+                logger.LogInformation($"Serving 'Cubes Management' from {zipPath}, request path '/admin'.");
             }
 
             var zfs     = new CompressedFileProvider(zipPath);
@@ -112,6 +114,12 @@ namespace Cubes.Core.Web.StaticContent
             };
             options.DefaultFilesOptions.DefaultFileNames.Clear();
             options.DefaultFilesOptions.DefaultFileNames.Add("index.html");
+            var fileName = Path.GetFileName(zipPath);
+            var debouncer = new Debouncer();
+            Action call = () => logger.LogInformation($"File {fileName} changed, 'Cubes Management' should be reloaded!");
+            ChangeToken.OnChange(
+                () => zfs.Watch(fileName),
+                () => debouncer.Debouce(call));
 
             app.Map(new PathString("/admin"), builder =>
             {

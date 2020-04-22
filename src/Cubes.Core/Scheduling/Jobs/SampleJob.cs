@@ -22,11 +22,11 @@ namespace Cubes.Core.Scheduling.Jobs
 
             logger.LogInformation("Sample Job executed at {executionTime}...", DateTime.Now);
 
-            throw new JobExecutionException("Execution failed!", new ArgumentException("Failed to do something interesting!"));
-            //const string message = "Sample job finished successfully!";
-            //context.Result = new { IsError = false, Message = message };
-            //context.Put(Scheduler.MessageKey, message);
-            //return Task.CompletedTask;
+            //throw new JobExecutionException("Execution failed!", new ArgumentException("Failed to do something interesting!"));
+            const string message = "Sample job finished successfully!";
+            context.Result = new { IsError = false, Message = message };
+            context.Put(Scheduler.MessageKey, message);
+            return Task.CompletedTask;
         }
     }
 }
