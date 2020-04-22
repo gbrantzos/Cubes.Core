@@ -11,6 +11,7 @@ namespace Cubes.Core.Base
     {
         public string Version                      { get; set; }
         public string RootFolder                   { get; set; }
+        public string AdminPath                    { get; set; }
         public string ContentFolder                { get; set; }
         public string LibrariesFolder              { get; set; }
         public string LogsFolder                   { get; set; }
@@ -32,6 +33,7 @@ namespace Cubes.Core.Base
                 {
                     { $"{section}:Version"        , cubes.GetEnvironmentInformation().FullVersion },
                     { $"{section}:RootFolder"     , cubes.GetRootFolder() },
+                    { $"{section}:AdminPath"      , cubes.GetAdminPath() },
                     { $"{section}:ContentFolder"  , cubes.GetFolder(CubesFolderKind.Content) },
                     { $"{section}:LibrariesFolder", cubes.GetFolder(CubesFolderKind.Libraries) },
                     { $"{section}:LogsFolder"     , cubes.GetFolder(CubesFolderKind.Logs) },

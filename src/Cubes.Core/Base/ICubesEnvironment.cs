@@ -13,10 +13,16 @@ namespace Cubes.Core.Base
         string GetFolder(CubesFolderKind folderKind);
 
         /// <summary>
-        /// Get Cubes binaries folder
+        /// Get Cubes binaries folder.
         /// </summary>
         /// <returns></returns>
         string GetBinariesFolder();
+
+        /// <summary>
+        /// Get Cubes Management web application path.
+        /// </summary>
+        /// <returns></returns>
+        string GetAdminPath();
 
         /// <summary>
         /// Cubes environment information.

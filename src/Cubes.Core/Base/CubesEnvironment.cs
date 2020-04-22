@@ -30,6 +30,7 @@ namespace Cubes.Core.Base
 
         private readonly static string Platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "win" : "unix";
         private readonly string rootFolder;
+        private readonly string adminPath;
         private readonly IEnumerable<ApplicationManifest> applicationManifests;
         private readonly ILogger logger;
         private readonly IFileSystem fileSystem;
@@ -44,15 +45,18 @@ namespace Cubes.Core.Base
         /// Constructor that accepts <see cref="IFileSystem"/> to support unit testing.
         /// </summary>
         /// <param name="rootFolder">Cubes root folder.</param>
+        /// <param name="adminPath">Path where Cubes Management web application is located.</param>
         /// <param name="applications">Application manifests defined using environment variables or command line parameters.</param>
         /// <param name="logger">The logger to use</param>
         /// <param name="fileSystem"></param>
         public CubesEnvironment(string rootFolder,
+            string adminPath,
             IEnumerable<ApplicationManifest> applications,
             ILogger logger,
             IFileSystem fileSystem)
         {
             this.rootFolder             = rootFolder;
+            this.adminPath              = adminPath;
             this.logger                 = logger;
             this.fileSystem             = fileSystem;
 
@@ -63,7 +67,10 @@ namespace Cubes.Core.Base
             this.loadedAssemblies       = new List<AssemblyDetails>();
             this.loadedApplications     = new List<ApplicationManifest>();
             this.swaggerXmlFiles        = new List<string>();
+
             CheckRootFolderExistance(rootFolder);
+            if (!fileSystem.File.Exists(adminPath))
+                adminPath = fileSystem.Path.Combine(rootFolder, adminPath);
 
             // Cubes information
             var figgle = FiggleFonts.Slant.Render(" Cubes v5");
@@ -81,14 +88,17 @@ namespace Cubes.Core.Base
         /// Create a CubesEnvironment.
         /// </summary>
         /// <param name="rootFolder">Cubes root folder.</param>
+        /// <param name="adminPath">Path where Cubes Management web application is located.</param>
         /// <param name="applications">Application manifests defined using environment variables or command line parameters.</param>
         /// <param name="logger">The logger to use</param>
-        public CubesEnvironment(string rootFolder, IEnumerable<ApplicationManifest> applications, ILogger logger)
-            : this(rootFolder, applications, logger, new FileSystem()) { }
+        public CubesEnvironment(string rootFolder, string adminPath, IEnumerable<ApplicationManifest> applications, ILogger logger)
+            : this(rootFolder, adminPath, applications, logger, new FileSystem()) { }
 
         #region ICubesEnvironment implementation
         public string GetBinariesFolder()
             => fileSystem.Path.GetDirectoryName(typeof(CubesEnvironment).Assembly.Location);
+
+        public string GetAdminPath() => adminPath;
 
         public string GetFolder(CubesFolderKind folderKind)
             => folderKind == CubesFolderKind.Root ? rootFolder : fileSystem.Path.Combine(rootFolder, folderKind.ToString());

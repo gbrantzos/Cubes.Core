@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 
@@ -20,33 +21,61 @@ namespace Cubes.Core.Utilities
         private ZipArchive archive;
         private List<ZipArchiveEntry> entries;
         private FileSystemWatcher fileWatcher;
+        private char pathSeparator = '/';
+        private int readTries = 0;
         private bool disposedValue = false;
 
         public CompressedFileProvider(string filePath,string rootFolder)
         {
+            var debouncer = new Debouncer(TimeSpan.FromSeconds(2));
             this.filePath   = filePath.ThrowIfEmpty(nameof(filePath));
             this.rootFolder = rootFolder.ThrowIfNull(nameof(rootFolder));
 
-            Initialize();
+            ProcessZip();
 
             var actualPath = Path.GetFullPath(filePath);
-            fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(actualPath), Path.GetFileName(actualPath));
-            fileWatcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
-            fileWatcher.Changed += (s, e) => { Initialize(); };
+            fileWatcher = new FileSystemWatcher();
+            fileWatcher.Path = Path.GetDirectoryName(actualPath);
+            fileWatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
+            fileWatcher.Filter = Path.GetFileName(actualPath);
+            fileWatcher.Changed += (s, e) => debouncer.Debouce(() => ProcessZip());
+            fileWatcher.Created += (s, e) => debouncer.Debouce(() => ProcessZip());
+            fileWatcher.Renamed += (s, e) => debouncer.Debouce(() => ProcessZip());
             fileWatcher.EnableRaisingEvents = true;
         }
 
         public CompressedFileProvider(string filePath) : this(filePath, String.Empty) { }
 
-        private void Initialize()
+        private void ProcessZip()
         {
-            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            inMemoryZip = new MemoryStream();
-            fileStream.CopyTo(inMemoryZip);
+            try
+            {
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                inMemoryZip = new MemoryStream();
+                fileStream.CopyTo(inMemoryZip);
+            }
+            catch (IOException ex)
+            {
+                // Cannot access file? Possibly someone else is working with it. Retry...
+                readTries++;
+                if (readTries >= 3)
+                    throw new Exception($"Could not precess changes on file {filePath}", ex);
+                Thread.Sleep(1000);
+                ProcessZip();
+            }
 
+            readTries = 0;
             archive = new ZipArchive(inMemoryZip, ZipArchiveMode.Read);
             cache   = new ConcurrentDictionary<string, IFileInfo>();
             entries = archive.Entries.ToList();
+
+            var temp = entries
+                .First(e => e.FullName.Contains('/') || e.FullName.Contains('\\'))
+                .FullName;
+            if (temp.Contains('/'))
+                pathSeparator = '/';
+            if (temp.Contains('\\'))
+                pathSeparator = '\\';
         }
 
         public IFileInfo GetFileInfo(string subpath)
@@ -55,7 +84,7 @@ namespace Cubes.Core.Utilities
                 subpath = subpath[1..];
             if (!String.IsNullOrEmpty(rootFolder))
                 subpath = $"{rootFolder}/{subpath}";
-            subpath = subpath.Replace('/', Path.DirectorySeparatorChar);
+            subpath = subpath.Replace('/', pathSeparator);
 
             if (!cache.TryGetValue(subpath, out var fi))
             {

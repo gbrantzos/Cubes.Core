@@ -91,5 +91,32 @@ namespace Cubes.Core.Base
 
             return toReturn;
         }
+
+        /// <summary>
+        /// Get the path where CubesManagement.zip is located, to server Cubes Management web application.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static string GetAdminPath(string[] args)
+        {
+            var argsList = args == null ? Enumerable.Empty<string>().ToList() : args.ToList();
+            var toReturn = String.Empty;
+
+            var adminFromVariable = Environment.GetEnvironmentVariable("CUBES_ADMINPATH");
+            if (!String.IsNullOrEmpty(adminFromVariable))
+                toReturn = adminFromVariable;
+
+            if (args.Length > 0)
+            {
+                int argIndex = argsList.FindIndex(arg => arg.Equals("--adminPath", StringComparison.OrdinalIgnoreCase));
+                if (argIndex != -1 && (argIndex + 1) < args.Length)
+                    toReturn = argsList[argIndex + 1];
+            }
+
+            string fallBack = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                "CubesManagement.zip");
+            return String.IsNullOrEmpty(toReturn) ? fallBack : toReturn;
+        }
     }
 }

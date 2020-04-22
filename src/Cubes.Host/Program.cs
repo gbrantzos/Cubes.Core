@@ -41,11 +41,13 @@ namespace Cubes.Host
             try
             {
                 var rootFolder   = CubesEnvironmentHelpers.GetRootFolder(args);
+                var adminPath    = CubesEnvironmentHelpers.GetAdminPath(args);
                 var applications = CubesEnvironmentHelpers.GetApplications(rootFolder, args);
                 using ILoggerProvider loggerProvider = GetNLogProvider(rootFolder);
 
                 var cubesEnvironment = new CubesEnvironment(
                     rootFolder   : rootFolder,
+                    adminPath    : adminPath,
                     applications : applications,
                     logger       : loggerProvider.CreateLogger(typeof(CubesEnvironment).FullName));
                 cubesEnvironment.PrepareHost();

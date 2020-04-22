@@ -87,37 +87,30 @@ namespace Cubes.Core.Web.StaticContent
             IConfiguration configuration,
             ILoggerFactory loggerFactory)
         {
-            var zipPath     = configuration.GetValue(CubesConstants.Config_HostManagementAppPackage, String.Empty);
-            var zipRoot     = configuration.GetValue(CubesConstants.Config_HostManagementAppPackageRoot, String.Empty);
-            var requestPath = configuration.GetValue(CubesConstants.Config_HostManagementAppRequestPath, String.Empty);
-            var logger      = loggerFactory.CreateLogger<Content>();
+            var zipPath = configuration.GetCubesConfiguration().AdminPath;
+            var logger  = loggerFactory.CreateLogger<Content>();
 
-            if (zipPath.StartsWith("~"))
-            {
-                // Path relative to bin path
-                var binariesPath = configuration.GetCubesConfiguration().BinariesFolder;
-                zipPath = zipPath[1..];
-
-                zipPath = Path.Combine(binariesPath, zipPath);
-                zipPath = Path.GetFullPath(zipPath);
-            }
             if (!File.Exists(zipPath))
             {
-                logger.LogWarning($"Could not load CubesManagement application from path: {zipPath}");
+                logger.LogWarning($"Could not load Cubes Management application from path: {zipPath}");
                 return app;
             }
+            else
+            {
+                logger.LogInformation($"Serving Cubes management from {zipPath}, request path '/admin'.");
+            }
 
-            var zfs     = new CompressedFileProvider(zipPath, zipRoot);
+            var zfs     = new CompressedFileProvider(zipPath);
             var options = new FileServerOptions
             {
-                FileProvider       = new CompressedFileProvider(zipPath, zipRoot),
+                FileProvider       = zfs,
                 RequestPath        = "",
                 EnableDefaultFiles = true,
             };
             options.DefaultFilesOptions.DefaultFileNames.Clear();
             options.DefaultFilesOptions.DefaultFileNames.Add("index.html");
 
-            app.Map(new PathString(requestPath), builder =>
+            app.Map(new PathString("/admin"), builder =>
             {
                 builder.UseFileServer(options);
                 builder.Use(async (context, next) =>
@@ -127,7 +120,9 @@ namespace Cubes.Core.Web.StaticContent
                     if (context.Response.StatusCode == 404 && !Path.HasExtension(fullRequest))
                     {
                         // Fall back to SPA entry point
-                        await zfs.GetFileInfo("index.html").CreateReadStream().CopyToAsync(context.Response.Body);
+                        await zfs.GetFileInfo("index.html")
+                            .CreateReadStream()
+                            .CopyToAsync(context.Response.Body);
                     }
                 });
             });

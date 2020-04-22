@@ -6,6 +6,7 @@ namespace Cubes.Core.Utilities
 {
     // Based on https://gist.github.com/cocowalla/5d181b82b9a986c6761585000901d1b8
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "<Pending>")]
     public class Debouncer : IDisposable
     {
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
@@ -30,9 +31,6 @@ namespace Cubes.Core.Utilities
             }, this.cts.Token);
         }
 
-        public void Dispose()
-        {
-            this.cts.Cancel();
-        }
+        public void Dispose() => this.cts.Cancel();
     }
 }

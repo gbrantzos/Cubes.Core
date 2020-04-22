@@ -14,7 +14,9 @@
     <Ignore>Brantzos</Ignore>
     <Ignore>deserialize</Ignore>
     <Ignore>Giorgos</Ignore>
+    <Ignore>http</Ignore>
     <Ignore>json</Ignore>
+    <Ignore>localhost</Ignore>
     <Ignore>mssql</Ignore>
     <Ignore>mysql</Ignore>
     <Ignore>os</Ignore>
@@ -24,8 +26,7 @@
     <Ignore>tmp</Ignore>
     <Ignore>unhandled</Ignore>
     <Ignore>unix</Ignore>
-    <Ignore>http</Ignore>
-    <Ignore>localhost</Ignore>
+    <Ignore>admin</Ignore>
   </IgnoredWords>
   <InheritExclusionExpressions>True</InheritExclusionExpressions>
   <InheritIgnoredFilePatterns>True</InheritIgnoredFilePatterns>
