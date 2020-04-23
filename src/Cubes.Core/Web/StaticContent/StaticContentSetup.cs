@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using Cubes.Core.Base;
 using Cubes.Core.Utilities;
@@ -65,7 +66,9 @@ namespace Cubes.Core.Web.StaticContent
                             {
                                 // Fall back to SPA entry point
                                 context.Response.StatusCode = 200;
-                                await context.Response.SendFileAsync(Path.Combine(rootPath, item.FileSystemPath, item.DefaultFile));
+                                await context
+                                    .Response
+                                    .SendFileAsync(Path.Combine(rootPath, item.FileSystemPath, item.DefaultFile));
                             }
                         });
                     });
@@ -92,8 +95,9 @@ namespace Cubes.Core.Web.StaticContent
             IConfiguration configuration,
             ILoggerFactory loggerFactory)
         {
-            var zipPath = configuration.GetCubesConfiguration().AdminPath;
-            var logger  = loggerFactory.CreateLogger<Content>();
+            var cubesConfig = configuration.GetCubesConfiguration();
+            var zipPath     = configuration.GetCubesConfiguration().AdminPath;
+            var logger      = loggerFactory.CreateLogger<Content>();
 
             if (!File.Exists(zipPath))
             {
@@ -102,25 +106,53 @@ namespace Cubes.Core.Web.StaticContent
             }
             else
             {
-                logger.LogInformation($"Serving 'Cubes Management' from {zipPath}, request path '/admin'.");
+                logger.LogInformation("Serving 'Cubes Management' from {cubesAdminPath}, request path '/admin'.", zipPath);
             }
 
-            var zfs     = new CompressedFileProvider(zipPath);
+            // Currently Compressed FileProvider seems to be broken!
+            var useCompressedFileProvider = false;
+            IFileProvider fileProvider;
+
+            if (useCompressedFileProvider)
+            {
+                fileProvider = new CompressedFileProvider(zipPath);
+
+                // Inform for changes on CompressedFileProvider
+                var fileName = Path.GetFileName(zipPath);
+                var debouncer = new Debouncer();
+                Action call = () => logger.LogInformation("File {cubesAdminPath} changed, 'Cubes Management' should be reloaded!", fileName);
+                ChangeToken.OnChange(
+                    () => fileProvider.Watch(fileName),
+                    () => debouncer.Debouce(call));
+            }
+            else
+            {
+                var tempFolder = Path.Combine(cubesConfig.TempFolder, "CubesMangement");
+                DeployZipOnTemp(tempFolder, zipPath);
+                fileProvider = new PhysicalFileProvider(tempFolder);
+
+                // Setup file changes mechanism for zip file
+                var fileName = Path.GetFileName(zipPath);
+                var pfp = new PhysicalFileProvider(Path.GetDirectoryName(zipPath));
+                var debouncer = new Debouncer();
+                Action call = () =>
+                {
+                    DeployZipOnTemp(tempFolder, zipPath);
+                    logger.LogInformation($"File {fileName} changed, 'Cubes Management' should be reloaded!");
+                };
+                ChangeToken.OnChange(
+                    () => pfp.Watch(fileName),
+                    () => debouncer.Debouce(call));
+            }
+
             var options = new FileServerOptions
             {
-                FileProvider       = zfs,
+                FileProvider       = fileProvider,
                 RequestPath        = "",
                 EnableDefaultFiles = true,
             };
             options.DefaultFilesOptions.DefaultFileNames.Clear();
             options.DefaultFilesOptions.DefaultFileNames.Add("index.html");
-            var fileName = Path.GetFileName(zipPath);
-            var debouncer = new Debouncer();
-            Action call = () => logger.LogInformation($"File {fileName} changed, 'Cubes Management' should be reloaded!");
-            ChangeToken.OnChange(
-                () => zfs.Watch(fileName),
-                () => debouncer.Debouce(call));
-
             app.Map(new PathString("/admin"), builder =>
             {
                 builder.UseFileServer(options);
@@ -134,15 +166,37 @@ namespace Cubes.Core.Web.StaticContent
                     {
                         // Fall back to SPA entry point
                         context.Response.StatusCode = 200;
-                        await zfs.GetFileInfo("index.html")
-                            .CreateReadStream()
-                            .CopyToAsync(context.Response.Body);
+                        if (useCompressedFileProvider)
+                        {
+                            await fileProvider.GetFileInfo("index.html")
+                                .CreateReadStream()
+                                .CopyToAsync(context.Response.Body);
+                        }
+                        else
+                        {
+                            await context.Response
+                                .WriteAsync(File.ReadAllText(fileProvider.GetFileInfo("index.html").PhysicalPath));
+                        }
                     }
                 });
             });
-            app.UseFileServer(options);
 
             return app;
+        }
+
+        private static void DeployZipOnTemp(string target, string zipPath)
+        {
+            // Make sure that target folder is empty
+            if (Directory.Exists(target))
+            {
+                Directory.Delete(target, true);
+                Directory.CreateDirectory(target);
+            }
+
+            // Extract zip
+            using var fileStream = new FileStream(zipPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var archive = new ZipArchive(fileStream);
+            archive.ExtractToDirectory(target);
         }
     }
 }
