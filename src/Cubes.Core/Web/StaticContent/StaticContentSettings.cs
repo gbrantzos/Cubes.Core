@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using Cubes.Core.Base;
+using Cubes.Core.Configuration;
 
 namespace Cubes.Core.Web.StaticContent
 {
+    [ConfigurationStore(CubesConstants.Files_StaticContent)]
     public class StaticContentSettings
     {
         public List<Content> Content { get; set; } = new List<Content>();
@@ -12,9 +15,8 @@ namespace Cubes.Core.Web.StaticContent
             toReturn.Content.Add(new Content
             {
                 DefaultFile           = "index.html",
-                RequestPath           = "/sample",
+                RequestPath           = "sample",
                 FileSystemPath        = "sampleContent",
-                PathIsAbsolute        = false,
                 Active                = false,
                 ServeUnknownFileTypes = true,
                 CustomContentTypes    = new Dictionary<string, string> { { "json", "application/json" } }
@@ -25,12 +27,11 @@ namespace Cubes.Core.Web.StaticContent
 
     public class Content
     {
-        public string RequestPath { get; set; }
-        public bool Active { get; set; }
-        public string FileSystemPath { get; set; }
-        public bool PathIsAbsolute { get; set; }
-        public string DefaultFile { get; set; } = "index.html";
-        public bool ServeUnknownFileTypes { get; set; }
+        public string RequestPath                            { get; set; }
+        public bool Active                                   { get; set; }
+        public string FileSystemPath                         { get; set; }
+        public string DefaultFile                            { get; set; } = "index.html";
+        public bool ServeUnknownFileTypes                    { get; set; }
         public Dictionary<string, string> CustomContentTypes { get; set; }
     }
 }

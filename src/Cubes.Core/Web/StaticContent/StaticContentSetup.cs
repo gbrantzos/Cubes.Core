@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using OfficeOpenXml.Packaging.Ionic.Zip;
 
 namespace Cubes.Core.Web.StaticContent
 {
@@ -31,9 +30,11 @@ namespace Cubes.Core.Web.StaticContent
 
             foreach (var item in settings.Content.Where(c => c.Active).ToList())
             {
-                var contentPath = item.PathIsAbsolute ?
+                var contentPath = Directory.Exists(item.FileSystemPath) ?
                     item.FileSystemPath :
                     Path.Combine(rootPath, item.FileSystemPath);
+                if (!item.RequestPath.StartsWith("/"))
+                    item.RequestPath = "/" + item.RequestPath;
 
                 if (!Directory.Exists(contentPath))
                 {
@@ -44,7 +45,7 @@ namespace Cubes.Core.Web.StaticContent
                 app.Map(new PathString(item.RequestPath),
                     builder =>
                     {
-                        logger.LogInformation($"Preparing static content listening on '{item.RequestPath}', serving from {contentPath}");
+                        logger.LogInformation("Preparing static content listening on '{requestPath}', serving from {contentPath}", item.RequestPath, contentPath);
                         var fsOptions = new FileServerOptions
                         {
                             FileProvider       = new PhysicalFileProvider(contentPath),
@@ -106,7 +107,7 @@ namespace Cubes.Core.Web.StaticContent
             }
             else
             {
-                logger.LogInformation("Serving 'Cubes Management' from {cubesAdminPath}, request path '/admin'.", zipPath);
+                logger.LogInformation("Serving 'Cubes Management' from {contentPath}, request path '{requestPath}'.", zipPath, "/admin");
             }
 
             // Currently Compressed FileProvider seems to be broken!
