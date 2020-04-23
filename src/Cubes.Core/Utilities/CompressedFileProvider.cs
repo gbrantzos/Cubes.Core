@@ -16,13 +16,13 @@ namespace Cubes.Core.Utilities
         private readonly string rootFolder;
         private readonly string filePath;
 
-        private ConcurrentDictionary<string, IFileInfo> cache;
+        private readonly ConcurrentDictionary<string, IFileInfo> cache;
+        private readonly FileSystemWatcher fileWatcher;
+        private readonly PhysicalFileProvider physicalFileProvider;
+        private char pathSeparator = '/';
         private MemoryStream inMemoryZip;
         private ZipArchive archive;
         private List<ZipArchiveEntry> entries;
-        private FileSystemWatcher fileWatcher;
-        private PhysicalFileProvider physicalFileProvider;
-        private char pathSeparator = '/';
         private int readTries = 0;
         private bool disposedValue = false;
 
@@ -31,6 +31,7 @@ namespace Cubes.Core.Utilities
             var debouncer = new Debouncer(TimeSpan.FromSeconds(2));
             this.filePath   = filePath.ThrowIfEmpty(nameof(filePath));
             this.rootFolder = rootFolder.ThrowIfNull(nameof(rootFolder));
+            this.cache = new ConcurrentDictionary<string, IFileInfo>();
 
             ProcessZip();
 
@@ -67,9 +68,12 @@ namespace Cubes.Core.Utilities
                 ProcessZip();
             }
 
+            // Cleanup...
+            archive?.Dispose();
+            cache.Clear();
+
             readTries = 0;
             archive = new ZipArchive(inMemoryZip, ZipArchiveMode.Read);
-            cache   = new ConcurrentDictionary<string, IFileInfo>();
             entries = archive.Entries.ToList();
 
             var temp = entries
@@ -119,6 +123,7 @@ namespace Cubes.Core.Utilities
             {
                 if (disposing)
                 {
+                    physicalFileProvider?.Dispose();
                     fileWatcher?.Dispose();
                     archive?.Dispose();
                     inMemoryZip?.Dispose();
