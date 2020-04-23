@@ -10,6 +10,7 @@ namespace Cubes.Core.Web.UIHelpers.Schema
                 .AddSingleton<ISchemaManager, SchemaManager>()
                 .AddTransient<ISchemaProvider, SmtpSettingsProfilesSchemaProvider>()
                 .AddTransient<ISchemaProvider, ConnectionSchemaProvider>()
-                .AddTransient<ISchemaProvider, QuerySchemaProvider>();
+                .AddTransient<ISchemaProvider, QuerySchemaProvider>()
+                .AddTransient<ISchemaProvider, StaticContentSchemaProvider>();
     }
 }
