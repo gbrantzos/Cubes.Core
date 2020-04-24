@@ -36,6 +36,7 @@
     <EmbeddedResource Include="BuildInfo.txt" />
     <EmbeddedResource Include="Web\Resources\*" />
     <EmbeddedResource Include="Web\Swagger\Themes\*" />
+    <EmbeddedResource Include="DataAccess\Queries\*" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.1.2" />
@@ -66,11 +67,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.3.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.3.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.3.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Core.Scheduling.Sample.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="PowerShell -NoProfile -ExecutionPolicy ByPass -File .\BuildInfo.ps1" />

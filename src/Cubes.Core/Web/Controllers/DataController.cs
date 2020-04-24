@@ -20,18 +20,21 @@ namespace Cubes.Core.Web.Controllers
         private readonly IConnectionManager connectionManager;
         private readonly DataAccessSettings settings;
         private readonly ILocalStorage localStorage;
+        private readonly IDefaultQueries defaultQueries;
 
         public DataController(IConnectionManager connectionManager,
             IQueryManager queryManager,
             IConfigurationWriter configurationWriter,
             IOptionsSnapshot<DataAccessSettings> options,
-            ILocalStorage localStorage)
+            ILocalStorage localStorage,
+            IDefaultQueries defaultQueries)
         {
             this.queryManager        = queryManager;
             this.configurationWriter = configurationWriter;
             this.connectionManager   = connectionManager;
             this.settings            = options.Value;
             this.localStorage        = localStorage;
+            this.defaultQueries      = defaultQueries;
         }
 
         /// <summary>
@@ -80,6 +83,28 @@ namespace Cubes.Core.Web.Controllers
         public IEnumerable<Query> GetQueries() => this.settings.Queries;
 
         /// <summary>
+        /// Get default query
+        /// </summary>
+        /// <remarks>
+        /// Retrieve a default query named 'queryName'. You register a default query by adding the appropriate
+        /// IQueryProvider in the DI services.
+        /// </remarks>
+        /// <param name="queryName"></param>
+        /// <returns></returns>
+        [HttpGet("queries-default/{queryName}")]
+        public IActionResult GetDefaultQuery(string queryName)
+        {
+            try
+            {
+                return Ok(defaultQueries.GetQuery(queryName));
+            }
+            catch (ArgumentException x)
+            {
+                return NotFound(x.Message);
+            }
+        }
+
+        /// <summary>
         /// Execute known query
         /// </summary>
         /// <remarks>
@@ -98,7 +123,7 @@ namespace Cubes.Core.Web.Controllers
         /// </summary>
         /// <remarks>
         /// Execute query defined in requests body using a known database connection.
-        /// Query string contains values for query parameters.
+        /// Query string contains values for query parameters. 
         /// </remarks>
         /// <param name="connectionName"></param>
         /// <param name="query"></param>

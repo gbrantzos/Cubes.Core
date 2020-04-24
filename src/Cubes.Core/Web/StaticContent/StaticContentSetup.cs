@@ -45,7 +45,7 @@ namespace Cubes.Core.Web.StaticContent
                 app.Map(new PathString(item.RequestPath),
                     builder =>
                     {
-                        logger.LogInformation("Preparing static content listening on '{requestPath}', serving from {contentPath}", item.RequestPath, contentPath);
+                        logger.LogInformation("Preparing static content listening on '{requestPath}', serving from {contentPath}.", item.RequestPath, contentPath);
                         var fsOptions = new FileServerOptions
                         {
                             FileProvider       = new PhysicalFileProvider(contentPath),
