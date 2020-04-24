@@ -83,6 +83,16 @@ namespace Cubes.Core.Web.Controllers
         public IEnumerable<Query> GetQueries() => this.settings.Queries;
 
         /// <summary>
+        /// Get names of all default queries.
+        /// </summary>
+        /// <remarks>
+        /// Returns the names of all default queries available as a string list.
+        /// </remarks>
+        /// <returns></returns>
+        [HttpGet("defaultQueries")]
+        public IEnumerable<string> GetDefaultQueries() => defaultQueries.GetQueryNames();
+
+        /// <summary>
         /// Get default query
         /// </summary>
         /// <remarks>
@@ -91,7 +101,7 @@ namespace Cubes.Core.Web.Controllers
         /// </remarks>
         /// <param name="queryName"></param>
         /// <returns></returns>
-        [HttpGet("queries-default/{queryName}")]
+        [HttpGet("defaultQueries/{queryName}")]
         public IActionResult GetDefaultQuery(string queryName)
         {
             try
@@ -123,7 +133,7 @@ namespace Cubes.Core.Web.Controllers
         /// </summary>
         /// <remarks>
         /// Execute query defined in requests body using a known database connection.
-        /// Query string contains values for query parameters. 
+        /// Query string contains values for query parameters.
         /// </remarks>
         /// <param name="connectionName"></param>
         /// <param name="query"></param>

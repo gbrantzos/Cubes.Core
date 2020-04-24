@@ -44,7 +44,7 @@ namespace Cubes.Core.Commands.Basic
                 {
                     new EmailContent.EmailAttachment
                     {
-                        FileName    = $"{command.FileName}_{ DateTime.Now.ToString("ddMMyyyy") }.xlsx",
+                        FileName    = $"{command.FileName}_{ DateTime.Now:ddMMyyyy}.xlsx",
                         ContentType = "application/vnd.ms-excel",
                         Content     = results.ToExcelPackage()
                     }

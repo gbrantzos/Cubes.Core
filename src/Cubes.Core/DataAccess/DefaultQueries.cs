@@ -7,6 +7,7 @@ namespace Cubes.Core.DataAccess
     public interface IDefaultQueries
     {
         Query GetQuery(string name);
+        IEnumerable<string> GetQueryNames();
     }
 
     public class DefaultQueries : IDefaultQueries
@@ -27,5 +28,7 @@ namespace Cubes.Core.DataAccess
 
             return provider.GetQuery();
         }
+
+        public IEnumerable<string> GetQueryNames() => queryProviders.Select(p => p.QueryName).ToList();
     }
 }
