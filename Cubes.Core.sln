@@ -30,6 +30,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F5F88370-397C-4308-ADFC-09BDE881DB85}"
 	ProjectSection(SolutionItems) = preProject
 		docs\Commands.md = docs\Commands.md
+		docs\Host.Configuration.md = docs\Host.Configuration.md
 		docs\TODOs.txt = docs\TODOs.txt
 	EndProjectSection
 EndProject
