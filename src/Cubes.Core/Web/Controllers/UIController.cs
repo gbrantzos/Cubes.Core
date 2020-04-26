@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cubes.Core.Base;
+using Cubes.Core.Commands;
+using Cubes.Core.Utilities;
 using Cubes.Core.Web.UIHelpers.Lookups;
 using Cubes.Core.Web.UIHelpers.Schema;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +16,7 @@ namespace Cubes.Core.Web.Controllers
     [Route("ui")]
     public class UIController : ControllerBase
     {
-        private static HashSet<string> themes = new HashSet<string>
+        private static readonly HashSet<string> themes = new HashSet<string>
         {
             "feeling-blue",
             "flattop",
@@ -23,18 +25,21 @@ namespace Cubes.Core.Web.Controllers
             "muted",
             "outline"
         };
-        private static string resourceRoot = "Cubes.Core.Web.Swagger.Themes";
+        private static readonly string resourceRoot = "Cubes.Core.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
         private readonly ISchemaManager schemaManager;
         private readonly List<ILookupProvider> lookupProviders;
+        private readonly ITypeResolver typeResolver;
 
         public UIController(IConfiguration configuration,
             IEnumerable<ILookupProvider> lookupProviders,
+            ITypeResolver typeResolver,
             ISchemaManager schemaManager)
         {
             this.configuration = configuration;
             this.schemaManager = schemaManager;
             this.lookupProviders = lookupProviders.ToList();
+            this.typeResolver = typeResolver;
         }
 
         [HttpGet("swagger-css")]
@@ -68,6 +73,17 @@ namespace Cubes.Core.Web.Controllers
         public IActionResult GetSchema(string schemaName)
         {
             return Ok(schemaManager.GetSchema(schemaName));
+        }
+
+        [HttpGet("requestSample/{providerName}")]
+        public IActionResult GetSample(string providerName)
+        {
+            var type = typeResolver.GetByName(providerName);
+            if (type == null)
+                return BadRequest($"Could not create provider '{providerName}'!");
+
+            var provider = Activator.CreateInstance(type) as IRequestSampleProvider;
+            return Ok(provider.GetSample());
         }
     }
 }

@@ -21,12 +21,15 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
                     var attribute = i.GetAttribute<DisplayAttribute>();
                     var display = attribute == null || String.IsNullOrEmpty(attribute.Name) ? i.Name : attribute.Name;
 
+                    var sampleAttribute = i.GetAttribute<RequestSampleAttribute>();
+                    var sampleType = sampleAttribute?.SampleProviderType.FullName;
+
                     return new LookupItem
                     {
                         Value     = i.FullName,
                         Display   = display,
                         Group     = String.Empty,
-                        OtherData = null
+                        OtherData = sampleType
                     };
                 })
                 .ToList();

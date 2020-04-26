@@ -13,5 +13,6 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public string Label { get; set; }
         public string Value { get; set; }
         public bool Disabled { get; set; }
+        public object OtherData { get; set; }
     }
 }

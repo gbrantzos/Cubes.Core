@@ -29,7 +29,8 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
                     .Select(i => new OptionsItem
                     {
                         Value = i.Value,
-                        Label = i.Display
+                        Label = i.Display,
+                        OtherData = i.OtherData
                     }).ToList()
             };
     }
