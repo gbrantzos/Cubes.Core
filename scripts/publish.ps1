@@ -50,6 +50,7 @@ function Finish {
 # ------------------------------------------------------------------------------
 # Setup 
 
+# TODO Shall we store them globally????
 $major = 5
 $minor = 1
 $patch = 0
@@ -105,7 +106,7 @@ dotnet publish --no-build "$srcPath/Cubes.Host/Cubes.Host.csproj" -o $tgtPath/Cu
 # Cubes host package
 $srcPath = Join-Path -Path $workingPath -ChildPath "../tmp/Cubes-v$Version"
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../deploy'
-Compress-Archive -Path $srcPath/* -CompressionLevel Optimal -DestinationPath $tgtPath/Cubes-v$Version.zip -Force
+Compress-Archive -Path $srcPath/* -CompressionLevel Optimal -DestinationPath $tgtPath/Cubes-v$Version$tag.zip -Force
 
 # Cubes nuget
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
@@ -117,6 +118,7 @@ dotnet nuget push "$tgtPath/Cubes.Core.$version$tag.nupkg" -s http://nuget.gbwor
 
 # ------------------------------------------------------------------------------
 # Clean Exit
+
 ClearTemp
 Finish
 # ------------------------------------------------------------------------------
