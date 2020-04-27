@@ -2,18 +2,17 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
-    <AssemblyVersion>5.0.1.0</AssemblyVersion>
-    <FileVersion>5.0.1.0</FileVersion>
-    <InformationalVersion>5.0.1</InformationalVersion>
-    <Version>5.0.1</Version>
+    <AssemblyVersion>5.1.0.0</AssemblyVersion>
+    <FileVersion>5.1.0.0</FileVersion>
+    <InformationalVersion>5.1.0</InformationalVersion>
+    <Version>5.1.0</Version>
     <Authors>Giorgos Brantzos</Authors>
     <Company>GbWorks</Company>
-    <Copyright>2019</Copyright>
+    <Copyright>2019 - 2020</Copyright>
     <PackageProjectUrl>https://github.com/gbrantzos/CubesNEXT</PackageProjectUrl>
     <RepositoryUrl>https://github.com/gbrantzos/CubesNEXT</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="BuildDate.txt" />
     <None Remove="Web\Resources\daffy-duck.png" />
     <None Remove="Web\Resources\index.html" />
     <None Remove="Web\Swagger\Themes\theme-feeling-blue.css" />
@@ -23,6 +22,10 @@
     <None Remove="Web\Swagger\Themes\theme-muted.css" />
     <None Remove="Web\Swagger\Themes\theme-newspaper.css" />
     <None Remove="Web\Swagger\Themes\theme-outline.css" />
+    <None Include="Cubes.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -31,6 +34,7 @@
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <PackageIcon>Cubes.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="BuildInfo.txt" />
@@ -39,10 +43,10 @@
     <EmbeddedResource Include="DataAccess\Queries\*" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="5.1.2" />
+    <PackageReference Include="Autofac" Version="5.1.3" />
     <PackageReference Include="CronExpressionDescriptor" Version="2.15.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
-    <PackageReference Include="EPPlus" Version="5.1.0" />
+    <PackageReference Include="EPPlus" Version="5.1.1" />
     <PackageReference Include="Figgle" Version="0.3.0" />
     <PackageReference Include="FluentValidation" Version="8.6.2" />
     <PackageReference Include="MediatR" Version="8.0.1" />
@@ -51,10 +55,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="System.IO.Abstractions" Version="10.0.10" />
+    <PackageReference Include="System.IO.Abstractions" Version="11.0.2" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="YamlDotNet" Version="8.1.1" />
-    <PackageReference Include="NetEscapades.Configuration.Yaml" Version="2.0.0" />
+    <PackageReference Include="NetEscapades.Configuration.Yaml" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.3" />
