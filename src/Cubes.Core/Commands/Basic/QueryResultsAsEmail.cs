@@ -17,9 +17,14 @@ namespace Cubes.Core.Commands.Basic
         public string FileName { get; set; }
 
         public override string ToString()
-            => QuerySet.Queries.Count > 1 ?
-                $"Run {QuerySet.Queries.Count} queries on {QuerySet.ConnectionName} and send results as email" :
-                $"Run query {QuerySet.Queries.First().Name} on {QuerySet.ConnectionName} and send results as email";
+        {
+            if (QuerySet.Queries.Count == 0)
+                return "No queries defined, possibly a mistake!";
+
+            return QuerySet.Queries.Count > 1 ?
+                           $"Run {QuerySet.Queries.Count} queries on {QuerySet.ConnectionName} and send results as email" :
+                           $"Run query {QuerySet.Queries.First().Name} on {QuerySet.ConnectionName} and send results as email";
+        }
     }
 
     public class QueryResultsAsEmailSampleProvider : IRequestSampleProvider

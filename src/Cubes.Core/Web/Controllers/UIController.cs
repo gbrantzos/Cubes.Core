@@ -9,6 +9,8 @@ using Cubes.Core.Web.UIHelpers.Lookups;
 using Cubes.Core.Web.UIHelpers.Schema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Cubes.Core.Web.Controllers
 {
@@ -83,7 +85,12 @@ namespace Cubes.Core.Web.Controllers
                 return BadRequest($"Could not create provider '{providerName}'!");
 
             var provider = Activator.CreateInstance(type) as IRequestSampleProvider;
-            return Ok(provider.GetSample());
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver()
+            };
+
+            return new JsonResult(provider.GetSample(), jsonSerializerSettings);
         }
     }
 }

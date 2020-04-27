@@ -173,7 +173,7 @@ namespace Cubes.Core.Scheduling
                 if (!String.IsNullOrEmpty(jobStatus.CronExpression))
                 {
                     jobStatus.CronExpressionDescription = ExpressionDescriptor
-                        .GetDescription(jobStatus.CronExpression)
+                        .GetDescription(jobStatus.CronExpression, new Options { Use24HourTimeFormat = true })
                         .ToLowerFirstChar();
                 }
 
@@ -308,6 +308,8 @@ namespace Cubes.Core.Scheduling
 
                 if (String.IsNullOrEmpty(message) && context.Result != null)
                     message = context.Result?.ToString();
+                if (String.IsNullOrEmpty(message))
+                    message = "Job executed successfully, but no details are available!";
                 scheduler.AddExecutionResults(context.JobDetail.Key, jobException, message);
                 return Task.CompletedTask;
             }

@@ -14,6 +14,7 @@ namespace Cubes.Core.Utilities
                 formattingSettings = ExcelFormattingSettings.Default<T>();
 
             // Create Excel package
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var p = new ExcelPackage())
             {
                 AddPage(p, formattingSettings.SheetName, list, formattingSettings);
@@ -29,6 +30,7 @@ namespace Cubes.Core.Utilities
                 formattingSettings = ExcelFormattingSettings.Default<T>();
 
             // Create Excel package
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var p = new ExcelPackage())
             {
                 // Create a sheet
@@ -47,6 +49,7 @@ namespace Cubes.Core.Utilities
                 formattingSettings = ExcelFormattingSettings.Default("Sheet1");
 
             // Create Excel package
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var p = new ExcelPackage())
             {
                 foreach (var result in queryResults)

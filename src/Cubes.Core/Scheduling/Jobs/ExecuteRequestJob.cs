@@ -73,14 +73,21 @@ namespace Cubes.Core.Scheduling.Jobs
                 if (result.HasErrors)
                 {
                     if (result.ExceptionThrown == null)
+                    {
                         logger.LogWarning(result.Message);
+                        context.Put(Scheduler.MessageKey, result.Message);
+                    }
                     else
+                    {
                         logger.LogError(result.ExceptionThrown, result.ExceptionThrown.Message);
+                        context.Put(Scheduler.MessageKey, result.ExceptionThrown.Message);
+                    }
                 }
                 else
                 {
                     logger.LogInformation(result.Message);
                     DispatchResult(result.Response/*, jobParams*/);
+                    context.Put(Scheduler.MessageKey, result.Message);
                 }
             }
         }

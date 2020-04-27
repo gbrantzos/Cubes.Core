@@ -51,7 +51,7 @@ namespace Cubes.Core.Commands.Basic
                 };
 
             // Body details
-            string suffix = results.Count() == 0 ? "y" : "ies";
+            string suffix = results.Count() == 1 ? "y" : "ies";
             string resultInfo = rowsFound ?
                 $"Executed {results.Count()} quer{suffix}, found {results.Select(i => i.Data.Count()).Sum()} rows." :
                 "No rows found!";
