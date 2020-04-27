@@ -26,14 +26,18 @@ function BuildConfig {
 # Create folder if missing
 function CreateFolder {
     param ([string] $folderName)
-    if(!(test-path $folderName)) { New-Item -ItemType Directory -Force -Path $folderName }
+    if(!(test-path $folderName)) { 
+        New-Item -ItemType Directory -Force -Path $folderName 
+    }
 
 }
 
 # Clear temp folder
 function ClearTemp {
     $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
-    if(Test-Path $tgtPath) { Remove-Item $tgtPath -Recurse }
+    if(Test-Path $tgtPath) { 
+        Remove-Item $tgtPath -Recurse 
+    }
 }
 
 # Clean exit
@@ -60,6 +64,7 @@ $timeStamp = Get-Date -Format 'yyyyMMddHHmm'
 
 $buildConfig  = BuildConfig
 $tag          = Tag
+$nugetServer  = "http://nuget.gbworks.lan"
 # ------------------------------------------------------------------------------
 
 
@@ -86,9 +91,15 @@ Write-Output 'Building project...'
 
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 dotnet clean -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj"
-dotnet build -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj" -p:AssemblyVersion=$assemblyVersion -p:FileVersion=$fileVersion -p:InformationalVersion=$informationalVersion
+dotnet build -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj" `
+  -p:AssemblyVersion=$assemblyVersion `
+  -p:FileVersion=$fileVersion `
+  -p:InformationalVersion=$informationalVersion
 dotnet clean -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj"
-dotnet build -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj" -p:AssemblyVersion=$assemblyVersion -p:FileVersion=$fileVersion -p:InformationalVersion=$informationalVersion
+dotnet build -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj" `
+  -p:AssemblyVersion=$assemblyVersion `
+  -p:FileVersion=$fileVersion `
+  -p:InformationalVersion=$informationalVersion
 # ------------------------------------------------------------------------------
 
 
@@ -101,18 +112,29 @@ $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
 ClearTemp
 CreateFolder $tgtPath
-dotnet publish --no-build "$srcPath/Cubes.Host/Cubes.Host.csproj" -o $tgtPath/Cubes-v$version -c $buildConfig
+dotnet publish "$srcPath/Cubes.Host/Cubes.Host.csproj" `
+  --no-build `
+  -o $tgtPath/Cubes-v$version `
+  -c $buildConfig
 
 # Cubes host package
 $srcPath = Join-Path -Path $workingPath -ChildPath "../tmp/Cubes-v$Version"
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../deploy'
-Compress-Archive -Path $srcPath/* -CompressionLevel Optimal -DestinationPath $tgtPath/Cubes-v$Version$tag.zip -Force
+Compress-Archive -Path $srcPath/* `
+  -CompressionLevel Optimal `
+  -DestinationPath $tgtPath/Cubes-v$Version$tag.zip `
+  -Force
 
 # Cubes nuget
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../deploy'
-dotnet pack "$srcPath/Cubes.Core/Cubes.Core.csproj" -c $buildConfig --no-build -p:PackageVersion=$version$tag -o $tgtPath
-dotnet nuget push "$tgtPath/Cubes.Core.$version$tag.nupkg" -s http://nuget.gbworks.lan
+dotnet pack "$srcPath/Cubes.Core/Cubes.Core.csproj" `
+  --no-build `
+  -c $buildConfig `
+  -p:PackageVersion=$version$tag `
+  -o $tgtPath
+dotnet nuget push "$tgtPath/Cubes.Core.$version$tag.nupkg" `
+  -s $nugetServer
 # ------------------------------------------------------------------------------
 
 
