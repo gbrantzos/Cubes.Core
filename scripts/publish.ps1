@@ -10,15 +10,27 @@ $workingPath  = ($PSScriptRoot)
 function Tag {
     # To be defined by branch....
     # master should return nothing
-    # release should return -rc<count> of commits, i.e. -rc3
-    # all others should return -dev-<timestamp>
+    if ($gitBranch.StartsWith("master")) {
+        return ""
+    }
     
+    # release should return -rc<count> of commits, i.e. -rc3
+    if ($gitBranch.StartsWith("release")) {
+        $commits = (git rev-list --count HEAD ^develop)
+        return "-rc$commits"
+    }
+    
+    # all others should return -dev-<timestamp>    
     return "-dev-$timeStamp"
 }
 
 function BuildConfig {
     # To be defined by branch....
     # master and release/* should return Release
+    if ($gitBranch.StartsWith("master") -or $gitBranch.StartsWith("release")) {
+        return "Release"
+    }
+    
     # others should return Debug
     return "Debug"
 }
