@@ -13,31 +13,12 @@ using NLog.Web;
 using NLog.Extensions.Logging;
 using Cubes.Core.Web;
 
-#if DEBUG
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-#endif
-
-
 namespace Cubes.Host
 {
     public static class Program
     {
-#if DEBUG
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int cmdShow);
-        private const int HIDE     = 0;
-        private const int MAXIMIZE = 3;
-        private const int MINIMIZE = 6;
-        private const int RESTORE  = 9;
-#endif
-
         public static void Main(string[] args)
         {
-#if DEBUG
-            Process p = Process.GetCurrentProcess();
-            ShowWindow(p.MainWindowHandle, MAXIMIZE);
-#endif
             try
             {
                 var rootFolder   = CubesEnvironmentHelpers.GetRootFolder(args);

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Cubes.Core.Base;
 using Cubes.Core.Utilities;
 using Microsoft.AspNetCore.Builder;
@@ -135,6 +136,8 @@ namespace Cubes.Core.Web.StaticContent
                 // Setup file changes mechanism for zip file
                 var fileName = Path.GetFileName(zipPath);
                 var pfp = new PhysicalFileProvider(Path.GetDirectoryName(zipPath));
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    pfp.UsePollingFileWatcher = true;
                 var debouncer = new Debouncer();
                 Action call = () =>
                 {
