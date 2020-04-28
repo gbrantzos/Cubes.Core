@@ -20,8 +20,9 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
             var knownProviders = ConnectionManager.KnownProviders;
             return new Lookup
             {
-                Name  = this.Name,
-                Items = knownProviders
+                Name      = this.Name,
+                Cacheable = true,
+                Items     = knownProviders
                     .Select(pv => new LookupItem
                     {
                         Value   = pv.Key,

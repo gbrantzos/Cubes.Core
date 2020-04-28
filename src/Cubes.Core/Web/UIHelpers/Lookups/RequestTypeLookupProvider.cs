@@ -35,8 +35,9 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
                 .ToList();
             return new Lookup
             {
-                Name  = this.Name,
-                Items = typesList
+                Name      = this.Name,
+                Items     = typesList,
+                Cacheable = true
             };
         }
 

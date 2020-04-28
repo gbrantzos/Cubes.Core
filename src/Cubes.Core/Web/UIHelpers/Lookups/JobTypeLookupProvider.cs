@@ -32,11 +32,11 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
 
             return new Lookup
             {
-                Name  = this.Name,
-                Items = typesList
+                Name      = this.Name,
+                Items     = typesList,
+                Cacheable = true
             };
         }
-
 
         private static IEnumerable<Type> GetJobTypes()
         {

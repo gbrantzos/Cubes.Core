@@ -8,6 +8,7 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
     {
         public string Name { get; set; }
         public ICollection<LookupItem> Items { get; set; }
+        public bool Cacheable { get; set; }
     }
 
     public class LookupItem
