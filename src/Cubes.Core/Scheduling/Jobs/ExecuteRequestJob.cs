@@ -81,6 +81,7 @@ namespace Cubes.Core.Scheduling.Jobs
                     {
                         logger.LogError(result.ExceptionThrown, result.ExceptionThrown.Message);
                         context.Put(Scheduler.MessageKey, result.ExceptionThrown.Message);
+                        context.Put(Scheduler.ResultKey, Boolean.TrueString);
                     }
                 }
                 else
