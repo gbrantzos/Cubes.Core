@@ -69,7 +69,7 @@ function Finish {
 # TODO Shall we store them globally????
 $major = 5
 $minor = 1
-$patch = 1
+$patch = 2
 $gitHash = (git rev-parse HEAD).Substring(0, 10)
 $gitBranch = (git rev-parse --abbrev-ref HEAD)
 $timeStamp = Get-Date -Format 'yyyyMMddHHmm'
