@@ -1,5 +1,7 @@
 using Cubes.Core.Web.UIHelpers.Lookups;
+using Cubes.Core.Web.UIHelpers.Lookups.Providers;
 using Cubes.Core.Web.UIHelpers.Schema;
+using Cubes.Core.Web.UIHelpers.Schema.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cubes.Core.Web.UIHelpers
@@ -8,11 +10,18 @@ namespace Cubes.Core.Web.UIHelpers
     {
         public static IServiceCollection AddUIServices(this IServiceCollection services)
         {
-            services.AddTransient<ILookupProvider, RequestTypeLookupProvider>();
-            services.AddTransient<ILookupProvider, JobTypeLookupProvider>();
-            services.AddTransient<ILookupProvider, DatabaseProvidersLookupProvider>();
+            services
+                .AddSingleton<ISchemaManager, SchemaManager>()
+                .AddTransient<ISchemaProvider, SmtpSettingsProfilesSchemaProvider>()
+                .AddTransient<ISchemaProvider, ConnectionSchemaProvider>()
+                .AddTransient<ISchemaProvider, QuerySchemaProvider>()
+                .AddTransient<ISchemaProvider, StaticContentSchemaProvider>()
 
-            services.AddSchemaServices();
+                .AddSingleton<ILookupManager, LookupManager>()
+                .AddTransient<ILookupProvider, RequestTypeLookupProvider>()
+                .AddTransient<ILookupProvider, JobTypeLookupProvider>()
+                .AddTransient<ILookupProvider, DatabaseProvidersLookupProvider>()
+                .AddTransient<ILookupProvider, DataConnectionLookupProvider>();
 
             return services;
         }

@@ -17,7 +17,9 @@ namespace Cubes.Core.Scheduling
 {
     public class Scheduler : IScheduler
     {
-        public static readonly string MessageKey = "CubesScheduling::JobResult";
+        public static readonly string MessageKey = "CubesScheduling::JobMessage";
+        public static readonly string ResultKey  = "CubesScheduling::JobResult";
+
         private class SchedulerJobDetails
         {
             public string Name                      { get; set; }
@@ -265,7 +267,7 @@ namespace Cubes.Core.Scheduling
             }
         }
 
-        internal void AddExecutionResults(JobKey jobKey, Exception exception, string message)
+        internal void AddExecutionResults(JobKey jobKey, Exception exception, string message, bool logicalError = false)
         {
             var internalDetail = internalDetails
                 .FirstOrDefault(dt => dt.JobKey.Equals(jobKey));
@@ -273,7 +275,7 @@ namespace Cubes.Core.Scheduling
                 throw new ArgumentException($"Invalid job key: {jobKey}");
 
             internalDetail.LastExecutionException = exception;
-            internalDetail.LastExecutionFailed = exception == null;
+            internalDetail.LastExecutionFailed = logicalError || (exception != null);
             if (exception != null)
             {
                 var allMesages = exception.GetAllMessages();
@@ -301,17 +303,32 @@ namespace Cubes.Core.Scheduling
 
             public Task JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException, CancellationToken cancellationToken = default)
             {
-                string message = String.Empty;
-                try
-                { message = context.Get(Scheduler.MessageKey).ToString(); }
-                catch { /* No big deal, just swallow and continue */}
+                string message = context.SafeGet(Scheduler.MessageKey)?.ToString();
+                string tmp = context.SafeGet(Scheduler.ResultKey)?.ToString();
+                bool logicalError = String.IsNullOrEmpty(tmp)? false : tmp.Equals(Boolean.TrueString);
 
                 if (String.IsNullOrEmpty(message) && context.Result != null)
                     message = context.Result?.ToString();
                 if (String.IsNullOrEmpty(message))
                     message = "Job executed successfully, but no details are available!";
-                scheduler.AddExecutionResults(context.JobDetail.Key, jobException, message);
+                scheduler.AddExecutionResults(context.JobDetail.Key, jobException, message, logicalError);
                 return Task.CompletedTask;
+            }
+        }
+    }
+
+    public static class JobExecutionContextExtensions
+    {
+        public static object SafeGet(this IJobExecutionContext executionContext, string key)
+        {
+            try
+            {
+                return executionContext.Get(key);
+            }
+            catch
+            {
+                //No big deal, just swallow and continue
+                return null;
             }
         }
     }

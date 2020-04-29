@@ -4,15 +4,15 @@ using System.Linq;
 using Cubes.Core.Commands;
 using Cubes.Core.Utilities;
 
-namespace Cubes.Core.Web.UIHelpers.Lookups
+namespace Cubes.Core.Web.UIHelpers.Lookups.Providers
 {
     public class RequestTypeLookupProvider : ILookupProvider
     {
-        private static readonly string ProviderName = "RequestTypes";
+        private static readonly string ProviderName = LookupProviders.RequestTypes;
 
         public string Name => ProviderName;
 
-        public Lookup Get()
+        public Lookup GetLookup()
         {
             var types = GetRequestTypes();
             var typesList = types

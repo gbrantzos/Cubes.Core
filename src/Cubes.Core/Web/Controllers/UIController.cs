@@ -30,18 +30,18 @@ namespace Cubes.Core.Web.Controllers
         private static readonly string resourceRoot = "Cubes.Core.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
         private readonly ISchemaManager schemaManager;
-        private readonly List<ILookupProvider> lookupProviders;
         private readonly ITypeResolver typeResolver;
+        private readonly ILookupManager lookupManager;
 
         public UIController(IConfiguration configuration,
-            IEnumerable<ILookupProvider> lookupProviders,
+            ILookupManager lookupManager,
             ITypeResolver typeResolver,
             ISchemaManager schemaManager)
         {
             this.configuration = configuration;
             this.schemaManager = schemaManager;
-            this.lookupProviders = lookupProviders.ToList();
             this.typeResolver = typeResolver;
+            this.lookupManager = lookupManager;
         }
 
         [HttpGet("swagger-css")]
@@ -62,13 +62,11 @@ namespace Cubes.Core.Web.Controllers
         [HttpGet("lookup/{lookupName}")]
         public IActionResult GetLookup(string lookupName)
         {
-            var provider = this
-                .lookupProviders
-                .FirstOrDefault(pr => pr.Name.Equals(lookupName, StringComparison.CurrentCultureIgnoreCase));
-            if (provider == null)
+            var lookup = this.lookupManager.GetLookup(lookupName);
+            if (lookup == null)
                 return BadRequest($"Unknown lookup provider: {lookupName}");
 
-            return Ok(provider.Get());
+            return Ok(lookup);
         }
 
         [HttpGet("schema/{schemaName}")]
@@ -91,6 +89,37 @@ namespace Cubes.Core.Web.Controllers
             };
 
             return new JsonResult(provider.GetSample(), jsonSerializerSettings);
+        }
+
+        [HttpGet("application-configuration/{applicationName}")]
+        public IActionResult GetApplicationConfiguration(string applicationName)
+        {
+            var connectionsLookup = lookupManager.GetLookup(LookupProviders.DataConnections);
+            var opt = connectionsLookup.ToOptions();
+
+            var cs = new ComplexSchema
+            {
+                Name = applicationName
+            };
+            cs.Sections.Add(new ComplexSchemaSection
+            {
+                Name = "Basic",
+                Schema = Schema.Create("Basic")
+                    .WithSelect("SEnConnection", "SEn Connection", opt)
+                    .WithSelect("OdwConnection", "ODW Connection", opt)
+            });
+            cs.Sections.Add(new ComplexSchemaSection
+            {
+                Name = "Users",
+                Schema = Schema.Create("Users", "WMS Users")
+                    .WithText("UserName", Validator.Required())
+                    .WithText("DisplayName", Validator.Required())
+                    .WithPassword("Password", Validator.Required()),
+                IsList = true,
+                ListItem = "displayName"
+            });
+
+            return Ok(cs);
         }
     }
 }

@@ -4,15 +4,15 @@ using System.Linq;
 using Cubes.Core.Utilities;
 using Quartz;
 
-namespace Cubes.Core.Web.UIHelpers.Lookups
+namespace Cubes.Core.Web.UIHelpers.Lookups.Providers
 {
     public class JobTypeLookupProvider : ILookupProvider
     {
-        private static readonly string ProviderName = "JobTypes";
+        private static readonly string ProviderName = LookupProviders.SchedulerJobTypes;
 
         public string Name => ProviderName;
 
-        public Lookup Get()
+        public Lookup GetLookup()
         {
             var typesList = GetJobTypes()
             .Select(i =>

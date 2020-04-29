@@ -1,6 +1,6 @@
 using Cubes.Core.Web.StaticContent;
 
-namespace Cubes.Core.Web.UIHelpers.Schema.CoreProviders
+namespace Cubes.Core.Web.UIHelpers.Schema.Providers
 {
     public class StaticContentSchemaProvider : SchemaProvider<Content>
     {
