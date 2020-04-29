@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Cubes.Core.DataAccess
 {
@@ -14,9 +15,15 @@ namespace Cubes.Core.DataAccess
     {
         private readonly IEnumerable<IQueryProvider> queryProviders;
 
-        public DefaultQueries(IEnumerable<IQueryProvider> queryProviders)
+        public DefaultQueries()
         {
-            this.queryProviders = queryProviders;
+            this.queryProviders = AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .SelectMany(asm => asm.GetTypes())
+                .Where(type => type.GetInterfaces().Contains(typeof(IQueryProvider)))
+                .Select(t => Activator.CreateInstance(t) as IQueryProvider)
+                .ToList();
         }
 
         public Query GetQuery(string name)

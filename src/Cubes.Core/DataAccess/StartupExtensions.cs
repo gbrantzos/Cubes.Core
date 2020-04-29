@@ -9,8 +9,7 @@ namespace Cubes.Core.DataAccess
         {
             services.AddScoped<IConnectionManager, ConnectionManager>();
             services.AddScoped<IQueryManager, QueryManager>();
-            services.AddScoped<IDefaultQueries, DefaultQueries>();
-            services.AddTransient<IQueryProvider, SampleQueryProvider>();
+            services.AddSingleton<IDefaultQueries, DefaultQueries>();
             services.Configure<DataAccessSettings>(configuration.GetSection(nameof(DataAccessSettings)));
 
             return services;
