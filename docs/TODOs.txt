@@ -2,7 +2,9 @@
 |   CubesNext - TODOs                                                          |
 +------------------------------------------------------------------------------+
 
+[ ]     Redesign IQuery providers
 [ ]     Improve - add documentation
+[ ]     Write unit tests
 [ ]     Handle cases when API response are already ApiResponse instances
 
 

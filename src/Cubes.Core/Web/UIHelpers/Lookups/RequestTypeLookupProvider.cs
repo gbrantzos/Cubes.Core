@@ -32,6 +32,7 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
                         OtherData = sampleType
                     };
                 })
+                .OrderBy(i => i.Display)
                 .ToList();
             return new Lookup
             {
