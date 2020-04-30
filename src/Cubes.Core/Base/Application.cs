@@ -15,7 +15,7 @@ namespace Cubes.Core.Base
         public virtual IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration)
             => configuration;
 
-        public virtual IServiceCollection ConfigureServices(IServiceCollection services)
+        public virtual IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration)
             => services;
 
         public virtual ContainerBuilder RegisterServices(ContainerBuilder builder)
@@ -23,6 +23,9 @@ namespace Cubes.Core.Base
 
         public virtual IEnumerable<string> GetSwaggerXmlFiles()
             => Enumerable.Empty<string>();
+
+        public virtual IEnumerable<ApplicationSettingsUIConfig> GetUISettings()
+            => Enumerable.Empty<ApplicationSettingsUIConfig>();
 
         protected string ApplicationPath()
             => Path.GetDirectoryName(this.GetType().Assembly.Location);

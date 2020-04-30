@@ -34,7 +34,7 @@ namespace Cubes.Core.Configuration
             if (format.StartsWith("."))
                 format = format.Substring(1);
 
-            var serializer = serializers.FirstOrDefault(s => s.Format.Equals(format, StringComparison.CurrentCultureIgnoreCase));
+            var serializer = serializers.Find(s => s.Format.Equals(format, StringComparison.CurrentCultureIgnoreCase));
             if (serializer == null)
                 throw new ArgumentException($"No serializer defined for format '{format}");
 

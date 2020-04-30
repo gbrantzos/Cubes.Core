@@ -32,16 +32,19 @@ namespace Cubes.Core.Web.Controllers
         private readonly ISchemaManager schemaManager;
         private readonly ITypeResolver typeResolver;
         private readonly ILookupManager lookupManager;
+        private readonly ICubesEnvironment cubesEnvironment;
 
         public UIController(IConfiguration configuration,
             ILookupManager lookupManager,
             ITypeResolver typeResolver,
-            ISchemaManager schemaManager)
+            ISchemaManager schemaManager,
+            ICubesEnvironment cubesEnvironment)
         {
-            this.configuration = configuration;
-            this.schemaManager = schemaManager;
-            this.typeResolver = typeResolver;
-            this.lookupManager = lookupManager;
+            this.configuration    = configuration;
+            this.schemaManager    = schemaManager;
+            this.typeResolver     = typeResolver;
+            this.lookupManager    = lookupManager;
+            this.cubesEnvironment = cubesEnvironment;
         }
 
         [HttpGet("swagger-css")]
@@ -91,35 +94,14 @@ namespace Cubes.Core.Web.Controllers
             return new JsonResult(provider.GetSample(), jsonSerializerSettings);
         }
 
-        [HttpGet("application-configuration/{applicationName}")]
-        public IActionResult GetApplicationConfiguration(string applicationName)
+        [HttpGet("applications-settings")]
+        public IActionResult GetApplicationsUISettings()
         {
-            var connectionsLookup = lookupManager.GetLookup(LookupProviders.DataConnections);
-            var opt = connectionsLookup.ToOptions();
-
-            var cs = new ComplexSchema
-            {
-                Name = applicationName
-            };
-            cs.Sections.Add(new ComplexSchemaSection
-            {
-                Name = "Basic",
-                Schema = Schema.Create("Basic")
-                    .WithSelect("SEnConnection", "SEn Connection", opt)
-                    .WithSelect("OdwConnection", "ODW Connection", opt)
-            });
-            cs.Sections.Add(new ComplexSchemaSection
-            {
-                Name = "Users",
-                Schema = Schema.Create("Users", "WMS Users")
-                    .WithText("UserName", Validator.Required())
-                    .WithText("DisplayName", Validator.Required())
-                    .WithPassword("Password", Validator.Required()),
-                IsList = true,
-                ListItem = "displayName"
-            });
-
-            return Ok(cs);
+            var settings = cubesEnvironment
+                .GetApplicationInstances()
+                .SelectMany(app => app.GetUISettings())
+                .ToList();
+            return Ok(settings);
         }
     }
 }

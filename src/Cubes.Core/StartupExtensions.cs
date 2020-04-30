@@ -49,11 +49,12 @@ namespace Cubes.Core
         }
 
         public static IServiceCollection AddApplicationsServices(this IServiceCollection services,
+            IConfiguration configuration,
             ICubesEnvironment cubes)
         {
             services.AddSingleton(cubes);
             foreach (var application in cubes.GetApplicationInstances())
-                application.ConfigureServices(services);
+                application.ConfigureServices(services, configuration);
 
             return services;
         }

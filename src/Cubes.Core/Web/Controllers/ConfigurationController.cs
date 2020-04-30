@@ -3,8 +3,11 @@ using Autofac.Features.Indexed;
 using Cubes.Core.Base;
 using Cubes.Core.Configuration;
 using Cubes.Core.Utilities;
+using Cubes.Core.Web.UIHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Cubes.Core.Web.Controllers
 {
@@ -44,6 +47,19 @@ namespace Cubes.Core.Web.Controllers
 
             var configurationInstance = configuration.GetSection(configurationType.Name).Get(configurationType) ??
                 Activator.CreateInstance(configurationType);
+
+            var vmConverterType = configurationType
+                .GetAttribute<ViewModelConverterAttribute>()?
+                .ViewModelConverterType;
+            if (vmConverterType != null)
+            {
+                var vmConverter = Activator.CreateInstance(vmConverterType) as ViewModelConverter;
+                var jsonSerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver()
+                };
+                return new JsonResult(vmConverter.ToViewModel(configurationInstance), jsonSerializerSettings);
+            }
             return Ok(configurationInstance );
         }
 

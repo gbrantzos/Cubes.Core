@@ -227,10 +227,14 @@ namespace Cubes.Core.Base
             // Instantiate application instances
             var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
             var loadedAssembliesNames = this.loadedAssemblies.Select(i => i.AssemblyName).ToList();
+
+            // TODO Add samples, Should this be only for DEBUG???
+            loadedAssembliesNames.Add(this.GetType().Assembly.FullName);
+
             var applicationTypes = domainAssemblies
                 .Where(l => loadedAssembliesNames.Contains(l.FullName))
                 .SelectMany(asm => asm.GetTypes())
-                .Where(t => typeof(IApplication).IsAssignableFrom(t))
+                .Where(t => typeof(IApplication).IsAssignableFrom(t) && !t.IsAbstract)
                 .ToList();
             foreach (var applicationType in applicationTypes)
             {

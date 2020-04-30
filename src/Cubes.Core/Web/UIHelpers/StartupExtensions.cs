@@ -17,7 +17,7 @@ namespace Cubes.Core.Web.UIHelpers
                 .AddTransient<ISchemaProvider, QuerySchemaProvider>()
                 .AddTransient<ISchemaProvider, StaticContentSchemaProvider>()
 
-                .AddSingleton<ILookupManager, LookupManager>()
+                .AddScoped<ILookupManager, LookupManager>()
                 .AddTransient<ILookupProvider, RequestTypeLookupProvider>()
                 .AddTransient<ILookupProvider, JobTypeLookupProvider>()
                 .AddTransient<ILookupProvider, DatabaseProvidersLookupProvider>()

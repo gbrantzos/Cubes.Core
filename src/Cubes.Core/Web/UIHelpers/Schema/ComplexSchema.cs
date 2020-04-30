@@ -13,7 +13,6 @@ namespace Cubes.Core.Web.UIHelpers.Schema
 
     public class ComplexSchemaSection
     {
-        public string Name { get; set; }
         public Schema Schema { get; set; }
         public bool IsList { get; set; }
 
