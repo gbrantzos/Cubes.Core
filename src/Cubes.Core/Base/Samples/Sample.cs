@@ -39,13 +39,15 @@ namespace Cubes.Core.Base.Samples
             };
             cs.Sections.Add(new ComplexSchemaSection
             {
-                Schema = Schema.Create("Basic")
+                RootProperty   = "Basic",
+                Schema         = Schema.Create("Basic")
                     .WithSelectDynamic("SEnConnection", "SEn Connection", LookupProviders.DataConnections)
                     .WithSelectDynamic("OdwConnection", "ODW Connection", LookupProviders.DataConnections)
             });
             cs.Sections.Add(new ComplexSchemaSection
             {
-                Schema = Schema.Create("Users", "WMS Users")
+                RootProperty   = "WmsUsers",
+                Schema         = Schema.Create("Users", "WMS Users")
                     .WithText("UserName", Validator.Required())
                     .WithText("DisplayName", Validator.Required())
                     .WithPassword("Password", Validator.Required()),
@@ -68,7 +70,13 @@ namespace Cubes.Core.Base.Samples
     {
         public override object FromViewModel(object viewModel)
         {
-            throw new System.NotImplementedException();
+            var toReturn = new SampleApplicationSettings();
+            dynamic temp = viewModel;
+
+            toReturn.SEnConnection = temp.Basic.SEnConnection;
+            toReturn.OdwConnection = temp.Basic.OdwConnection;
+
+            return toReturn;
         }
 
         public override object ToViewModel(object configurationInstance)

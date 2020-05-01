@@ -81,8 +81,21 @@ namespace Cubes.Core.Web.Controllers
             if (configurationType == null)
                 return BadRequest($"Could not resolve type '{configurationName}");
 
-            var configurationInstance = serializer.Deserialize(configurationJson, configurationType);
-            configurationWriter.Save(configurationType, configurationInstance);
+            var vmConverterType = configurationType
+                .GetAttribute<ViewModelConverterAttribute>()?
+                .ViewModelConverterType;
+            if (vmConverterType != null)
+            {
+                var vmConverter = Activator.CreateInstance(vmConverterType) as ViewModelConverter;
+                dynamic temp = serializer.Deserialize(configurationJson, typeof(object));
+                var configurationInstance = vmConverter.FromViewModel(temp);
+                configurationWriter.Save(configurationType, configurationInstance);
+            }
+            else
+            {
+                var configurationInstance = serializer.Deserialize(configurationJson, configurationType);
+                configurationWriter.Save(configurationType, configurationInstance);
+            }
 
             return Ok($"Configuration {configurationType.Name} saved");
         }

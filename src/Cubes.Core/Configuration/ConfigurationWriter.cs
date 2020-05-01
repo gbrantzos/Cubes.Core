@@ -27,7 +27,7 @@ namespace Cubes.Core.Configuration
         {
             var storeAttribute = configType.GetAttribute<ConfigurationStoreAttribute>();
             if (storeAttribute == null)
-                throw new ArgumentNullException($"No configuration storage attribute for type {configType.Name}");
+                throw new ArgumentException($"No configuration storage attribute for type {configType.Name}.");
 
             var path = Path.Combine(cubesEnvironment.GetFolder(storeAttribute.CubesFolder), storeAttribute.FilePath);
             var format = Path.GetExtension(path);
@@ -36,7 +36,7 @@ namespace Cubes.Core.Configuration
 
             var serializer = serializers.Find(s => s.Format.Equals(format, StringComparison.CurrentCultureIgnoreCase));
             if (serializer == null)
-                throw new ArgumentException($"No serializer defined for format '{format}");
+                throw new ArgumentException($"No serializer defined for format '{format}.");
 
             var toWrite = new ExpandoObject();
             toWrite.TryAdd(configType.Name, configInstance);
@@ -49,7 +49,7 @@ namespace Cubes.Core.Configuration
         {
             var configType = typeResolver.GetByName(configTypeName);
             if (configTypeName == null)
-                throw new ArgumentException($"Could not resolve type {configTypeName}");
+                throw new ArgumentException($"Could not resolve type {configTypeName}.");
 
             Save(configType, configInstance);
         }

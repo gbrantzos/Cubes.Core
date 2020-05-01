@@ -6,7 +6,8 @@ namespace Cubes.Core.Utilities
 {
     public class JsonSerializer : ISerializer
     {
-        private JsonSerializerSettings settings = new JsonSerializerSettings
+        private readonly JsonSerializerSettings settings =
+            new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Include
             };
