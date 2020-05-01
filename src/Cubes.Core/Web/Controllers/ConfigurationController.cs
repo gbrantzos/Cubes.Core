@@ -99,5 +99,26 @@ namespace Cubes.Core.Web.Controllers
 
             return Ok($"Configuration {configurationType.Name} saved");
         }
+
+        /// <summary>
+        /// Reset configuration
+        /// </summary>
+        /// <remarks>
+        /// Save a default instance of requested configuration type.
+        /// </remarks>
+        /// <param name="configurationName"></param>
+        /// <returns></returns>
+        [HttpGet("{configurationName}/reset")]
+        public IActionResult ResetConfiguration(string configurationName)
+        {
+            var configurationType = typeResolver.GetByName(configurationName);
+            if (configurationType == null)
+                return BadRequest($"Could not resolve type '{configurationName}");
+
+            var configurationInstance = Activator.CreateInstance(configurationType);
+            configurationWriter.Save(configurationType, configurationInstance);
+
+            return Ok($"Saved a default instance of {configurationType.Name}!");
+        }
     }
 }
