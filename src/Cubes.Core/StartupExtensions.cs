@@ -63,7 +63,7 @@ namespace Cubes.Core
             ICubesEnvironment cubes)
         {
             foreach (var application in cubes.GetApplicationInstances())
-                application.ConfigureAppConfiguration(configuration);
+                application.ConfigureAppConfiguration(configuration, cubes);
 
             return configuration;
         }

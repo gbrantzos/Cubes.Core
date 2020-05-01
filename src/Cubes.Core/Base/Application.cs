@@ -12,8 +12,9 @@ namespace Cubes.Core.Base
     /// </summary>
     public abstract class Application : IApplication
     {
-        public virtual IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration)
-            => configuration;
+        public virtual IConfigurationBuilder ConfigureAppConfiguration(
+            IConfigurationBuilder configuration,
+            ICubesEnvironment cubes) => configuration;
 
         public virtual IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration)
             => services;

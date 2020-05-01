@@ -46,7 +46,9 @@ namespace Cubes.Core.Base
         /// </summary>
         /// <param name="rootFolder">Cubes root folder.</param>
         /// <param name="adminPath">Path where Cubes Management web application is located.</param>
-        /// <param name="applications">Application manifests defined using environment variables or command line parameters.</param>
+        /// <param name="applications">Application manifests defined using environment variables or
+        /// command line parameters.
+        /// </param>
         /// <param name="logger">The logger to use</param>
         /// <param name="fileSystem"></param>
         public CubesEnvironment(string rootFolder,
@@ -68,16 +70,16 @@ namespace Cubes.Core.Base
             this.loadedApplications     = new List<ApplicationManifest>();
             this.swaggerXmlFiles        = new List<string>();
 
-            CheckRootFolderExistance(rootFolder);
+            CheckRootFolderExistence(rootFolder);
             if (!fileSystem.File.Exists(adminPath))
-                adminPath = fileSystem.Path.Combine(rootFolder, adminPath);
+                this.adminPath = fileSystem.Path.Combine(rootFolder, adminPath);
 
             // Cubes information
-            var figgle = FiggleFonts.Slant.Render(" Cubes v5");
+            var figgle    = FiggleFonts.Slant.Render(" Cubes v5");
             var buildInfo = environmentInformation.BuildInformation;
             var buildLogo = $"Git Commit #{buildInfo.Commit}, build at {buildInfo.BuildAt}";
-            var version = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode}";
-            var message = $"Starting Cubes, version {version} build [{buildLogo}]{Environment.NewLine}{figgle}";
+            var version   = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode}";
+            var message   = $"Starting Cubes, version {version} build [{buildLogo}]{Environment.NewLine}{figgle}";
 
             logger.LogInformation(new String('-', 100));
             logger.LogInformation(message);
@@ -134,14 +136,15 @@ namespace Cubes.Core.Base
         // TODO We shall keep this until we can provide a centralized IConfiguration with write capabilities!
         private void CreateSettingsFile()
         {
+            // TODO We always use YAML serializer. Why??
             var serializer = new SerializerBuilder().Build();
-            foreach (var config in configurationFiles)
+            foreach (var (Filename, CreateDefaultObject) in configurationFiles)
             {
-                var filePath = this.GetFileOnPath(CubesFolderKind.Settings, config.Filename);
+                var filePath = this.GetFileOnPath(CubesFolderKind.Settings, Filename);
                 if (!fileSystem.File.Exists(filePath))
                 {
                     var toWrite  = new ExpandoObject();
-                    var instance = config.CreateDefaultObject();
+                    var instance = CreateDefaultObject();
                     toWrite.TryAdd(instance.GetType().Name, instance);
                     fileSystem.File.WriteAllText(filePath, serializer.Serialize(toWrite));
                 }
@@ -168,8 +171,8 @@ namespace Cubes.Core.Base
             // Add default application
             var defaultApplication = new ApplicationManifest
             {
-                Name = "Default",
-                Active = true,
+                Name       = "Default",
+                Active     = true,
                 Assemblies = GetCommonAssemblies()
             };
             discoveredApplications.Add(defaultApplication);
@@ -195,16 +198,16 @@ namespace Cubes.Core.Base
                         // Make assembly paths absolute
                         var actualPath = fileSystem.File.Exists(temp) ?
                             temp :
-                            fileSystem.Path.Combine(application.BasePath, temp);
+                            fileSystem.Path.Combine(application.ManifestPath, temp);
                         applicationAssemblies.Add(actualPath);
                     }
 
                     var toLoad = new ApplicationManifest
                     {
-                        Name = application.Name,
-                        Active = true,
-                        BasePath = application.BasePath,
-                        Assemblies = applicationAssemblies
+                        Name           = application.Name,
+                        Active         = true,
+                        ManifestPath   = application.ManifestPath,
+                        Assemblies     = applicationAssemblies
                     };
                     discoveredApplications.Add(toLoad);
                 }
@@ -277,7 +280,7 @@ namespace Cubes.Core.Base
                 {
                     // Check if we have already loaded such an assembly
                     var asmName = AssemblyName.GetAssemblyName(file).Name;
-                    var existing = this.loadedAssemblies.FirstOrDefault(asm => asm.AssemblyName == asmName);
+                    var existing = this.loadedAssemblies.Find(asm => asm.AssemblyName == asmName);
                     if (existing != null)
                     {
                         logger.LogError("Assembly with name {name} is already loaded: {path}", asmName, existing.Path);
@@ -304,7 +307,7 @@ namespace Cubes.Core.Base
         }
 
         // Make sure root folder exists
-        private void CheckRootFolderExistance(string rootFolder)
+        private void CheckRootFolderExistence(string rootFolder)
         {
             if (!this.fileSystem.Directory.Exists(rootFolder))
             {

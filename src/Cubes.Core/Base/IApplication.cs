@@ -15,8 +15,9 @@ namespace Cubes.Core.Base
         /// Configure Application configuration, .Net core specific
         /// </summary>
         /// <param name="configuration"></param>
+        /// <param name="cubes"></param>
         /// <returns></returns>
-        IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration);
+        IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration, ICubesEnvironment cubes);
 
         /// <summary>
         /// Configure Services, .Net core specific

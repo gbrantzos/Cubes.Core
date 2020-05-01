@@ -81,10 +81,9 @@ namespace Cubes.Core.Base
             var deserializer = new DeserializerBuilder().Build();
             foreach (var path in absolutePaths)
             {
-                var content = File.ReadAllText(path);
-                var manifest = deserializer.Deserialize<ApplicationManifest>(content);
-                if (String.IsNullOrEmpty(manifest.BasePath))
-                    manifest.BasePath = Path.GetDirectoryName(path);
+                var content           = File.ReadAllText(path);
+                var manifest          = deserializer.Deserialize<ApplicationManifest>(content);
+                manifest.ManifestPath = Path.GetDirectoryName(path);
 
                 toReturn.Add(manifest);
             }
