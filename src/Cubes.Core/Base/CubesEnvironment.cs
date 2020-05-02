@@ -75,15 +75,18 @@ namespace Cubes.Core.Base
                 this.adminPath = fileSystem.Path.Combine(rootFolder, adminPath);
 
             // Cubes information
-            var figgle    = FiggleFonts.Slant.Render(" Cubes v5");
+            var figgle    = FiggleFonts.Slant.Render("    Cubes v5");
             var buildInfo = environmentInformation.BuildInformation;
-            var buildLogo = $"Git Commit #{buildInfo.Commit}, build at {buildInfo.BuildAt}";
             var version   = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode}";
-            var message   = $"Starting Cubes, version {version} build [{buildLogo}]{Environment.NewLine}{figgle}";
+            var message   = $"Starting Cubes, version {version} build";
+            var gitInfo   = $"Git branch {buildInfo.Branch}, commit {buildInfo.Commit}, build time {buildInfo.BuildAt}";
+            gitInfo      += $"{Environment.NewLine}{figgle}";
 
             logger.LogInformation(new String('-', 100));
             logger.LogInformation(message);
+            logger.LogInformation(gitInfo);
             logger.LogInformation($"Cubes root folder: {rootFolder}");
+            logger.LogInformation(new String('-', 100) + Environment.NewLine);
         }
 
         /// <summary>

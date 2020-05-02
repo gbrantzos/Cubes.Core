@@ -30,29 +30,27 @@ namespace Cubes.Core.Commands.Basic
     public class QueryResultsAsEmailSampleProvider : IRequestSampleProvider
     {
         public object GetSample()
-        {
-            return new QueryResultsAsEmail
+            => new QueryResultsAsEmail
             {
                 QuerySet = new QuerySet
                 {
                     ConnectionName = "A connection to use",
-                    Queries = new List<QuerySetItem>
-                    {
-                        new QuerySetItem { Name = "Details page", QueryName = "Query.#1.Details" },
-                        new QuerySetItem { Name = "Totals page", QueryName = "Query.#2.Totals" },
-                    }
+                    Queries        = new List<QuerySetItem>
+                        {
+                            new QuerySetItem { Name = "Details page", QueryName = "Query.#1.Details" },
+                            new QuerySetItem { Name = "Totals page",  QueryName = "Query.#2.Totals" },
+                        }
                 },
-                Subject = "E-mail subject",
-                Body = "This is the body of the e-mail",
+                Subject     = "E-mail subject",
+                Body        = "This is the body of the e-mail",
                 ToAddresses = new List<string>
-                {
-                    "recipient1@somewhere.com",
-                    "recipient2@somewhere.com"
-                },
+                    {
+                        "recipient1@somewhere.com",
+                        "recipient2@somewhere.com"
+                    },
                 SendIfDataExists = true,
-                SmtpProfile = "SMTP.Profile#2",
-                FileName = "Save.ToFile.xlsx"
+                SmtpProfile      = "SMTP.Profile#2",
+                FileName         = "SaveToFile"
             };
-        }
     }
 }

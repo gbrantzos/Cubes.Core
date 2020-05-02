@@ -3,7 +3,7 @@ using Cubes.Core.Utilities;
 
 namespace Cubes.Core.Commands.Basic
 {
-    [Display("Run OS process")]
+    [Display("Run OS process"), RequestSample(typeof(RunOsProcessSampleProvider))]
     public class RunOsProcess : Request<RunOsProcessResult>
     {
         /// <summary>
@@ -30,6 +30,17 @@ namespace Cubes.Core.Commands.Basic
 
         public override string ToString()
             => $"Run {Command} with {(String.IsNullOrEmpty(Arguments)? "no argumets" : $"args '{Arguments}'")}, in {StartIn.IfNullOrEmpty("current directory")}";
+    }
 
+    public class RunOsProcessSampleProvider : IRequestSampleProvider
+    {
+        public object GetSample()
+            => new RunOsProcess
+            {
+                Command = "notepad.exe",
+                Arguments = "my-file.txt",
+                StartIn = ">>a path<<",
+                TimeoutSecs = 30
+            };
     }
 }
