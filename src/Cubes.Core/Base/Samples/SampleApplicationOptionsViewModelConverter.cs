@@ -5,11 +5,11 @@ using Cubes.Core.Web.UIHelpers.Schema;
 
 namespace Cubes.Core.Base.Samples
 {
-    public class SampleApplicationSettingsViewModelConverter : ViewModelConverter
+    public class SampleApplicationOptionsViewModelConverter : ViewModelConverter
     {
         public override object FromViewModel(object viewModel)
         {
-            var toReturn = new SampleApplicationSettings();
+            var toReturn = new SampleApplicationOptions();
             dynamic temp = viewModel;
 
             toReturn.SEnConnection = temp.Basic.SEnConnection;
@@ -30,9 +30,9 @@ namespace Cubes.Core.Base.Samples
 
         public override object ToViewModel(object configurationInstance)
         {
-            var config = configurationInstance as SampleApplicationSettings;
+            var config = configurationInstance as SampleApplicationOptions;
             if (config is null)
-                throw new ArgumentException($"Could not cast to {nameof(SampleApplicationSettings)}");
+                throw new ArgumentException($"Could not cast to {nameof(SampleApplicationOptions)}");
 
             return new
             {

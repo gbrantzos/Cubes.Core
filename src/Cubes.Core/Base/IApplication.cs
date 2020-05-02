@@ -40,19 +40,19 @@ namespace Cubes.Core.Base
         IEnumerable<string> GetSwaggerXmlFiles();
 
         /// <summary>
-        /// Information needed to enable UI design for application settings.
+        /// Information needed to enable UI design for application options.
         /// </summary>
         /// <returns></returns>
-        IEnumerable<ApplicationSettingsUIConfig> GetUISettings();
+        IEnumerable<ApplicationOptionsUIConfig> GetUISettings();
     }
 
-    public class ApplicationSettingsUIConfig
+    public class ApplicationOptionsUIConfig
     {
-        public string DisplayName      { get; set; }
-        public string SettingsTypeName { get; set; }
-        public ComplexSchema UISchema  { get; set; }
-        public string AssemblyName     { get; set; }
-        public string AssemblyPath     { get; set; }
+        public string DisplayName     { get; set; }
+        public string OptionsTypeName { get; set; }
+        public ComplexSchema UISchema { get; set; }
+        public string AssemblyName    { get; set; }
+        public string AssemblyPath    { get; set; }
     }
 
 }

@@ -7,32 +7,32 @@ namespace Cubes.Core.Base.Samples
 {
     public class SampleApplication : Application
     {
-        public const string SettingFile = "Core.SampleApplication.yaml";
+        public const string OptionsFile = "Core.SampleApplication.yaml";
 
-        public override IEnumerable<ApplicationSettingsUIConfig> GetUISettings()
+        public override IEnumerable<ApplicationOptionsUIConfig> GetUISettings()
         {
             return base
                 .GetUISettings()
-                .Append(new ApplicationSettingsUIConfig
+                .Append(new ApplicationOptionsUIConfig
                 {
-                    DisplayName      = "Sample Application",
-                    SettingsTypeName = "Cubes.Core.Base.Samples.SampleApplicationSettings",
-                    UISchema         = SampleApplicationSettingsSchema.GetSchema(),
-                    AssemblyName     = this.GetType().Assembly.GetName().Name,
-                    AssemblyPath     = this.GetType().Assembly.Location
+                    DisplayName     = "Sample Application",
+                    OptionsTypeName = "Cubes.Core.Base.Samples.SampleApplicationOptions",
+                    UISchema        = SampleApplicationOptionsSchema.GetSchema(),
+                    AssemblyName    = this.GetType().Assembly.GetName().Name,
+                    AssemblyPath    = this.GetType().Assembly.Location
                 });
         }
 
         public override IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             return base.ConfigureServices(services, configuration)
-                .Configure<SampleApplicationSettings>(configuration.GetSection(nameof(SampleApplicationSettings)));
+                .Configure<SampleApplicationOptions>(configuration.GetSection(nameof(SampleApplicationOptions)));
         }
 
         public override IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration, ICubesEnvironment cubes)
         {
             return configuration.AddYamlFile(
-                cubes.GetFileOnPath(CubesFolderKind.Settings, SampleApplication.SettingFile),
+                cubes.GetFileOnPath(CubesFolderKind.Settings, SampleApplication.OptionsFile),
                 optional: true,
                 reloadOnChange: true);
         }

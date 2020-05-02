@@ -3,7 +3,7 @@ using Cubes.Core.Web.UIHelpers.Schema;
 
 namespace Cubes.Core.Base.Samples
 {
-    public static class SampleApplicationSettingsSchema
+    public static class SampleApplicationOptionsSchema
     {
         public static ComplexSchema GetSchema()
         {
@@ -34,6 +34,5 @@ namespace Cubes.Core.Base.Samples
 
             return cs;
         }
-
     }
 }

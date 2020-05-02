@@ -5,16 +5,16 @@ using Cubes.Core.Web.UIHelpers;
 
 namespace Cubes.Core.Base.Samples
 {
-    [ConfigurationStore(SampleApplication.SettingFile)]
-    [ViewModelConverter(typeof(SampleApplicationSettingsViewModelConverter))]
-    public class SampleApplicationSettings
+    [ConfigurationStore(SampleApplication.OptionsFile)]
+    [ViewModelConverter(typeof(SampleApplicationOptionsViewModelConverter))]
+    public class SampleApplicationOptions
     {
         public string SEnConnection { get; set; }
         public string OdwConnection { get; set; }
         public bool CheckEofExistence { get; set; }
         public List<string> CheckEofExistenceExceptions { get; set; }
 
-        public SampleApplicationSettings()
+        public SampleApplicationOptions()
         {
             SEnConnection = "Pharmex.SEn";
             OdwConnection = "Pharmex.ODW";

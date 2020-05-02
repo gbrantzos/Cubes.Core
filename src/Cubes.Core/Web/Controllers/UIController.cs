@@ -27,7 +27,7 @@ namespace Cubes.Core.Web.Controllers
             "muted",
             "outline"
         };
-        private static readonly string resourceRoot = "Cubes.Core.Web.Swagger.Themes";
+        private const string resourceRoot = "Cubes.Core.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
         private readonly ISchemaManager schemaManager;
         private readonly ITypeResolver typeResolver;
@@ -94,8 +94,8 @@ namespace Cubes.Core.Web.Controllers
             return new JsonResult(provider.GetSample(), jsonSerializerSettings);
         }
 
-        [HttpGet("applications-settings")]
-        public IActionResult GetApplicationsUISettings()
+        [HttpGet("applications-options")]
+        public IActionResult GetApplicationsUIOptions()
         {
             var settings = cubesEnvironment
                 .GetApplicationInstances()
