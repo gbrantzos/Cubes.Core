@@ -91,6 +91,18 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public static Schema WithSelect(this Schema schema, string key, Options options, params Validator[] validators)
             => schema.WithSelect(key, String.Empty, options, validators);
 
+        public static Schema WithSelectDynamic(this Schema schema, string key, string label, string lookupKey, params Validator[] validators)
+        {
+            var item = CreateItem(key, label, SchemaItemType.Select, validators);
+            item.Options = new Options { Dynamic = true, LookupKey = lookupKey };
+            schema.AddItem(item);
+
+            return schema;
+        }
+
+        public static Schema WithSelectDynamic(this Schema schema, string key, string lookupKey, params Validator[] validators)
+            => schema.WithSelectDynamic(key, String.Empty, lookupKey, validators);
+
         public static Schema WithPassword(this Schema schema, string key, string label, params Validator[] validators)
         {
             var item = CreateItem(key, label, SchemaItemType.Password, validators);

@@ -13,14 +13,14 @@ function Tag {
     if ($gitBranch.StartsWith("master")) {
         return ""
     }
-    
+
     # release should return -rc<count> of commits, i.e. -rc3
     if ($gitBranch.StartsWith("release")) {
         $commits = (git rev-list --count HEAD ^develop)
         return "-rc$commits"
     }
-    
-    # all others should return -dev-<timestamp>    
+
+    # all others should return -dev-<timestamp>
     return "-dev-$timeStamp"
 }
 
@@ -30,7 +30,7 @@ function BuildConfig {
     if ($gitBranch.StartsWith("master") -or $gitBranch.StartsWith("release")) {
         return "Release"
     }
-    
+
     # others should return Debug
     return "Debug"
 }
@@ -38,8 +38,8 @@ function BuildConfig {
 # Create folder if missing
 function CreateFolder {
     param ([string] $folderName)
-    if(!(test-path $folderName)) { 
-        New-Item -ItemType Directory -Force -Path $folderName 
+    if(!(test-path $folderName)) {
+        New-Item -ItemType Directory -Force -Path $folderName
     }
 
 }
@@ -47,8 +47,8 @@ function CreateFolder {
 # Clear temp folder
 function ClearTemp {
     $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
-    if(Test-Path $tgtPath) { 
-        Remove-Item $tgtPath -Recurse 
+    if(Test-Path $tgtPath) {
+        Remove-Item $tgtPath -Recurse
     }
 }
 
@@ -64,13 +64,13 @@ function Finish {
 
 
 # ------------------------------------------------------------------------------
-# Setup 
+# Setup
 
 # TODO Shall we store them globally????
 $major = 5
 $minor = 1
 $patch = 2
-$gitHash = (git rev-parse HEAD).Substring(0, 10)
+$gitHash   = (git rev-parse HEAD).Substring(0, 10)
 $gitBranch = (git rev-parse --abbrev-ref HEAD)
 $timeStamp = Get-Date -Format 'yyyyMMddHHmm'
 

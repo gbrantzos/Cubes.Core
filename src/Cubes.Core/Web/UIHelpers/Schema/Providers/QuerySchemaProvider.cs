@@ -1,6 +1,6 @@
 using Cubes.Core.DataAccess;
 
-namespace Cubes.Core.Web.UIHelpers.Schema.CoreProviders
+namespace Cubes.Core.Web.UIHelpers.Schema.Providers
 {
     public class QuerySchemaProvider : SchemaProvider<Query>
     {

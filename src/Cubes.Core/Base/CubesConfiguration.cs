@@ -28,7 +28,7 @@ namespace Cubes.Core.Base
         public static IConfigurationBuilder AddCubesConfigurationProvider(this IConfigurationBuilder configuration,
             ICubesEnvironment cubes)
         {
-            var section = CubesConstants.Configuration_Section;
+            const string section = CubesConstants.Configuration_Section;
             var cubesConfig = new Dictionary<string, string>
                 {
                     { $"{section}:Version"        , cubes.GetEnvironmentInformation().FullVersion },

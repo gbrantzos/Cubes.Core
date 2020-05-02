@@ -9,18 +9,14 @@ namespace Cubes.Core.Configuration
     {
         public CubesFolderKind CubesFolder { get; set; }
         public string FilePath { get; set; }
-        public string ElementPath { get; set; } = String.Empty;
 
-        public ConfigurationStoreAttribute(CubesFolderKind cubesFolder, string filePath, string elementPath)
+        public ConfigurationStoreAttribute(CubesFolderKind cubesFolder, string filePath)
         {
             CubesFolder = cubesFolder;
             FilePath    = filePath.ThrowIfEmpty(nameof(filePath));
-            ElementPath = elementPath;
         }
-        public ConfigurationStoreAttribute(CubesFolderKind cubesFolder, string filePath)
-            : this(cubesFolder, filePath, String.Empty) { }
-        public ConfigurationStoreAttribute(string filePath)
-            : this(CubesFolderKind.Settings, filePath, String.Empty) { }
 
+        public ConfigurationStoreAttribute(string filePath)
+            : this(CubesFolderKind.Settings, filePath) { }
     }
 }

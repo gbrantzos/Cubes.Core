@@ -3,8 +3,11 @@ using Autofac.Features.Indexed;
 using Cubes.Core.Base;
 using Cubes.Core.Configuration;
 using Cubes.Core.Utilities;
+using Cubes.Core.Web.UIHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Cubes.Core.Web.Controllers
 {
@@ -44,6 +47,19 @@ namespace Cubes.Core.Web.Controllers
 
             var configurationInstance = configuration.GetSection(configurationType.Name).Get(configurationType) ??
                 Activator.CreateInstance(configurationType);
+
+            var vmConverterType = configurationType
+                .GetAttribute<ViewModelConverterAttribute>()?
+                .ViewModelConverterType;
+            if (vmConverterType != null)
+            {
+                var vmConverter = Activator.CreateInstance(vmConverterType) as ViewModelConverter;
+                var jsonSerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver()
+                };
+                return new JsonResult(vmConverter.ToViewModel(configurationInstance), jsonSerializerSettings);
+            }
             return Ok(configurationInstance );
         }
 
@@ -65,10 +81,44 @@ namespace Cubes.Core.Web.Controllers
             if (configurationType == null)
                 return BadRequest($"Could not resolve type '{configurationName}");
 
-            var configurationInstance = serializer.Deserialize(configurationJson, configurationType);
-            configurationWriter.Save(configurationType, configurationInstance);
+            var vmConverterType = configurationType
+                .GetAttribute<ViewModelConverterAttribute>()?
+                .ViewModelConverterType;
+            if (vmConverterType != null)
+            {
+                var vmConverter = Activator.CreateInstance(vmConverterType) as ViewModelConverter;
+                dynamic temp = serializer.Deserialize(configurationJson, typeof(object));
+                var configurationInstance = vmConverter.FromViewModel(temp);
+                configurationWriter.Save(configurationType, configurationInstance);
+            }
+            else
+            {
+                var configurationInstance = serializer.Deserialize(configurationJson, configurationType);
+                configurationWriter.Save(configurationType, configurationInstance);
+            }
 
             return Ok($"Configuration {configurationType.Name} saved");
+        }
+
+        /// <summary>
+        /// Reset configuration
+        /// </summary>
+        /// <remarks>
+        /// Save a default instance of requested configuration type.
+        /// </remarks>
+        /// <param name="configurationName"></param>
+        /// <returns></returns>
+        [HttpGet("{configurationName}/reset")]
+        public IActionResult ResetConfiguration(string configurationName)
+        {
+            var configurationType = typeResolver.GetByName(configurationName);
+            if (configurationType == null)
+                return BadRequest($"Could not resolve type '{configurationName}");
+
+            var configurationInstance = Activator.CreateInstance(configurationType);
+            configurationWriter.Save(configurationType, configurationInstance);
+
+            return Ok($"Saved a default instance of {configurationType.Name}!");
         }
     }
 }

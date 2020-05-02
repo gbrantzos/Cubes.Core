@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cubes.Core.DataAccess;
 
-namespace Cubes.Core.Web.UIHelpers.Lookups
+namespace Cubes.Core.Web.UIHelpers.Lookups.Providers
 {
     public class DatabaseProvidersLookupProvider : ILookupProvider
     {
@@ -13,9 +13,9 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
             { "mysql",  "mySQL" },
         };
 
-        public string Name => "DbProviders";
+        public string Name => LookupProviders.DatabaseProviders;
 
-        public Lookup Get()
+        public Lookup GetLookup()
         {
             var knownProviders = ConnectionManager.KnownProviders;
             return new Lookup

@@ -28,10 +28,10 @@ Assemblies:
     -   Cubes.Pharmex.dll
 ```
 Notes:
-- An application marked as not `Active` is not loaded. 
-- A manifest can define multiple assemblies.
-- A manifest can define a base path. If a base path is not defined, the path of the manifest file is used instead.
-- Paths are treated first as absolute and if not found, as relative to the application's base path.
+- An application marked as not `Active` will not be loaded. 
+- A manifest file can define multiple assemblies to be loaded.
+- The path of a manifest file is stored in `ManifestPath` property and is used for creating relative paths.
+- Paths are treated first as absolute and if not found, as relative to the application's `ManifestPath`.
 
 
 #### Library filtering

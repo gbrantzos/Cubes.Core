@@ -30,18 +30,21 @@ namespace Cubes.Core.Web.Controllers
         private static readonly string resourceRoot = "Cubes.Core.Web.Swagger.Themes";
         private readonly IConfiguration configuration;
         private readonly ISchemaManager schemaManager;
-        private readonly List<ILookupProvider> lookupProviders;
         private readonly ITypeResolver typeResolver;
+        private readonly ILookupManager lookupManager;
+        private readonly ICubesEnvironment cubesEnvironment;
 
         public UIController(IConfiguration configuration,
-            IEnumerable<ILookupProvider> lookupProviders,
+            ILookupManager lookupManager,
             ITypeResolver typeResolver,
-            ISchemaManager schemaManager)
+            ISchemaManager schemaManager,
+            ICubesEnvironment cubesEnvironment)
         {
-            this.configuration = configuration;
-            this.schemaManager = schemaManager;
-            this.lookupProviders = lookupProviders.ToList();
-            this.typeResolver = typeResolver;
+            this.configuration    = configuration;
+            this.schemaManager    = schemaManager;
+            this.typeResolver     = typeResolver;
+            this.lookupManager    = lookupManager;
+            this.cubesEnvironment = cubesEnvironment;
         }
 
         [HttpGet("swagger-css")]
@@ -62,13 +65,11 @@ namespace Cubes.Core.Web.Controllers
         [HttpGet("lookup/{lookupName}")]
         public IActionResult GetLookup(string lookupName)
         {
-            var provider = this
-                .lookupProviders
-                .FirstOrDefault(pr => pr.Name.Equals(lookupName, StringComparison.CurrentCultureIgnoreCase));
-            if (provider == null)
+            var lookup = this.lookupManager.GetLookup(lookupName);
+            if (lookup == null)
                 return BadRequest($"Unknown lookup provider: {lookupName}");
 
-            return Ok(provider.Get());
+            return Ok(lookup);
         }
 
         [HttpGet("schema/{schemaName}")]
@@ -91,6 +92,16 @@ namespace Cubes.Core.Web.Controllers
             };
 
             return new JsonResult(provider.GetSample(), jsonSerializerSettings);
+        }
+
+        [HttpGet("applications-settings")]
+        public IActionResult GetApplicationsUISettings()
+        {
+            var settings = cubesEnvironment
+                .GetApplicationInstances()
+                .SelectMany(app => app.GetUISettings())
+                .ToList();
+            return Ok(settings);
         }
     }
 }

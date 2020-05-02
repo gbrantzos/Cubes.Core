@@ -8,7 +8,7 @@ using Cubes.Core.Utilities;
 
 namespace Cubes.Core.Configuration
 {
-    class ConfigurationWriter : IConfigurationWriter
+    public class ConfigurationWriter : IConfigurationWriter
     {
         private readonly ITypeResolver typeResolver;
         private readonly ICubesEnvironment cubesEnvironment;
@@ -18,25 +18,25 @@ namespace Cubes.Core.Configuration
             ICubesEnvironment cubesEnvironment,
             IEnumerable<ISerializer> serializers)
         {
-            this.typeResolver = typeResolver;
+            this.typeResolver     = typeResolver;
             this.cubesEnvironment = cubesEnvironment;
-            this.serializers = serializers.ToList();
+            this.serializers      = serializers.ToList();
         }
 
         public void Save(Type configType, object configInstance)
         {
             var storeAttribute = configType.GetAttribute<ConfigurationStoreAttribute>();
             if (storeAttribute == null)
-                throw new ArgumentNullException($"No configuration storage attribute for type {configType.Name}");
+                throw new ArgumentException($"No configuration storage attribute for type '{configType.Name}'.");
 
             var path = Path.Combine(cubesEnvironment.GetFolder(storeAttribute.CubesFolder), storeAttribute.FilePath);
             var format = Path.GetExtension(path);
             if (format.StartsWith("."))
                 format = format.Substring(1);
 
-            var serializer = serializers.FirstOrDefault(s => s.Format.Equals(format, StringComparison.CurrentCultureIgnoreCase));
+            var serializer = serializers.Find(s => s.Format.Equals(format, StringComparison.CurrentCultureIgnoreCase));
             if (serializer == null)
-                throw new ArgumentException($"No serializer defined for format '{format}");
+                throw new ArgumentException($"No serializer defined for format '{format}'.");
 
             var toWrite = new ExpandoObject();
             toWrite.TryAdd(configType.Name, configInstance);
@@ -49,7 +49,7 @@ namespace Cubes.Core.Configuration
         {
             var configType = typeResolver.GetByName(configTypeName);
             if (configTypeName == null)
-                throw new ArgumentException($"Could not resolve type {configTypeName}");
+                throw new ArgumentException($"Could not resolve type '{configTypeName}'.");
 
             Save(configType, configInstance);
         }
