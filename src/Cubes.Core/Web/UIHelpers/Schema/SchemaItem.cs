@@ -28,6 +28,8 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public Options Options { get; set; }
         public ICollection<Validator> Validators { get; set; } = new List<Validator>();
         public string ClassName { get; set; }
+        public string Hint { get; set; }
+        public string Flex { get; set; }
 
         [JsonIgnore]
         public Schema Schema { get; set; }

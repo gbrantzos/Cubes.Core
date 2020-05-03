@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Cubes.Core.Utilities;
 using Humanizer;
 
@@ -113,5 +114,17 @@ namespace Cubes.Core.Web.UIHelpers.Schema
 
         public static Schema WithPassword(this Schema schema, string key, params Validator[] validators)
             => schema.WithPassword(key, String.Empty, validators);
+
+        public static Schema SetItemHint(this Schema schema, string hint)
+        {
+            schema.Items.Last().Hint = hint;
+            return schema;
+        }
+
+        public static Schema SetItemFlex(this Schema schema, string flex)
+        {
+            schema.Items.Last().Flex = flex;
+            return schema;
+        }
     }
 }

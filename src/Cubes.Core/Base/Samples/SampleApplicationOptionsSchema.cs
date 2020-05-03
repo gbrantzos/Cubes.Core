@@ -19,7 +19,7 @@ namespace Cubes.Core.Base.Samples
                     .WithSelectDynamic("OdwConnection", "ODW Connection", LookupProviders.DataConnections)
                     .WithCheckbox("CheckEofExistence", "Check EOF label existence")
                     .WithTextArea("CheckEofExistenceExceptions", "Codes to skip EOF labels existence check")
-                // Comma separated list of codes to exclude from EOF label check
+                        .SetItemHint("Comma separated list of codes to exclude from EOF label check")
             });
             cs.Sections.Add(new ComplexSchemaSection
             {

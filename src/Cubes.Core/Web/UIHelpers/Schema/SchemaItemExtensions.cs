@@ -80,7 +80,6 @@ namespace Cubes.Core.Web.UIHelpers.Schema
             return item;
         }
 
-        // TODO We can add methods like
 
         // StartsGroup
         // EndsGroup
