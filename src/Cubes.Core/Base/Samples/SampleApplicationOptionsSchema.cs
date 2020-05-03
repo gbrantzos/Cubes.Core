@@ -25,11 +25,17 @@ namespace Cubes.Core.Base.Samples
             {
                 RootProperty = "WmsUsers",
                 Schema = Schema.Create("Users", "WMS Users")
-                    .WithText("UserName", Validator.Required())
                     .WithText("DisplayName", Validator.Required())
+                    .WithText("UserName", Validator.Required())
                     .WithPassword("Password", Validator.Required()),
                 IsList = true,
-                ListItem = "displayName"
+                ListDefinition = new ListDefinition
+                {
+                    Item        = "DisplayName",
+                    ItemSub     = "UserName",
+                    ItemSubExpr = "return `Username: ${listItem.UserName}`;",
+                    Icon        = "far fa-user"
+                }
             });
 
             return cs;

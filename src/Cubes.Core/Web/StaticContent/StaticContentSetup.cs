@@ -188,19 +188,17 @@ namespace Cubes.Core.Web.StaticContent
             return app;
         }
 
-        private static void DeployZipOnTemp(string target, string zipPath)
+        private static void DeployZipOnTemp(string targetFolder, string zipFilePath)
         {
             // Make sure that target folder is empty
-            if (Directory.Exists(target))
+            if (Directory.Exists(targetFolder))
             {
-                Directory.Delete(target, true);
-                Directory.CreateDirectory(target);
+                Directory.Delete(targetFolder, true);
+                Directory.CreateDirectory(targetFolder);
             }
 
             // Extract zip
-            using var fileStream = new FileStream(zipPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            using var archive = new ZipArchive(fileStream);
-            archive.ExtractToDirectory(target);
+            ZipFile.ExtractToDirectory(zipFilePath, targetFolder);
         }
     }
 }

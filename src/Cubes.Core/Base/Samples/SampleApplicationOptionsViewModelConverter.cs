@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Cubes.Core.Web.UIHelpers;
 using Cubes.Core.Web.UIHelpers.Schema;
+using Newtonsoft.Json.Linq;
 
 namespace Cubes.Core.Base.Samples
 {
@@ -25,6 +26,16 @@ namespace Cubes.Core.Base.Samples
                 .Where(i => !String.IsNullOrEmpty(i))
                 .ToList();
 
+            foreach (var user in temp.WmsUsers)
+            {
+                toReturn.WmsUsers.Add(new WmsUser
+                {
+                    DisplayName = user.DisplayName,
+                    UserName    = user.UserName,
+                    Password    = user.Password
+                });
+            }
+
             return toReturn;
         }
 
@@ -42,7 +53,8 @@ namespace Cubes.Core.Base.Samples
                     config.OdwConnection,
                     config.CheckEofExistence,
                     CheckEofExistenceExceptions = String.Join(", ", config.CheckEofExistenceExceptions.ToArray())
-                }
+                },
+                config.WmsUsers
             };
         }
     }

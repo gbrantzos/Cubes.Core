@@ -36,8 +36,14 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public bool IsList         { get; set; }
 
         // List specification
-        public string ListItem     { get; set; }
-        public string ListItemSub  { get; set; }
-        public string ListIcon     { get; set; }
+        public ListDefinition ListDefinition { get; set; }
+    }
+
+    public class ListDefinition
+    {
+        public string Item        { get; set; }
+        public string ItemSub     { get; set; }
+        public string ItemSubExpr { get; set; }
+        public string Icon        { get; set; }
     }
 }
