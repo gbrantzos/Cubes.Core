@@ -74,9 +74,10 @@ $gitHash   = (git rev-parse HEAD).Substring(0, 10)
 $gitBranch = (git rev-parse --abbrev-ref HEAD)
 $timeStamp = Get-Date -Format 'yyyyMMddHHmm'
 
-$buildConfig  = BuildConfig
-$tag          = Tag
-$nugetServer  = "http://nuget.gbworks.lan"
+$buildConfig    = BuildConfig
+$tag            = Tag
+$nugetServer    = "http://baget.gbworks.lan/v3/index.json"
+$nugetServerKey = "GbWorks@ApiKey!"
 # ------------------------------------------------------------------------------
 
 
@@ -145,8 +146,10 @@ dotnet pack "$srcPath/Cubes.Core/Cubes.Core.csproj" `
   -c $buildConfig `
   -p:PackageVersion=$version$tag `
   -o $tgtPath
-dotnet nuget push "$tgtPath/Cubes.Core.$version$tag.nupkg" `
-  -s $nugetServer
+dotnet nuget push `
+  -s $nugetServer `
+  -k $nugetServerKey `
+  "$tgtPath/Cubes.Core.$version$tag.nupkg"
 # ------------------------------------------------------------------------------
 
 

@@ -19,7 +19,7 @@
     },
     "Cubes.Host": {
       "commandName": "Project",
-      "commandLineArgs": "--application \"D:\\Code\\CubesNEXT\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml\" --adminPath \"D:\\Code\\CubesNEXT\\Core.WebApp\\dist\\CubesManagement.zip\"",
+      "commandLineArgs": "--adminPath \"D:\\Code\\CubesNEXT\\Core.WebApp\\dist\\CubesManagement.zip\" --application \"D:\\Code\\CubesNEXT\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml\"",
       "launchUrl": "api/values",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
