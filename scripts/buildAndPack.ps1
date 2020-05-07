@@ -1,7 +1,16 @@
 # ------------------------------------------------------------------------------
+# Script parameters
+param(
+    [bool]$PushNuget = $true
+)
+
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
 # Location variables
 $originalPath = Get-Location
-$workingPath  = ($PSScriptRoot)
+$workingPath = ($PSScriptRoot)
 # ------------------------------------------------------------------------------
 
 
@@ -38,7 +47,7 @@ function BuildConfig {
 # Create folder if missing
 function CreateFolder {
     param ([string] $folderName)
-    if(!(test-path $folderName)) {
+    if (!(test-path $folderName)) {
         New-Item -ItemType Directory -Force -Path $folderName
     }
 
@@ -47,7 +56,7 @@ function CreateFolder {
 # Clear temp folder
 function ClearTemp {
     $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
-    if(Test-Path $tgtPath) {
+    if (Test-Path $tgtPath) {
         Remove-Item $tgtPath -Recurse
     }
 }
@@ -70,13 +79,13 @@ function Finish {
 $major = 5
 $minor = 1
 $patch = 2
-$gitHash   = (git rev-parse HEAD).Substring(0, 10)
+$gitHash = (git rev-parse HEAD).Substring(0, 10)
 $gitBranch = (git rev-parse --abbrev-ref HEAD)
 $timeStamp = Get-Date -Format 'yyyyMMddHHmm'
 
-$buildConfig    = BuildConfig
-$tag            = Tag
-$nugetServer    = "http://baget.gbworks.lan/v3/index.json"
+$buildConfig = BuildConfig
+$tag = Tag
+$nugetServer = "http://baget.gbworks.lan/v3/index.json"
 $nugetServerKey = "GbWorks@ApiKey!"
 # ------------------------------------------------------------------------------
 
@@ -84,10 +93,10 @@ $nugetServerKey = "GbWorks@ApiKey!"
 # ------------------------------------------------------------------------------
 # Prepare version numbers
 
-$version="$major.$minor.$patch"
-$assemblyVersion=$version
-$fileVersion="$major.$minor.$patch"
-$informationalVersion="$major.$minor.$patch$tag.$gitHash"
+$version = "$major.$minor.$patch"
+$assemblyVersion = $version
+$fileVersion = "$major.$minor.$patch"
+$informationalVersion = "$major.$minor.$patch$tag.$gitHash"
 
 Write-Output 'Versions'
 Write-Output ''
@@ -105,14 +114,14 @@ Write-Output 'Building project...'
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 dotnet clean -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj"
 dotnet build -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj" `
-  -p:AssemblyVersion=$assemblyVersion `
-  -p:FileVersion=$fileVersion `
-  -p:InformationalVersion=$informationalVersion
+    -p:AssemblyVersion=$assemblyVersion `
+    -p:FileVersion=$fileVersion `
+    -p:InformationalVersion=$informationalVersion
 dotnet clean -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj"
 dotnet build -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj" `
-  -p:AssemblyVersion=$assemblyVersion `
-  -p:FileVersion=$fileVersion `
-  -p:InformationalVersion=$informationalVersion
+    -p:AssemblyVersion=$assemblyVersion `
+    -p:FileVersion=$fileVersion `
+    -p:InformationalVersion=$informationalVersion
 # ------------------------------------------------------------------------------
 
 
@@ -126,30 +135,33 @@ $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
 ClearTemp
 CreateFolder $tgtPath
 dotnet publish "$srcPath/Cubes.Host/Cubes.Host.csproj" `
-  --no-build `
-  -o $tgtPath/Cubes-v$version `
-  -c $buildConfig
+    --no-build `
+    -o $tgtPath/Cubes-v$version `
+    -c $buildConfig
 
 # Cubes host package
 $srcPath = Join-Path -Path $workingPath -ChildPath "../tmp/Cubes-v$Version"
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../deploy'
 Compress-Archive -Path $srcPath/* `
-  -CompressionLevel Optimal `
-  -DestinationPath $tgtPath/Cubes-v$Version$tag.zip `
-  -Force
+    -CompressionLevel Optimal `
+    -DestinationPath $tgtPath/Cubes-v$Version$tag.zip `
+    -Force
 
 # Cubes nuget
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../deploy'
 dotnet pack "$srcPath/Cubes.Core/Cubes.Core.csproj" `
-  --no-build `
-  -c $buildConfig `
-  -p:PackageVersion=$version$tag `
-  -o $tgtPath
-dotnet nuget push `
-  -s $nugetServer `
-  -k $nugetServerKey `
-  "$tgtPath/Cubes.Core.$version$tag.nupkg"
+    --no-build `
+    -c $buildConfig `
+    -p:PackageVersion=$version$tag `
+    -o $tgtPath
+if ($PushNuget) {
+    Write-Host 'Pushing nuget package...'
+    dotnet nuget push `
+        -s $nugetServer `
+        -k $nugetServerKey `
+        "$tgtPath/Cubes.Core.$version$tag.nupkg"
+}
 # ------------------------------------------------------------------------------
 
 
