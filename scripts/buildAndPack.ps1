@@ -45,7 +45,7 @@ function BuildConfig {
 }
 
 # Create folder if missing
-function CreateFolder {
+function Create-Folder {
     param ([string] $folderName)
     if (!(test-path $folderName)) {
         New-Item -ItemType Directory -Force -Path $folderName
@@ -54,7 +54,7 @@ function CreateFolder {
 }
 
 # Clear temp folder
-function ClearTemp {
+function Clear-Temp {
     $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
     if (Test-Path $tgtPath) {
         Remove-Item $tgtPath -Recurse
@@ -69,16 +69,32 @@ function Finish {
     if ($code -eq 0) { Write-Output 'Finished!' }
     exit $code
 }
+
+function Read-Version {
+    $versionPath  = Join-Path -Path $workingPath -ChildPath '../Version.txt'
+    if (!(Test-Path $versionPath)) {
+        Write-Output 'No Version.txt file found!'
+        exit -1
+    }
+    
+    $versionParts = (Get-Content $versionPath -First 1).Split('.')
+    if (!$versionParts -or $versionParts.Length -ne 3) {
+        Write-Output 'Version.txt contains wrong version information!'
+        exit -1
+    }
+    
+    return $versionParts
+    
+    
+}
 # ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
 # Setup
-
-# TODO Shall we store them globally????
-$major = 5
-$minor = 1
-$patch = 2
+$major = 0
+$minor = 0
+$patch = 1
 $gitHash = (git rev-parse HEAD).Substring(0, 10)
 $gitBranch = (git rev-parse --abbrev-ref HEAD)
 $timeStamp = Get-Date -Format 'yyyyMMddHHmm'
@@ -92,6 +108,10 @@ $nugetServerKey = "GbWorks@ApiKey!"
 
 # ------------------------------------------------------------------------------
 # Prepare version numbers
+$versionParts = Read-Version
+$major = $versionParts[0]
+$minor = $versionParts[1]
+$patch = $versionParts[2]
 
 $version = "$major.$minor.$patch"
 $assemblyVersion = $version
@@ -108,7 +128,6 @@ Write-Output "Informational Version : $informationalVersion"
 
 # ------------------------------------------------------------------------------
 # Build
-
 Write-Output 'Building project...'
 
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
@@ -127,13 +146,12 @@ dotnet build -c $buildConfig "$srcPath/Cubes.Host/Cubes.Host.csproj" `
 
 # ------------------------------------------------------------------------------
 # Create packages
-
 Write-Output 'Creating package ...'
 
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
-ClearTemp
-CreateFolder $tgtPath
+Clear-Temp
+Create-Folder $tgtPath
 dotnet publish "$srcPath/Cubes.Host/Cubes.Host.csproj" `
     --no-build `
     -o $tgtPath/Cubes-v$version `
@@ -167,7 +185,6 @@ if ($PushNuget) {
 
 # ------------------------------------------------------------------------------
 # Clean Exit
-
-ClearTemp
+Clear-Temp
 Finish
 # ------------------------------------------------------------------------------
