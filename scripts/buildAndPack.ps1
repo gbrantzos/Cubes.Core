@@ -44,8 +44,8 @@ function BuildConfig {
     return "Debug"
 }
 
-# Create folder if missing
-function Create-Folder {
+# Initialize folder if missing
+function Initialize-Folder {
     param ([string] $folderName)
     if (!(test-path $folderName)) {
         New-Item -ItemType Directory -Force -Path $folderName
@@ -76,16 +76,16 @@ function Read-Version {
         Write-Output 'No Version.txt file found!'
         exit -1
     }
-    
+
     $versionParts = (Get-Content $versionPath -First 1).Split('.')
     if (!$versionParts -or $versionParts.Length -ne 3) {
         Write-Output 'Version.txt contains wrong version information!'
         exit -1
     }
-    
+
     return $versionParts
-    
-    
+
+
 }
 # ------------------------------------------------------------------------------
 
@@ -128,7 +128,7 @@ Write-Output "Informational Version : $informationalVersion"
 
 # ------------------------------------------------------------------------------
 # Build
-Write-Output 'Building project...'
+Write-Output "Building project... [$buildConfig]"
 
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 dotnet clean -c $buildConfig "$srcPath/Cubes.Core/Cubes.Core.csproj"
@@ -151,7 +151,7 @@ Write-Output 'Creating package ...'
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../tmp'
 Clear-Temp
-Create-Folder $tgtPath
+Initialize-Folder $tgtPath
 dotnet publish "$srcPath/Cubes.Host/Cubes.Host.csproj" `
     --no-build `
     -o $tgtPath/Cubes-v$version `
