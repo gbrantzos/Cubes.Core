@@ -29,8 +29,5 @@ BuildInfo.txt
 # Visual Studio 2015
 .vs/
 
-# Visual Studio Code
-.vscode/
-
 # Rider IDE
 .idea/

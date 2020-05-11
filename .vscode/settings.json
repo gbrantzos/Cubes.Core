@@ -1,0 +1,31 @@
+{
+    "cSpell.words": [
+        "Expando",
+        "Figgle",
+        "Roslynator",
+        "monokai",
+        "serializers",
+        "Giorgos",
+        "Brantzos",
+        "Autofac",
+        "MediatR",
+        "Newtonsoft",
+        "Swashbuckle"
+    ],
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#68217a",
+        "statusBar.border": "#68217a",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#8a2ca2"
+    },
+    "peacock.color": "#68217A",
+    "csharpsortusings.sort.usings.splitGroups": false,
+    "files.exclude": {
+        "**/.vs": true,
+        "**/bin": true,
+        "**/obj": true,
+        "**/deploy": true
+    },
+    "powershell.integratedConsole.showOnStartup": false,
+    "powershell.integratedConsole.suppressStartupBanner": true
+}
