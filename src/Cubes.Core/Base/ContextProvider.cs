@@ -9,7 +9,7 @@ namespace Cubes.Core.Base
             public Context Context { get; set; }
         }
 
-        private static AsyncLocal<ContextHolder> currentContext = new AsyncLocal<ContextHolder>();
+        private static readonly AsyncLocal<ContextHolder> currentContext = new AsyncLocal<ContextHolder>();
 
         public Context Current
         {

@@ -7,24 +7,21 @@ namespace Cubes.Core.Base.Samples
     {
         public static ComplexSchema GetSchema()
         {
-            var cs = new ComplexSchema
-            {
-                Name = "SampleApplication"
-            };
+            var cs = new ComplexSchema { Name = "SampleApplication" };
             cs.Sections.Add(new ComplexSchemaSection
             {
                 RootProperty = "Basic",
                 Schema = Schema.Create("Basic")
-                    .WithSelectDynamic("SEnConnection", "SEn Connection", LookupProviders.DataConnections)
-                    .WithSelectDynamic("OdwConnection", "ODW Connection", LookupProviders.DataConnections)
-                    .WithCheckbox("CheckEofExistence", "Check EOF label existence")
-                    .WithTextArea("CheckEofExistenceExceptions", "Codes to skip EOF labels existence check")
-                        .SetItemHint("Comma separated list of codes to exclude from EOF label check")
+                    .WithSelectDynamic("ConnectionString", "Connection String", LookupProviders.DataConnections)
+                    .WithSelectDynamic("Endpoint", "Endpoint", LookupProviders.DataConnections)
+                    .WithCheckbox("CheckExistence", "Check existence")
+                    .WithTextArea("CheckExistenceExceptions", "Codes to skip existence check")
+                        .SetItemHint("Comma separated list of codes to exclude from check")
             });
             cs.Sections.Add(new ComplexSchemaSection
             {
-                RootProperty = "WmsUsers",
-                Schema = Schema.Create("Users", "WMS Users")
+                RootProperty = "Users",
+                Schema       = Schema.Create("Users", "Users")
                     .WithText("DisplayName", Validator.Required())
                     .WithText("UserName", Validator.Required())
                     .WithPassword("Password", Validator.Required()),

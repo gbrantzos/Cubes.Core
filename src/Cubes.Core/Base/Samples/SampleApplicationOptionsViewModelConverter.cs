@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Cubes.Core.Web.UIHelpers;
 using Cubes.Core.Web.UIHelpers.Schema;
-using Newtonsoft.Json.Linq;
 
 namespace Cubes.Core.Base.Samples
 {
@@ -13,12 +12,12 @@ namespace Cubes.Core.Base.Samples
             var toReturn = new SampleApplicationOptions();
             dynamic temp = viewModel;
 
-            toReturn.SEnConnection = temp.Basic.SEnConnection;
-            toReturn.OdwConnection = temp.Basic.OdwConnection;
-            toReturn.CheckEofExistence = temp.Basic.CheckEofExistence;
+            toReturn.ConnectionString = temp.Basic.ConnectionString;
+            toReturn.Endpoint = temp.Basic.Endpoint;
+            toReturn.CheckExistence = temp.Basic.CheckExistence;
 
-            string tempValue = temp.Basic.CheckEofExistenceExceptions;
-            toReturn.CheckEofExistenceExceptions = tempValue
+            string tempValue = temp.Basic.CheckExistenceExceptions;
+            toReturn.CheckExistenceExceptions = tempValue
                 .Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(line => !line.StartsWith("#"))
                 .SelectMany(line => line.Split(',', StringSplitOptions.RemoveEmptyEntries))
@@ -28,7 +27,7 @@ namespace Cubes.Core.Base.Samples
 
             foreach (var user in temp.WmsUsers)
             {
-                toReturn.WmsUsers.Add(new WmsUser
+                toReturn.Users.Add(new User
                 {
                     DisplayName = user.DisplayName,
                     UserName    = user.UserName,
@@ -41,20 +40,19 @@ namespace Cubes.Core.Base.Samples
 
         public override object ToViewModel(object configurationInstance)
         {
-            var config = configurationInstance as SampleApplicationOptions;
-            if (config is null)
+            if (!(configurationInstance is SampleApplicationOptions config))
                 throw new ArgumentException($"Could not cast to {nameof(SampleApplicationOptions)}");
 
             return new
             {
                 Basic = new
                 {
-                    config.SEnConnection,
-                    config.OdwConnection,
-                    config.CheckEofExistence,
-                    CheckEofExistenceExceptions = String.Join(", ", config.CheckEofExistenceExceptions.ToArray())
+                    config.ConnectionString,
+                    config.Endpoint,
+                    config.CheckExistence,
+                    CheckExistenceExceptions = String.Join(", ", config.CheckExistenceExceptions.ToArray())
                 },
-                config.WmsUsers
+                config.Users
             };
         }
     }

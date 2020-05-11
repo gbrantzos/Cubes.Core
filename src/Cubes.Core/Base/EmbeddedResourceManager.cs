@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.IO;
 using System.Reflection;
 
@@ -7,7 +9,11 @@ namespace Cubes.Core.Base
     {
         public static string GetText(Assembly assembly, string nameSpace, string name)
         {
-            using var stream = assembly.GetManifestResourceStream($"{nameSpace}.{name}");
+            var resourceName = $"{nameSpace}.{name}";
+            if (!assembly.GetManifestResourceNames().Contains(resourceName))
+                throw new ArgumentException($"Resource '{resourceName}' does not exist!");
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd().Trim();
         }

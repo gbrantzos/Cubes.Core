@@ -9,23 +9,21 @@ namespace Cubes.Core.Base.Samples
     [ViewModelConverter(typeof(SampleApplicationOptionsViewModelConverter))]
     public class SampleApplicationOptions
     {
-        public string SEnConnection { get; set; }
-        public string OdwConnection { get; set; }
-        public bool CheckEofExistence { get; set; }
-        public List<string> CheckEofExistenceExceptions { get; set; }
-        public List<WmsUser> WmsUsers { get; set; }
-
+        public string ConnectionString { get; set; }
+        public string Endpoint { get; set; }
+        public bool CheckExistence { get; set; }
+        public List<string> CheckExistenceExceptions { get; set; }
+        public List<User> Users { get; set; }
         public SampleApplicationOptions()
         {
-            SEnConnection = "Pharmex.SEn";
-            OdwConnection = "Pharmex.ODW";
-            CheckEofExistenceExceptions = Enumerable.Empty<string>().ToList();
+            ConnectionString = "Connection string ...";
+            CheckExistenceExceptions = Enumerable.Empty<string>().ToList();
 
-            WmsUsers = new List<WmsUser>();
+            Users = new List<User>();
         }
     }
 
-    public class WmsUser
+    public class User
     {
         public string DisplayName { get; set; }
         public string UserName { get; set; }

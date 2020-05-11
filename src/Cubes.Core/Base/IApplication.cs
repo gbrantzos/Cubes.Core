@@ -54,5 +54,4 @@ namespace Cubes.Core.Base
         public string AssemblyName    { get; set; }
         public string AssemblyPath    { get; set; }
     }
-
 }

@@ -14,6 +14,5 @@ namespace Cubes.Core.Base
             => contextProvider.GetData(key) as T;
         public static void ClearData(this IContextProvider contextProvider, string key)
             => contextProvider.SetData(key, null);
-
     }
 }
