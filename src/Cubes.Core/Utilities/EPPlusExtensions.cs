@@ -116,7 +116,7 @@ namespace Cubes.Core.Utilities
                 iRow++;
             }
 
-            // Fix widths
+            // Column widths
             if (formattingSettings.AutoFit)
             {
                 for (int i = 0; i < props.Length; i++)
@@ -170,7 +170,7 @@ namespace Cubes.Core.Utilities
                 iRow++;
             }
 
-            // Fix widths
+            // Column widths
             if (formattingSettings.AutoFit)
             {
                 for (int i = 0; i < length; i++)

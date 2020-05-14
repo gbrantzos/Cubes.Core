@@ -136,7 +136,6 @@ namespace Cubes.Core.Base
             CreateSettingsFile();
         }
 
-        // TODO We shall keep this until we can provide a centralized IConfiguration with write capabilities!
         private void CreateSettingsFile()
         {
             // TODO We always use YAML serializer. Why??
@@ -202,7 +201,7 @@ namespace Cubes.Core.Base
                         var actualPath = fileSystem.File.Exists(temp) ?
                             temp :
                             fileSystem.Path.Combine(application.ManifestPath, temp);
-                        applicationAssemblies.Add(actualPath);
+                        applicationAssemblies.Add(fileSystem.Path.GetFullPath(actualPath));
                     }
 
                     var toLoad = new ApplicationManifest
@@ -234,8 +233,9 @@ namespace Cubes.Core.Base
             var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
             var loadedAssembliesNames = this.loadedAssemblies.Select(i => i.AssemblyName).ToList();
 
-            // TODO Add samples, Should this be only for DEBUG???
+            #if DEBUG
             loadedAssembliesNames.Add(this.GetType().Assembly.FullName);
+            #endif
 
             var applicationTypes = domainAssemblies
                 .Where(l => loadedAssembliesNames.Contains(l.FullName))
@@ -277,16 +277,29 @@ namespace Cubes.Core.Base
         // Load assemblies
         private void LoadAssemblies(string[] assemblies)
         {
+            var loadedByCore = AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .SelectMany(asm => asm.GetReferencedAssemblies())
+                .Select(asm => asm.Name)
+                .Distinct()
+                .ToList();
+
             foreach (var file in assemblies)
             {
                 try
                 {
                     // Check if we have already loaded such an assembly
-                    var asmName = AssemblyName.GetAssemblyName(file).Name;
-                    var existing = this.loadedAssemblies.Find(asm => asm.AssemblyName == asmName);
+                    var asmName = AssemblyName.GetAssemblyName(file);
+                    var existing = this.loadedAssemblies.Find(asm => asm.AssemblyName == asmName.Name);
                     if (existing != null)
                     {
-                        logger.LogError("Assembly with name {name} is already loaded: {path}", asmName, existing.Path);
+                        logger.LogError("Assembly with name '{name}' is already loaded: {path}", asmName.FullName, existing.Path);
+                        continue;
+                    }
+                    if (loadedByCore.Contains(asmName.Name))
+                    {
+                        logger.LogError("Assembly with name '{name}' is already loaded by Cubes!", asmName.FullName);
                         continue;
                     }
 
@@ -297,8 +310,8 @@ namespace Cubes.Core.Base
                     this.loadedAssemblies.Add(new AssemblyDetails
                     {
                         Filename        = fileSystem.Path.GetFileName(file),
-                        Path            = file,
-                        AssemblyName    = asm.FullName,
+                        Path            = fileSystem.Path.GetFullPath(file),
+                        AssemblyName    = asm.GetName().Name,
                         AssemblyVersion = asm.GetName().Version.ToString()
                     });
                 }

@@ -11,7 +11,12 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Cubes.Host/bin/Debug/netcoreapp3.1/Cubes.Host.dll",
-            "args": [],
+            "args": [
+              "--adminPath",
+              "${workspaceFolder}/../Core.WebApp/dist/CubesManagement.zip",
+              "--application",
+              "${workspaceFolder}/../Pharmex.App/src/Cubes.Pharmex/bin/Debug/netcoreapp3.1/Cubes.Pharmex.yaml"
+            ],
             "cwd": "${workspaceFolder}/src/Cubes.Host",
             "stopAtEntry": false,
             "console": "integratedTerminal",
