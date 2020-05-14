@@ -134,6 +134,9 @@ namespace Cubes.Core.Base
 
             // Create settings files
             CreateSettingsFile();
+
+            // Load data providers
+            ConnectionManager.RegisterProviders();
         }
 
         private void CreateSettingsFile()
@@ -234,11 +237,12 @@ namespace Cubes.Core.Base
             var loadedAssembliesNames = this.loadedAssemblies.Select(i => i.AssemblyName).ToList();
 
             #if DEBUG
-            loadedAssembliesNames.Add(this.GetType().Assembly.FullName);
+            var thisAsm = typeof(CubesEnvironment).Assembly;
+            loadedAssembliesNames.Add(thisAsm.GetName().Name);
             #endif
 
             var applicationTypes = domainAssemblies
-                .Where(l => loadedAssembliesNames.Contains(l.FullName))
+                .Where(l => loadedAssembliesNames.Contains(l.GetName().Name))
                 .SelectMany(asm => asm.GetTypes())
                 .Where(t => typeof(IApplication).IsAssignableFrom(t) && !t.IsAbstract)
                 .ToList();

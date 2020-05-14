@@ -34,9 +34,11 @@ namespace Cubes.Core.Web
 
             // Add applications assemblies
             foreach (var asm in assemblies)
+            {
                 mvcBuilder
                     .AddApplicationPart(asm)
                     .AddControllersAsServices();
+            }
 
             // Setup Cubes
             services.AddCubesWeb(configuration, mvcBuilder);

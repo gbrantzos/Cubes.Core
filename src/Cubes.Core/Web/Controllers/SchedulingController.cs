@@ -12,15 +12,12 @@ namespace Cubes.Core.Web.Controllers
     public class SchedulingController : ControllerBase
     {
         private readonly IScheduler scheduler;
-        private readonly ICubesEnvironment cubesEnvironment;
         private readonly IConfigurationWriter configurationWriter;
 
         public SchedulingController(IScheduler scheduler,
-            ICubesEnvironment cubesEnvironment,
             IConfigurationWriter configurationWriter)
         {
             this.scheduler           = scheduler;
-            this.cubesEnvironment    = cubesEnvironment;
             this.configurationWriter = configurationWriter;
         }
 

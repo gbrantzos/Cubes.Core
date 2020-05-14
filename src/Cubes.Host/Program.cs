@@ -64,7 +64,7 @@ namespace Cubes.Host
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseWindowsService()
                 .UseContentRoot(cubes.GetRootFolder())
-                .ConfigureAppConfiguration((builder, config) =>
+                .ConfigureAppConfiguration((_, config) =>
                 {
                     config.SetBasePath(cubes.GetBinariesFolder());
                     config.AddCubesConfiguration(cubes);

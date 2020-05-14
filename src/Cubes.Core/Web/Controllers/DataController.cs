@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Cubes.Core.Configuration;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Utilities;
 using Dapper;
@@ -16,7 +15,6 @@ namespace Cubes.Core.Web.Controllers
     public class DataController : ControllerBase
     {
         private readonly IQueryManager queryManager;
-        private readonly IConfigurationWriter configurationWriter;
         private readonly IConnectionManager connectionManager;
         private readonly DataAccessSettings settings;
         private readonly ILocalStorage localStorage;
@@ -24,13 +22,11 @@ namespace Cubes.Core.Web.Controllers
 
         public DataController(IConnectionManager connectionManager,
             IQueryManager queryManager,
-            IConfigurationWriter configurationWriter,
             IOptionsSnapshot<DataAccessSettings> options,
             ILocalStorage localStorage,
             IDefaultQueries defaultQueries)
         {
             this.queryManager        = queryManager;
-            this.configurationWriter = configurationWriter;
             this.connectionManager   = connectionManager;
             this.settings            = options.Value;
             this.localStorage        = localStorage;
@@ -68,7 +64,7 @@ namespace Cubes.Core.Web.Controllers
             }
             catch (ArgumentException ax)
             {
-                return NotFound(new { Message = ax.Message });
+                return NotFound(new { ax.Message });
             }
         }
 
@@ -176,7 +172,7 @@ namespace Cubes.Core.Web.Controllers
                     foreach (var item in Request.Query)
                     {
                         if (item.Key == "nulls") continue;
-                        var prm = query.Parameters.FirstOrDefault(p => p.Name == item.Key);
+                        var prm = query.Parameters.Find(p => p.Name == item.Key);
 
                         if (prm == null)
                             throw new ArgumentException($"Parameter '{item.Key}' is not defined in the query!");
@@ -195,7 +191,7 @@ namespace Cubes.Core.Web.Controllers
             }
             catch (ArgumentException ax)
             {
-                return NotFound(new { Message = ax.Message });
+                return NotFound(new { ax.Message });
             }
         }
 
@@ -208,7 +204,7 @@ namespace Cubes.Core.Web.Controllers
 
             public static ExportSettings Default = new ExportSettings
             {
-                Separator = ";",
+                Separator      = ";",
                 IncludeHeaders = true
             };
         }

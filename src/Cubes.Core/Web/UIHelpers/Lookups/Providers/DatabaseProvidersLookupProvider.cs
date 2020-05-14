@@ -6,27 +6,28 @@ namespace Cubes.Core.Web.UIHelpers.Lookups.Providers
 {
     public class DatabaseProvidersLookupProvider : ILookupProvider
     {
-        private static Dictionary<string, string> knownProviderNames = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> knownProviders = new Dictionary<string, string>
         {
-            { "oracle", "Oracle" },
-            { "mssql",  "SQL Server" },
-            { "mysql",  "mySQL" },
+            { "Oracle.ManagedDataAccess", "Oracle" },
+            { "Microsoft.Data.SqlClient", "SQL Server" },
+            { "MySql.Data"              , "mySQL" },
+            { "Npgsql"                  , "PostgreSQL"}
         };
 
         public string Name => LookupProviders.DatabaseProviders;
 
         public Lookup GetLookup()
         {
-            var knownProviders = ConnectionManager.KnownProviders;
+            var registeredProviders = ConnectionManager.RegisteredProviders;
             return new Lookup
             {
                 Name      = this.Name,
                 Cacheable = true,
-                Items     = knownProviders
+                Items     = registeredProviders
                     .Select(pv => new LookupItem
                     {
-                        Value   = pv.Key,
-                        Display = knownProviderNames[pv.Key]
+                        Value   = pv.Value,
+                        Display = knownProviders.ContainsKey(pv.Key) ? knownProviders[pv.Key] : pv.Key
                     })
                     .OrderBy(i => i.Display)
                     .ToList()

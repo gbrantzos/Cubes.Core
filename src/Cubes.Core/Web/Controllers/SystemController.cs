@@ -36,15 +36,15 @@ namespace Cubes.Core.Web.Controllers
             var info = new
             {
                 ProcID           = proc.Id,
-                ProcessName      = proc.ProcessName,
+                proc.ProcessName,
                 Executable       = Path.GetFileName(proc.MainModule.FileName),
                 Assembly         = Assembly.GetEntryAssembly().GetName().Name,
                 WorkingFolder    = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 Machine          = proc.MachineName,
-                Hostname         = envInfo.Hostname,
+                envInfo.Hostname,
                 KernelVersion    = envInfo.BuildVersion,
                 Build            = envInfo.IsDebug ? "DEBUG" : "RELEASE",
-                BuildInformation = envInfo.BuildInformation,
+                envInfo.BuildInformation,
                 LiveSince        = envInfo.LiveSince.ToString("yyyy-MM-dd HH:mm:ss"),
                 ServerTime       = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 WorkingSet       = Math.Round(proc.WorkingSet64 / 1024M / 1024M, 2),
@@ -76,7 +76,7 @@ namespace Cubes.Core.Web.Controllers
                    Path       = i.RelativePath,
                    Parameters = i.ParameterDescriptions.Select(p => new
                    {
-                       Name   = p.Name,
+                       p.Name,
                        Type   = p.ParameterDescriptor == null ?
                                     "Unknown" :
                                     $"{p.ParameterDescriptor.ParameterType.Name}, {p.ParameterDescriptor.ParameterType.FullName}",

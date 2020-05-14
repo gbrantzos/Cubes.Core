@@ -8,27 +8,32 @@ namespace Cubes.Core.DataAccess
 {
     public class ConnectionManager : IConnectionManager
     {
-        // Using the new Microsoft.Data.SqlClient package
-        // https://github.com/dotnet/SqlClient/wiki/Frequently-Asked-Questions#11-why-do-i-get-a-platformnotsupported-exception-when-my-application-hits-a-sqlclient-method
-        public static Dictionary<string, string> KnownProviders = new Dictionary<string, string>()
-        {
-            { "oracle", "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" },
-            { "mssql",  "Microsoft.Data.SqlClient.SqlClientFactory, Microsoft.Data" },
-            { "mysql",  "MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data" }
-        };
+        public static Dictionary<string, string> RegisteredProviders { get; private set; }
+
         private readonly DataAccessSettings settings;
 
         public ConnectionManager(IOptionsSnapshot<DataAccessSettings> options)
             => this.settings = options.Value;
 
+        public static void RegisterProviders()
+        {
+            RegisteredProviders = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(asm => asm.GetTypes())
+                .Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(DbProviderFactory)))
+                .Select(type => new
+                {
+                    TypeName     = type.FullName,
+                    AssemblyName = type.Assembly.GetName().Name
+                })
+                .ToDictionary(t => t.AssemblyName, t => t.TypeName);
+        }
+
         public DbConnection GetConnection(Connection connection)
         {
-            if (!KnownProviders.TryGetValue(connection.DbProvider, out string providerName))
-                providerName = connection.DbProvider;
-
-            var providerType = GetProviderType(providerName);
+            var providerType = GetProviderType(connection.DbProvider);
             var providerInst = Activator.CreateInstance(providerType, true);
-            var cnxFactory = providerInst.GetType().GetMethod(nameof(DbProviderFactory.CreateConnection));
+            var cnxFactory   = providerInst.GetType().GetMethod(nameof(DbProviderFactory.CreateConnection));
 
             var dbConnection = cnxFactory.Invoke(providerInst, null) as DbConnection;
             dbConnection.ConnectionString = connection.ConnectionString;
@@ -50,8 +55,6 @@ namespace Cubes.Core.DataAccess
         // Get provider type
         private Type GetProviderType(string providerName)
         {
-            if (providerName.IndexOf(",", StringComparison.Ordinal) > 0)
-                providerName = providerName.Substring(0, providerName.IndexOf(",", StringComparison.Ordinal));
             var type = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
