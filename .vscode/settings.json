@@ -1,16 +1,17 @@
 {
     "cSpell.words": [
+        "Autofac",
+        "Brantzos",
+        "Calibri",
         "Expando",
         "Figgle",
-        "Roslynator",
-        "monokai",
-        "serializers",
         "Giorgos",
-        "Brantzos",
-        "Autofac",
         "MediatR",
         "Newtonsoft",
-        "Swashbuckle"
+        "Roslynator",
+        "Swashbuckle",
+        "monokai",
+        "serializers"
     ],
     "workbench.colorCustomizations": {
         "statusBar.background": "#68217a",

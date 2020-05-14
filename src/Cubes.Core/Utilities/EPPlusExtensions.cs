@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Cubes.Core.DataAccess;
 using OfficeOpenXml;
@@ -8,20 +9,38 @@ namespace Cubes.Core.Utilities
 {
     public static class EPPlusExtensions
     {
+        public static DataTable ToDataTable(this ExcelWorksheet ws, bool hasHeaderRow = true)
+        {
+            DataTable dataTable = new DataTable();
+            foreach (ExcelRangeBase item in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
+            {
+                dataTable.Columns.Add(hasHeaderRow ? item.Text : $"Column {item.Start.Column}");
+            }
+            int num = (!hasHeaderRow) ? 1 : 2;
+            for (int i = num; i <= ws.Dimension.End.Row; i++)
+            {
+                ExcelRange excelRange = ws.Cells[i, 1, i, ws.Dimension.End.Column];
+                DataRow dataRow = dataTable.NewRow();
+                foreach (ExcelRangeBase item2 in excelRange)
+                {
+                    dataRow[item2.Start.Column - 1] = item2.Text;
+                }
+                dataTable.Rows.Add(dataRow);
+            }
+            return dataTable;
+        }
+
         public static byte[] ToExcelPackage<T>(this IEnumerable<T> list, ExcelFormattingSettings formattingSettings = null)
         {
             if (formattingSettings == null)
                 formattingSettings = ExcelFormattingSettings.Default<T>();
 
             // Create Excel package
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var p = new ExcelPackage())
-            {
-                AddPage(p, formattingSettings.SheetName, list, formattingSettings);
+            using var p = new ExcelPackage();
+            AddPage(p, formattingSettings.SheetName, list, formattingSettings);
 
-                // Return as byte array
-                return p.GetAsByteArray();
-            }
+            // Return as byte array
+            return p.GetAsByteArray();
         }
 
         public static byte[] ToExcelPackage<T>(this Dictionary<string,IEnumerable<T>> lists, ExcelFormattingSettings formattingSettings = null)
@@ -30,17 +49,15 @@ namespace Cubes.Core.Utilities
                 formattingSettings = ExcelFormattingSettings.Default<T>();
 
             // Create Excel package
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var p = new ExcelPackage())
-            {
-                // Create a sheet
-                var ws = p.Workbook.Worksheets.Add(formattingSettings.SheetName);
-                foreach (var list in lists)
-                    AddPage(p, list.Key, list.Value, formattingSettings);
+            using var p = new ExcelPackage();
 
-                // Return as byte array
-                return p.GetAsByteArray();
-            }
+            // Create a sheet
+            var ws = p.Workbook.Worksheets.Add(formattingSettings.SheetName);
+            foreach (var list in lists)
+                AddPage(p, list.Key, list.Value, formattingSettings);
+
+            // Return as byte array
+            return p.GetAsByteArray();
         }
 
         public static byte[] ToExcelPackage(this IEnumerable<QueryResult> queryResults, ExcelFormattingSettings formattingSettings = null)
@@ -49,15 +66,12 @@ namespace Cubes.Core.Utilities
                 formattingSettings = ExcelFormattingSettings.Default("Sheet1");
 
             // Create Excel package
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var p = new ExcelPackage())
-            {
-                foreach (var result in queryResults)
-                    AddQueryResultPage(p, result, formattingSettings);
+            using var p = new ExcelPackage();
+            foreach (var result in queryResults)
+                AddQueryResultPage(p, result, formattingSettings);
 
-                // Return as byte array
-                return p.GetAsByteArray();
-            }
+            // Return as byte array
+            return p.GetAsByteArray();
         }
 
         private static void AddPage<T>(ExcelPackage package, string pageName, IEnumerable<T> data, ExcelFormattingSettings formattingSettings)
@@ -74,7 +88,6 @@ namespace Cubes.Core.Utilities
             ws.Cells.Style.Font.Bold   = formattingSettings.DefaultFont.IsBold;
             ws.Cells.Style.Font.Italic = formattingSettings.DefaultFont.IsItalic;
             int iColumn = 0;
-
 
             // Add headers
             if (formattingSettings.HeaderSettings.AddHeaders)
@@ -105,8 +118,10 @@ namespace Cubes.Core.Utilities
 
             // Fix widths
             if (formattingSettings.AutoFit)
+            {
                 for (int i = 0; i < props.Length; i++)
                     ws.Column(i + 1).AutoFit();
+            }
 
             // Freeze headers
             ws.View.FreezePanes(2, 1);
@@ -157,8 +172,10 @@ namespace Cubes.Core.Utilities
 
             // Fix widths
             if (formattingSettings.AutoFit)
+            {
                 for (int i = 0; i < length; i++)
                     ws.Column(i + 1).AutoFit();
+            }
 
             // Freeze headers
             ws.View.FreezePanes(2, 1);

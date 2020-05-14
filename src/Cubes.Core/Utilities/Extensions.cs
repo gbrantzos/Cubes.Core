@@ -14,9 +14,9 @@ namespace Cubes.Core.Utilities
         /// <returns>True in case the class is real, false otherwise.</returns>
         public static bool IsConcrete(this Type testType)
         {
-            return testType.IsAbstract == false
-                && testType.IsGenericTypeDefinition == false
-                && testType.IsInterface == false;
+            return !testType.IsAbstract
+                && !testType.IsGenericTypeDefinition
+                && !testType.IsInterface;
         }
 
         /// <summary>
@@ -28,10 +28,7 @@ namespace Cubes.Core.Utilities
         /// <returns></returns>
         public static TAttribute GetAttribute<TAttribute>(this Type type, bool throwOnError) where TAttribute : Attribute
         {
-            var attr = type
-                .GetCustomAttributes(true)
-                .Where(i => i.GetType().Equals(typeof(TAttribute)))
-                .FirstOrDefault();
+            var attr = Array.Find(type.GetCustomAttributes(true), i => i.GetType().Equals(typeof(TAttribute)));
             if ((attr == null || !(attr is TAttribute)) && throwOnError)
                 throw new Exception($"Could not find attribute '{ typeof(TAttribute).Name }' for type { type.Name }");
 
@@ -92,8 +89,8 @@ namespace Cubes.Core.Utilities
         public static TProperty GetPropertyByType<TProperty>(this object obj) where TProperty : class
         {
             if (obj == null) return null;
-            if (obj is TProperty)
-                return (TProperty)obj;
+            if (obj is TProperty property)
+                return property;
 
             var props = obj.GetType().GetProperties().Where(p => p.GetIndexParameters().Length == 0).ToArray();
             if (props.Length == 0) return null;
@@ -194,8 +191,23 @@ namespace Cubes.Core.Utilities
         public static bool IsJson(this string input)
         {
             input = input.Trim();
-            return input.StartsWith("{") && input.EndsWith("}")
-                   || input.StartsWith("[") && input.EndsWith("]");
+            return (input.StartsWith("{") && input.EndsWith("}"))
+                   || (input.StartsWith("[") && input.EndsWith("]"));
+        }
+
+        /// <summary>
+        /// Split list in chunks
+        /// </summary>
+        /// <param name="source">Source list</param>
+        /// <param name="size">Chunk size</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IEnumerable<List<T>> SplitList<T>(this List<T> source, int size = 100)
+        {
+            for (int i = 0; i < source.Count; i += size)
+            {
+                yield return source.GetRange(i, Math.Min(size, source.Count - i));
+            }
         }
     }
 }

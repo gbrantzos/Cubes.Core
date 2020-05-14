@@ -6,6 +6,7 @@ using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Cubes.Core.Configuration;
+using OfficeOpenXml;
 
 namespace Cubes.Core
 {
@@ -13,6 +14,9 @@ namespace Cubes.Core
     {
         public static IServiceCollection AddCubesCore(this IServiceCollection services, IConfiguration configuration)
         {
+            // EPPlus license
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             var cubesConfig = configuration.GetCubesConfiguration();
 
             services.AddDataAccess(configuration)

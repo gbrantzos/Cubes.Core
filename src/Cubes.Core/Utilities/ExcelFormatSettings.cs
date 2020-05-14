@@ -54,11 +54,14 @@ namespace Cubes.Core.Utilities
         public ExcelFormattingSettings Sanitize()
         {
             if (DefaultFont == null)
+            {
                 DefaultFont = new Font
                 {
                     Family = FONT_FAMILY,
                     Size = FONT_SIZE
                 };
+            }
+
             DefaultFont.Family.IfNullOrEmpty(FONT_FAMILY);
             if (HeaderSettings.Font.Size == 0)
                 DefaultFont.Size = FONT_SIZE;
