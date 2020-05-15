@@ -35,5 +35,4 @@ namespace Cubes.Core.Utilities
             return parameter;
         }
     }
-
 }

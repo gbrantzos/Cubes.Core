@@ -23,23 +23,23 @@ namespace Cubes.Core.Utilities
 
         public string Format => CubesConstants.Serializer_YAML;
     }
-}
 
-public class StringHandlerEmitter : ChainedEventEmitter
-{
-    public StringHandlerEmitter(IEventEmitter nextEmitter) : base(nextEmitter) { }
-    public override void Emit(ScalarEventInfo eventInfo, IEmitter emitter)
+    public class StringHandlerEmitter : ChainedEventEmitter
     {
-        if (eventInfo.Source.Type == typeof(string))
+        public StringHandlerEmitter(IEventEmitter nextEmitter) : base(nextEmitter) { }
+        public override void Emit(ScalarEventInfo eventInfo, IEmitter emitter)
         {
-            var value = (string)eventInfo.Source.Value;
-            if (!String.IsNullOrEmpty(value) && value.Contains('\n'))
+            if (eventInfo.Source.Type == typeof(string))
             {
-                var ev = new Scalar(null, null, value, ScalarStyle.Literal, true, false);
-                emitter.Emit(ev);
-                return;
+                var value = (string)eventInfo.Source.Value;
+                if (!String.IsNullOrEmpty(value) && value.Contains('\n'))
+                {
+                    var ev = new Scalar(null, null, value, ScalarStyle.Literal, true, false);
+                    emitter.Emit(ev);
+                    return;
+                }
             }
+            base.Emit(eventInfo, emitter);
         }
-        base.Emit(eventInfo, emitter);
     }
 }

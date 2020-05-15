@@ -18,7 +18,7 @@ namespace Cubes.Core.Utilities
             this.waitTime = waitTime ?? TimeSpan.FromSeconds(3);
         }
 
-        public void Debouce(Action action)
+        public void Debounce(Action action)
         {
             var current = Interlocked.Increment(ref this.counter);
             Task.Delay(this.waitTime).ContinueWith(task =>

@@ -6,7 +6,7 @@ namespace Cubes.Core.Email
 {
     public class SmtpClientWrapper : ISmtpClient, IDisposable
     {
-        private SmtpClient client;
+        private readonly SmtpClient client;
         public SmtpClientWrapper() => client = new SmtpClient();
 
         public string Host { get => client.Host; set => client.Host = value; }

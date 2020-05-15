@@ -48,7 +48,7 @@ namespace Cubes.Core.Web.Swager
 
         public static IApplicationBuilder UseCubesSwagger(this IApplicationBuilder app)
         {
-            var swaggerUrl = "/docs/v1/swagger.json";
+            const string swaggerUrl = "/docs/v1/swagger.json";
             app.UseSwagger(c => c.RouteTemplate = "docs/{documentName}/swagger.json");
             app.UseSwaggerUI(c =>
             {

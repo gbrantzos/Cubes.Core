@@ -19,7 +19,7 @@ namespace Cubes.Core.Utilities
             // https://github.com/aspnet/AspNetCore/issues/2542
             var debouncer = new Debouncer(TimeSpan.FromSeconds(2));
 
-            ChangeToken.OnChange<object>(config.GetReloadToken, _ => debouncer.Debouce(action), null);
+            ChangeToken.OnChange<object>(config.GetReloadToken, _ => debouncer.Debounce(action), null);
         }
     }
 }

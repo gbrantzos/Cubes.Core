@@ -7,11 +7,11 @@ using MediatR;
 
 namespace Cubes.Core.Commands
 {
-    public class ValidatorBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class ValidatorBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
         private readonly IEnumerable<IValidator<TRequest>> validators;
 
-        public ValidatorBehaviour(IEnumerable<IValidator<TRequest>> validators)
+        public ValidatorBehavior(IEnumerable<IValidator<TRequest>> validators)
             => this.validators = validators;
 
         // Based on http://softdevben.blogspot.com/2017/12/using-mediatr-pipeline-with-fluent.html
@@ -23,8 +23,7 @@ namespace Cubes.Core.Commands
             var failures = validators
                 .Select(v => v.Validate(context))
                 .SelectMany(r => r.Errors)
-                .Where(fail => fail != null)
-                .ToList();
+                .Where(fail => fail != null);
 
             if (failures.Any())
                 throw new ValidationException(failures);

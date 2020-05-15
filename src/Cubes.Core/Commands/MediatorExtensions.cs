@@ -54,9 +54,8 @@ namespace Cubes.Core.Commands
         /// <param name="requestType">The command type</param>
         /// <returns></returns>
         private static Type GetRequestType(this Type requestType)
-            => requestType
-                .GetInterfaces()
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequest<>))?
+            => Array
+                .Find(requestType.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequest<>))?
                 .GetGenericArguments()?
                 .FirstOrDefault();
     }

@@ -23,7 +23,7 @@ namespace Cubes.Core
                 .AddEmailDispatcher(configuration)
                 .AddScheduler(typeof(StartupExtensions).Assembly)
                 .AddTransient<ITypeResolver, TypeResolver>()
-                .AddTransient<ILocalStorage>(s => new LocalStorage(cubesConfig.StorageFolder))
+                .AddTransient<ILocalStorage>(_ => new LocalStorage(cubesConfig.StorageFolder))
                 .AddSingleton<IContextProvider, ContextProvider>()
                 .AddTransient<IConfigurationWriter, ConfigurationWriter>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));

@@ -30,6 +30,5 @@ namespace Cubes.Core.Web.UIHelpers.Schema
         public static Validator MinLength(int value) => new Validator { Name = ValidatorType.MinLength, Parameters = value };
         public static Validator MaxLength(int value) => new Validator { Name = ValidatorType.MaxLength, Parameters = value };
         public static Validator Pattern(string regex) => new Validator { Name = ValidatorType.Pattern, Parameters = regex };
-
     }
 }

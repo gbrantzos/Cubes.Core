@@ -60,5 +60,4 @@ namespace Cubes.Core.Email
             public string Password { get; set; }
         }
     }
-
 }

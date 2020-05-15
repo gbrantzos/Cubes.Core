@@ -79,11 +79,5 @@ namespace Cubes.Core.Web.UIHelpers.Schema
             item.ClassName = className;
             return item;
         }
-
-
-        // StartsGroup
-        // EndsGroup
-        // FlexProperties
-        // ...
     }
 }

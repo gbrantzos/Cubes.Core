@@ -40,9 +40,9 @@ namespace Cubes.Core.Utilities
             fileWatcher.Path = Path.GetDirectoryName(actualPath);
             fileWatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
             fileWatcher.Filter = Path.GetFileName(actualPath);
-            fileWatcher.Changed += (s, e) => debouncer.Debouce(() => ProcessZip());
-            fileWatcher.Created += (s, e) => debouncer.Debouce(() => ProcessZip());
-            fileWatcher.Renamed += (s, e) => debouncer.Debouce(() => ProcessZip());
+            fileWatcher.Changed += (s, e) => debouncer.Debounce(() => ProcessZip());
+            fileWatcher.Created += (s, e) => debouncer.Debounce(() => ProcessZip());
+            fileWatcher.Renamed += (s, e) => debouncer.Debounce(() => ProcessZip());
             fileWatcher.EnableRaisingEvents = true;
 
             physicalFileProvider = new PhysicalFileProvider(fileWatcher.Path);

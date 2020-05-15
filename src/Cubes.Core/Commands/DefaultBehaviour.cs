@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Cubes.Core.Commands
 {
-    public class DefaultBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class DefaultBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
-        private readonly ILogger<DefaultBehaviour<TRequest, TResponse>> logger;
+        private readonly ILogger<DefaultBehavior<TRequest, TResponse>> logger;
 
-        public DefaultBehaviour(ILogger<DefaultBehaviour<TRequest, TResponse>> logger)
+        public DefaultBehavior(ILogger<DefaultBehavior<TRequest, TResponse>> logger)
         {
             this.logger = logger;
         }

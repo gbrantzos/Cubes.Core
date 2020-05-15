@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -14,18 +15,18 @@ namespace Cubes.Core.Commands.Basic
 
             // Create process
             var process = new Process();
-            process.StartInfo.FileName = command.Command;
-            process.StartInfo.Arguments = command.Arguments;
+            process.StartInfo.FileName         = command.Command;
+            process.StartInfo.Arguments        = command.Arguments;
             process.StartInfo.WorkingDirectory = command.StartIn;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.UseShellExecute  = false;
+            process.StartInfo.CreateNoWindow   = true;
 
             // Capture output
             process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.OutputDataReceived += (s, e) => output.Append($"{System.Environment.NewLine}{e.Data}");
-            process.ErrorDataReceived += (s, e) => output.Append($"{System.Environment.NewLine}ERROR: { e.Data}");
-            output.Append($"==> {command}");
+            process.StartInfo.RedirectStandardError  = true;
+            process.OutputDataReceived += (s, e) => output.Append(Environment.NewLine).Append(e.Data);
+            process.ErrorDataReceived  += (s, e) => output.Append(Environment.NewLine).Append("ERROR: ").Append(e.Data);
+            output.Append("==> ").Append(command);
 
             // Start process and handlers
             process.Start();

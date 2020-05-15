@@ -122,14 +122,14 @@ namespace Cubes.Core.Web.StaticContent
                 // Inform for changes on CompressedFileProvider
                 var fileName = Path.GetFileName(zipPath);
                 var debouncer = new Debouncer();
-                Action call = () => logger.LogInformation("File {cubesAdminPath} changed, 'Cubes Management' should be reloaded!", fileName);
+                void call() => logger.LogInformation("File {cubesAdminPath} changed, 'Cubes Management' should be reloaded!", fileName);
                 ChangeToken.OnChange(
                     () => fileProvider.Watch(fileName),
-                    () => debouncer.Debouce(call));
+                    () => debouncer.Debounce(call));
             }
             else
             {
-                var tempFolder = Path.Combine(cubesConfig.TempFolder, "CubesMangement");
+                var tempFolder = Path.Combine(cubesConfig.TempFolder, "CubesManagement");
                 DeployZipOnTemp(tempFolder, zipPath);
                 fileProvider = new PhysicalFileProvider(tempFolder);
 
@@ -139,14 +139,14 @@ namespace Cubes.Core.Web.StaticContent
                 if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     pfp.UsePollingFileWatcher = true;
                 var debouncer = new Debouncer();
-                Action call = () =>
+                void call()
                 {
                     DeployZipOnTemp(tempFolder, zipPath);
                     logger.LogInformation($"File {fileName} changed, 'Cubes Management' should be reloaded!");
-                };
+                }
                 ChangeToken.OnChange(
                     () => pfp.Watch(fileName),
-                    () => debouncer.Debouce(call));
+                    () => debouncer.Debounce(call));
             }
 
             var options = new FileServerOptions

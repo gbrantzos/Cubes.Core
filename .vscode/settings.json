@@ -11,8 +11,12 @@
         "Newtonsoft",
         "Npgsql",
         "Roslynator",
+        "Swager",
         "Swashbuckle",
+        "categ",
+        "debouncer",
         "monokai",
+        "redocs",
         "serializers"
     ],
     "workbench.colorCustomizations": {
