@@ -20,7 +20,6 @@
             "cwd": "${workspaceFolder}/src/Cubes.Host",
             "stopAtEntry": false,
             "console": "integratedTerminal",
-
             "internalConsoleOptions": "neverOpen",
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {

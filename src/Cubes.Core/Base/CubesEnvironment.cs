@@ -80,7 +80,7 @@ namespace Cubes.Core.Base
             var version   = $"{environmentInformation.BuildVersion}, {environmentInformation.Mode}";
             var message   = $"Starting Cubes, version {version} build";
             var gitInfo   = $"Git branch {buildInfo.Branch}, commit {buildInfo.Commit}, build time {buildInfo.BuildAt}";
-            gitInfo      += $"{Environment.NewLine}{figgle}";
+            gitInfo      += Environment.NewLine + figgle;
 
             logger.LogInformation(new String('-', 100));
             logger.LogInformation(message);
@@ -143,6 +143,13 @@ namespace Cubes.Core.Base
         {
             // TODO We always use YAML serializer. Why??
             var serializer = new SerializerBuilder().Build();
+
+            // Gather initializers from applications
+            var temp = this.applicationInstances
+                .SelectMany(app => app.ConfigurationInitializers())
+                .ToList();
+            configurationFiles.AddRange(temp);
+
             foreach (var (Filename, CreateDefaultObject) in configurationFiles)
             {
                 var filePath = this.GetFileOnPath(CubesFolderKind.Settings, Filename);

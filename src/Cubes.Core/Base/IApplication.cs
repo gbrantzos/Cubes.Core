@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Autofac;
 using Cubes.Core.Web.UIHelpers.Schema;
@@ -33,6 +34,12 @@ namespace Cubes.Core.Base
         /// <param name="builder"></param>
         /// <returns></returns>
         ContainerBuilder RegisterServices(ContainerBuilder builder);
+
+        /// <summary>
+        /// Get an enumerable of configuration files initializers.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<(string, Func<object>)> ConfigurationInitializers();
 
         /// <summary>
         /// File to be used for Swagger documentation

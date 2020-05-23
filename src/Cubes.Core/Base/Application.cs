@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,5 +34,8 @@ namespace Cubes.Core.Base
 
         protected string GetFullPathForFile(string fileName)
             => Path.Combine(this.ApplicationPath(), fileName);
+
+        public virtual IEnumerable<(string, Func<object>)> ConfigurationInitializers()
+            => Enumerable.Empty<(string, Func<object>)>();
     }
 }

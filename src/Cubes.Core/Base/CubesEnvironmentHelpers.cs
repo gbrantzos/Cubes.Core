@@ -74,13 +74,16 @@ namespace Cubes.Core.Base
                 var actualPath = File.Exists(path) ?
                     path :
                     Path.Combine(rootFolder, path);
-                absolutePaths.Add(actualPath);
+                absolutePaths.Add(Path.GetFullPath(actualPath));
             }
 
             // Process manifest files
             var deserializer = new DeserializerBuilder().Build();
             foreach (var path in absolutePaths)
             {
+                if (!File.Exists(path))
+                    throw new ArgumentException($"Manifest file not found: {path}");
+
                 var content           = File.ReadAllText(path);
                 var manifest          = deserializer.Deserialize<ApplicationManifest>(content);
                 manifest.ManifestPath = Path.GetDirectoryName(path);
