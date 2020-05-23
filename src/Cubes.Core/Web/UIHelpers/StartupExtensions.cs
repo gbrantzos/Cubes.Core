@@ -21,7 +21,8 @@ namespace Cubes.Core.Web.UIHelpers
                 .AddTransient<ILookupProvider, RequestTypeLookupProvider>()
                 .AddTransient<ILookupProvider, JobTypeLookupProvider>()
                 .AddTransient<ILookupProvider, DatabaseProvidersLookupProvider>()
-                .AddTransient<ILookupProvider, DataConnectionLookupProvider>();
+                .AddTransient<ILookupProvider, DataConnectionLookupProvider>()
+                .AddTransient<ILookupProvider, DataQueryLookupProvider>();
 
             return services;
         }

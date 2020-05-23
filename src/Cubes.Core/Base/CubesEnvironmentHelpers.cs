@@ -118,7 +118,7 @@ namespace Cubes.Core.Base
             string fallBack = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 "CubesManagement.zip");
-            return String.IsNullOrEmpty(toReturn) ? fallBack : toReturn;
+            return Path.GetFullPath(String.IsNullOrEmpty(toReturn) ? fallBack : toReturn);
         }
     }
 }

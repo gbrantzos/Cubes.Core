@@ -1,13 +1,11 @@
 using Autofac;
-using Autofac.Features.AttributeFilters;
-using Cubes.Core.Commands.Basic;
 using Cubes.Core.Base;
-using Cubes.Core.Utilities;
-using MediatR;
 using Cubes.Core.Commands;
+using Cubes.Core.Commands.Basic;
+using MediatR;
 using MediatR.Pipeline;
 
-namespace Cubes.Core
+namespace Cubes.Core.Utilities
 {
     public static class ContainerHelpers
     {
