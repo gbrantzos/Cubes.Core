@@ -15,9 +15,12 @@ namespace Cubes.Core.Web.ResponseWrapping
         public string Version     { get; set; }
         public DateTime CreatedAt { get; set; }
         public int StatusCode     { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Message     { get; set; }
         public bool HasErrors     { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public object Response    { get; set; }
 
         public override string ToString()
@@ -34,7 +37,7 @@ namespace Cubes.Core.Web.ResponseWrapping
 
     public static class ApiResponseExtensions
     {
-        public static ApiResponse HasErrors(this ApiResponse response)
+        public static ApiResponse WithErrors(this ApiResponse response)
         {
             (response ?? ApiResponse.CreateResponse()).HasErrors = true;
             return response;

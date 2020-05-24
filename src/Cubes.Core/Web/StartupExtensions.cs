@@ -128,7 +128,7 @@ namespace Cubes.Core.Web
             {
                 context.HttpContext.Response.ContentType = "application/json";
                 var apiResponse = responseBuilder.Create()
-                            .HasErrors()
+                            .WithErrors()
                             .WithStatusCode(context.HttpContext.Response.StatusCode)
                             .WithMessage($"Invalid request, status code: {context.HttpContext.Response.StatusCode}")
                             .WithResponse(new
@@ -175,7 +175,7 @@ namespace Cubes.Core.Web
                             .AppendLine(fileInfo);
 
                         var apiResponse = responseBuilder.Create()
-                            .HasErrors()
+                            .WithErrors()
                             .WithStatusCode(context.Response.StatusCode)
                             .WithMessage("An unhandled exception occurred while processing the request.")
                             .WithResponse(new
