@@ -7,7 +7,7 @@ namespace Cubes.Core.Web.UIHelpers.Lookups.Providers
 {
     public class DataQueryLookupProvider : ILookupProvider
     {
-        public string Name => LookupProviders.DataConnections;
+        public string Name => LookupProviders.DataQueries;
 
         public DataAccessSettings settings { get; }
 

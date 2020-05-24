@@ -1,3 +1,4 @@
+using System.Reflection;
 using Autofac;
 using Cubes.Core.Base;
 using Cubes.Core.Commands;
@@ -52,6 +53,14 @@ namespace Cubes.Core.Utilities
             foreach (var application in cubes.GetApplicationInstances())
                 application.RegisterServices(builder);
 
+            return builder;
+        }
+
+        public static ContainerBuilder RegisterCubesRequestHandlers(this ContainerBuilder builder, params Assembly[] assemblies)
+        {
+            builder.RegisterAssemblyTypes(assemblies)
+                .Where(t => t.IsCubesRequestHandler())
+                .AsImplementedInterfaces();
             return builder;
         }
     }

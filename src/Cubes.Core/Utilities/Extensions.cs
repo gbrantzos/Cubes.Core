@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Cubes.Core.Commands;
 
 namespace Cubes.Core.Utilities
 {
@@ -208,6 +209,18 @@ namespace Cubes.Core.Utilities
             {
                 yield return source.GetRange(i, Math.Min(size, source.Count - i));
             }
+        }
+
+        /// <summary>
+        /// Check if the given type is a <see cref="RequestHandler{TRequest, TResponse}"/> type.
+        /// </summary>
+        /// <param name="type">Type to check.</param>
+        /// <returns></returns>
+        public static bool IsCubesRequestHandler(this Type type)
+        {
+            var handlerType = typeof(RequestHandler<,>);
+            return type?.BaseType?.IsGenericType == true
+                && type.BaseType.GetGenericTypeDefinition() == handlerType;
         }
     }
 }

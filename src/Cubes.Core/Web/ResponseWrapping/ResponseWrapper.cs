@@ -61,14 +61,18 @@ namespace Cubes.Core.Web.ResponseWrapping
 
                 // Restore response body
                 context.Response.Body = originalBody;
-
-                // If Success, wrap response, else restore
                 if (context.Response.IsSuccess())
+                {
                     await HandleResponse(body: await ResponseBody(ms),
-                        context,
-                        context.Response.StatusCode);
+                       context,
+                       context.Response.StatusCode);
+                }
                 else
-                    await Restore(ms, originalBody);
+                {
+                    await HandleErrorResponse(body: await ResponseBody(ms),
+                       context,
+                       context.Response.StatusCode);
+                }
             }
             catch (Exception ex)
             {
@@ -93,6 +97,28 @@ namespace Cubes.Core.Web.ResponseWrapping
                 .WithStatusCode(statusCode)
                 .WithResponse(bodyObject);
 
+            return WriteToResponse(apiResponse, context);
+        }
+
+        private Task HandleErrorResponse(string body, HttpContext context, int statusCode)
+        {
+            var bodyObject = ConvertBody(body);
+            var apiResponse = responseBuilder.Create()
+                .WithStatusCode(statusCode);
+
+            if (bodyObject.ToString().IsJson())
+            {
+                apiResponse.WithMessage(bodyObject.ToString());
+            }
+            else
+            {
+                apiResponse.WithResponse(bodyObject);
+            }
+            return WriteToResponse(apiResponse, context);
+        }
+
+        private Task WriteToResponse(ApiResponse apiResponse, HttpContext context)
+        {
             var wrappedBody = apiResponse.ToString();
             context.Response.ContentType = "application/json";
             context.Response.ContentLength = wrappedBody != null ? Encoding.UTF8.GetByteCount(wrappedBody) : 0;
@@ -131,9 +157,9 @@ namespace Cubes.Core.Web.ResponseWrapping
                 .WithStatusCode((int)HttpStatusCode.InternalServerError)
                 .WithExceptionMessages(ex);
 
-            var wrappedBody              = apiResponse.ToString();
+            var wrappedBody = apiResponse.ToString();
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode  = apiResponse.StatusCode;
+            context.Response.StatusCode = apiResponse.StatusCode;
 
             return context.Response.WriteAsync(wrappedBody);
         }
