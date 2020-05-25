@@ -95,7 +95,7 @@ namespace Cubes.Core.Web.ResponseWrapping
             var bodyObject = ConvertBody(body);
             var apiResponse = responseBuilder.Create()
                 .WithStatusCode(statusCode)
-                .WithResponse(bodyObject);
+                .WithData(bodyObject);
 
             return WriteToResponse(apiResponse, context);
         }
@@ -109,7 +109,7 @@ namespace Cubes.Core.Web.ResponseWrapping
 
             if (bodyObject.ToString().IsJson())
             {
-                apiResponse.WithResponse(bodyObject);
+                apiResponse.WithData(bodyObject);
             }
             else
             {

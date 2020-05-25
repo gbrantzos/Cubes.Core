@@ -21,7 +21,7 @@ namespace Cubes.Core.Web.ResponseWrapping
         public bool HasErrors     { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public object Response    { get; set; }
+        public object Data        { get; set; }
 
         public override string ToString()
             => JsonConvert.SerializeObject(this, serializerSettings);
@@ -55,9 +55,9 @@ namespace Cubes.Core.Web.ResponseWrapping
             return apiResponse;
         }
 
-        public static ApiResponse WithResponse(this ApiResponse apiResponse, object response)
+        public static ApiResponse WithData(this ApiResponse apiResponse, object data)
         {
-            (apiResponse ?? ApiResponse.CreateResponse()).Response = response;
+            (apiResponse ?? ApiResponse.CreateResponse()).Data = data;
             return apiResponse;
         }
 

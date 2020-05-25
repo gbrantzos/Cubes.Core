@@ -128,13 +128,13 @@ namespace Cubes.Core.Web
             {
                 context.HttpContext.Response.ContentType = "application/json";
                 var apiResponse = responseBuilder.Create()
-                            .WithErrors()
-                            .WithStatusCode(context.HttpContext.Response.StatusCode)
-                            .WithMessage($"Invalid request, status code: {context.HttpContext.Response.StatusCode}")
-                            .WithResponse(new
-                            {
-                                Details = $"URL: {context.HttpContext.Request.Path}, Method: {context.HttpContext.Request.Method}"
-                            });
+                    .WithErrors()
+                    .WithStatusCode(context.HttpContext.Response.StatusCode)
+                    .WithMessage($"Invalid request, status code: {context.HttpContext.Response.StatusCode}")
+                    .WithData(new
+                    {
+                        Details = $"URL: {context.HttpContext.Request.Path}, Method: {context.HttpContext.Request.Method}"
+                    });
                 await context
                     .HttpContext
                     .Response
@@ -178,7 +178,7 @@ namespace Cubes.Core.Web
                             .WithErrors()
                             .WithStatusCode(context.Response.StatusCode)
                             .WithMessage("An unhandled exception occurred while processing the request.")
-                            .WithResponse(new
+                            .WithData(new
                             {
                                 Details = details.ToString(),
                                 RequestInfo = $"{context.Request.Path} [{context.Request.Method}]"
