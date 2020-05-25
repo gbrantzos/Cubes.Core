@@ -40,6 +40,7 @@ namespace Cubes.Core.Commands.Basic
             };
             bool rowsFound = results.Any(i => i.Data.Any());
             if (rowsFound)
+            {
                 email.Attachments = new List<EmailContent.EmailAttachment>
                 {
                     new EmailContent.EmailAttachment
@@ -49,6 +50,7 @@ namespace Cubes.Core.Commands.Basic
                         Content     = results.ToExcelPackage()
                     }
                 };
+            }
 
             // Body details
             string suffix = results.Count() == 1 ? "y" : "ies";

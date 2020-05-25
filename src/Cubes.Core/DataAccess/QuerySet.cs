@@ -17,31 +17,29 @@ namespace Cubes.Core.DataAccess
             var toReturn = new List<QueryResult>();
             foreach (var queryItem in querySet.Queries)
             {
-                using (var cnx = connectionManager.GetConnection(querySet.ConnectionName))
-                {
-                    var query = queryManager.GetSqlQuery(queryItem.QueryName);
-                    var results = cnx.Query(query.QueryCommand).ToList();
+                using var cnx = connectionManager.GetConnection(querySet.ConnectionName);
+                var query = queryManager.GetSqlQuery(queryItem.QueryName);
+                var results = cnx.Query(query.QueryCommand).ToList();
 
-                    var queryResult = new QueryResult
-                    {
-                        Name = queryItem.Name,
-                        Data = results,
-                    };
-                    var firstRow = (IDictionary<string, object>)results.FirstOrDefault();
-                    if (firstRow != null)
-                    {
-                        var headers = firstRow.Keys.ToArray();
-                        var values  = firstRow.Values.Select(v => v.GetType()).ToArray();
-                        queryResult.Columns = headers
-                            .Zip(values, (h, v) => new QueryResult.Column
-                            {
-                                Name = h,
-                                ColumnType = v
-                            })
-                            .ToList();
-                    }
-                    toReturn.Add(queryResult);
+                var queryResult = new QueryResult
+                {
+                    Name = queryItem.Name,
+                    Data = results,
+                };
+                var firstRow = (IDictionary<string, object>)results.FirstOrDefault();
+                if (firstRow != null)
+                {
+                    var headers = firstRow.Keys.ToArray();
+                    var values = firstRow.Values.Select(v => v.GetType()).ToArray();
+                    queryResult.Columns = headers
+                        .Zip(values, (h, v) => new QueryResult.Column
+                        {
+                            Name       = h,
+                            ColumnType = v
+                        })
+                        .ToList();
                 }
+                toReturn.Add(queryResult);
             }
             return toReturn;
         }

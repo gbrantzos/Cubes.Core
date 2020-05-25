@@ -34,8 +34,10 @@ namespace Cubes.Core.Utilities
 
             // Register basic jobs
             builder.RegisterType<RunOsProcessHandler>().AsImplementedInterfaces();
-            builder.RegisterType<QueryResultsAsEmailHandler>().AsImplementedInterfaces();
             builder.RegisterType<RunOsProcessValidator>().AsImplementedInterfaces();
+
+            builder.RegisterType<ArchiveFilesHandler>().AsImplementedInterfaces();
+            builder.RegisterType<QueryResultsAsEmailHandler>().AsImplementedInterfaces();
 
             // Register serializers, use them by name
             builder.RegisterType<JsonSerializer>()
