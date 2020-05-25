@@ -10,7 +10,7 @@ namespace Cubes.Core.Tests.Environment
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "<Pending>")]
     public class CubesEnvironmentTests : IDisposable
     {
-        private MockRepository mockRepository;
+        private readonly MockRepository mockRepository;
 
         public CubesEnvironmentTests() =>
             this.mockRepository = new MockRepository(MockBehavior.Strict);
@@ -50,6 +50,5 @@ namespace Cubes.Core.Tests.Environment
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Temp)));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Logs)));
         }
-
     }
 }
