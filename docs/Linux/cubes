@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export CUBES_ROOT="/opt/Cubes"
+export CUBES_ADMIN="/opt/Cubes/Zippies/CubesManagement.zip"
+
+dotnet /opt/Cubes/Versions/Current/Cubes.Host.dll
+

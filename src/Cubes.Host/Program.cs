@@ -65,16 +65,18 @@ namespace Cubes.Host
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseWindowsService()
                 .UseContentRoot(cubes.GetRootFolder())
-                .ConfigureAppConfiguration((_, config) =>
+                .ConfigureAppConfiguration((_, configBuilder) =>
                 {
-                    config.SetBasePath(cubes.GetBinariesFolder());
-                    config.AddCubesConfiguration(cubes);
-                    config.AddApplicationsConfiguration(cubes);
+                    configBuilder
+                        .SetBasePath(cubes.GetBinariesFolder())
+                        .AddCubesConfiguration(cubes)
+                        .AddApplicationsConfiguration(cubes);
                 })
                 .ConfigureLogging(logging =>
                 {
-                    logging.ClearProviders();
-                    logging.AddNLog();
+                    logging
+                        .ClearProviders()
+                        .AddNLog();
                 })
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
@@ -84,15 +86,16 @@ namespace Cubes.Host
                 })
                 .ConfigureServices((builder, services) =>
                 {
-                    services.AddSingleton(cubes);
-                    services.AddCubesCore(builder.Configuration);
-
-                    services.AddApplicationsServices(builder.Configuration, cubes);
+                    services
+                        .AddSingleton(cubes)
+                        .AddCubesCore(builder.Configuration)
+                        .AddApplicationsServices(builder.Configuration, cubes);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
-                    webBuilder.UseWebRoot(cubes.GetFolder(CubesFolderKind.WebRoot));
+                    webBuilder
+                        .UseStartup<Startup>()
+                        .UseWebRoot(cubes.GetFolder(CubesFolderKind.WebRoot));
                 });
 
         // This is the only Host specific method, and can be changed with no Core changes!

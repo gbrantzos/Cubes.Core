@@ -13,6 +13,10 @@ Command Line Parameter | Environment Variable | Value
 --application | CUBES_APPLICATION | A path to an application manifest file. 
 --admin | CUBES_ADMIN | Path to CubesManagement.zip file (web management UI).
 
+#### AppSettings 
+
+To avoid overwriting `appsettings.json` file, Cubes tries to load settings from Settings folder (CUBES_ROOT\Settings). 
+Since this file is added last on the configuration builder, settings defined there override previous values.
 
 #### Common Libraries
 Assemblies under the folder root\Libraries are considered common libraries and loaded before all applications. 

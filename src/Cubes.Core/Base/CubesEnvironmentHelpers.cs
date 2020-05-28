@@ -21,7 +21,7 @@ namespace Cubes.Core.Base
             var argsList = args == null ? Enumerable.Empty<string>().ToList() : args.ToList();
             var toReturn = String.Empty;
 
-            var rootFromVariable = Environment.GetEnvironmentVariable("CUBES_ROOTFOLDER");
+            var rootFromVariable = Environment.GetEnvironmentVariable("CUBES_ROOT");
             if (!String.IsNullOrEmpty(rootFromVariable))
                 toReturn = rootFromVariable;
 
@@ -104,7 +104,7 @@ namespace Cubes.Core.Base
             var argsList = args == null ? Enumerable.Empty<string>().ToList() : args.ToList();
             var toReturn = String.Empty;
 
-            var adminFromVariable = Environment.GetEnvironmentVariable("CUBES_ADMINPATH");
+            var adminFromVariable = Environment.GetEnvironmentVariable("CUBES_ADMIN");
             if (!String.IsNullOrEmpty(adminFromVariable))
                 toReturn = adminFromVariable;
 

@@ -91,6 +91,19 @@ function Read-Version {
 
 
 # ------------------------------------------------------------------------------
+# Compression
+function Compress-Files([String] $aDirectory, [String] $aZipfile){
+    if (test-path $aZipfile) { Remove-Item $aZipfile -Force }
+    [string]$pathToZipExe = "$($Env:ProgramFiles)\7-Zip\7z.exe";
+    [Array]$arguments = "a", "-tzip", "$aZipfile", "$aDirectory", "-r";
+    & $pathToZipExe $arguments;
+
+    # TODO Add unix version!
+  }
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
 # Setup
 $major = 0
 $minor = 0
@@ -160,10 +173,9 @@ dotnet publish "$srcPath/Cubes.Host/Cubes.Host.csproj" `
 # Cubes host package
 $srcPath = Join-Path -Path $workingPath -ChildPath "../tmp/Cubes-v$Version"
 $tgtPath = Join-Path -Path $workingPath -ChildPath '../deploy'
-Compress-Archive -Path $srcPath/* `
-    -CompressionLevel Optimal `
-    -DestinationPath $tgtPath/Cubes-v$Version$tag.zip `
-    -Force
+$archive = "$tgtPath/Cubes-v$Version$tag.zip"
+Remove-Item "$srcPath/appsettings.Development.json"
+Compress-Files $srcPath/* $archive
 
 # Cubes nuget
 $srcPath = Join-Path -Path $workingPath -ChildPath '../src'

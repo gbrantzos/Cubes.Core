@@ -6,6 +6,7 @@ namespace Cubes.Core.Base
         public const string Files_Scheduling             = "Core.Scheduling.yaml";
         public const string Files_StaticContent          = "Core.StaticContent.yaml";
         public const string Files_SmtpSettings           = "Core.SmtpSettings.yaml";
+        public const string Files_AppSettings            = "appsettings.json";
 
         public const string Config_HostUseSSL            = "Host:UseSSL";
         public const string Config_HostEnableCompression = "Host:EnableCompression";
