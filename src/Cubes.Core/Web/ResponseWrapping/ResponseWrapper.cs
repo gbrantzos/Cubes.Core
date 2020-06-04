@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Net;
@@ -19,6 +20,10 @@ namespace Cubes.Core.Web.ResponseWrapping
 
     public class ResponseWrapper
     {
+        private readonly static HashSet<string> systemExcluded = new HashSet<string>
+        {
+            "/api/system/version"
+        };
         private readonly RequestDelegate next;
         private readonly ILogger<ResponseWrapper> logger;
         private readonly IApiResponseBuilder responseBuilder;
@@ -41,8 +46,10 @@ namespace Cubes.Core.Web.ResponseWrapping
         public async Task Invoke(HttpContext context)
         {
             // Honor include and exclude paths
-            var shouldSkip = !context.Request.Path.Value.StartsWith(this.includePath) ||
-                (!String.IsNullOrEmpty(this.excludePath) && context.Request.Path.Value.StartsWith(this.excludePath));
+            var requestPath = context.Request.Path.Value;
+            var shouldSkip = !requestPath.StartsWith(this.includePath) ||
+                (!String.IsNullOrEmpty(this.excludePath) && requestPath.StartsWith(this.excludePath)) ||
+                systemExcluded.Contains(requestPath);
             if (shouldSkip)
             {
                 await this.next(context);

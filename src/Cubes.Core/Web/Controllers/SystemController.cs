@@ -42,7 +42,7 @@ namespace Cubes.Core.Web.Controllers
                 WorkingFolder    = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 Machine          = proc.MachineName,
                 envInfo.Hostname,
-                KernelVersion    = envInfo.BuildVersion,
+                CoreVersion      = envInfo.BuildVersion,
                 Build            = envInfo.IsDebug ? "DEBUG" : "RELEASE",
                 envInfo.BuildInformation,
                 LiveSince        = envInfo.LiveSince.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -84,6 +84,14 @@ namespace Cubes.Core.Web.Controllers
                    })
                });
             return Ok(routes);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet("version")]
+        public string Version()
+        {
+            var envInfo = cubesEnvironment.GetEnvironmentInformation();
+            return envInfo.Version;
         }
     }
 }

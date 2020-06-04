@@ -83,9 +83,38 @@
 
   <div class="content">
     <p class="welcome">Welcome</p>
-    <p class="details">Your Cubes server is up and running</p>
+    <p class="details" id="version">Your Cubes server is up and running</p>
     <p class="link"><a href="docs/api" target="_blank">API Reference</a> - <a href="admin" target="_blank">Cubes Management</a></p>
   </div>
 
+  <script type="text/javascript">
+    // When document is loaded
+    document.addEventListener("DOMContentLoaded", function(event) {
+      getVersion();
+    });
+
+    // Get version
+    function getVersion() {
+      var req = new XMLHttpRequest();
+
+      req.onreadystatechange = function() {
+          if (req.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+            if (req.status == 200) {
+                console.log('Cubes Version: ' + req.responseText);
+                document.getElementById("version").innerHTML = 'Your Cubes server is up and running, version <b>' + req.responseText;
+            }
+            else if (req.status == 400) {
+                alert('There was an error 400');
+            }
+            else {
+                alert('something else other than 200 was returned');
+            }
+          }
+      };
+
+      req.open("GET", "api/system/version", true);
+      req.send();
+  }
+  </script>
 </body>
 </html>
