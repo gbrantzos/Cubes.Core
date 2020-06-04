@@ -99,7 +99,7 @@ namespace Cubes.Core.Web.Controllers
         {
             var settings = cubesEnvironment
                 .GetApplicationInstances()
-                .SelectMany(app => app.GetUISettings())
+                .SelectMany(app => app.GetUIConfig())
                 .OrderBy(app => app.DisplayName)
                 .ToList();
             return Ok(settings);

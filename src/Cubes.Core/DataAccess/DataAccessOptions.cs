@@ -5,20 +5,20 @@ using Cubes.Core.Configuration;
 namespace Cubes.Core.DataAccess
 {
     [ConfigurationStore(CubesConstants.Files_DataAccess)]
-    public class DataAccessSettings
+    public class DataAccessOptions
     {
         public List<Connection> Connections { get; set; }
         public List<Query> Queries { get; set; }
 
-        public DataAccessSettings()
+        public DataAccessOptions()
         {
             Connections = new List<Connection>();
             Queries = new List<Query>();
         }
 
-        public static DataAccessSettings Create()
+        public static DataAccessOptions Create()
         {
-            var toReturn = new DataAccessSettings();
+            var toReturn = new DataAccessOptions();
             toReturn.Connections.Add(new Connection
             {
                 Name             = "SampleConnection",

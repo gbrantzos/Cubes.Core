@@ -50,7 +50,7 @@ namespace Cubes.Core.Base
         /// Information needed to enable UI design for application options.
         /// </summary>
         /// <returns></returns>
-        IEnumerable<ApplicationOptionsUIConfig> GetUISettings();
+        IEnumerable<ApplicationOptionsUIConfig> GetUIConfig();
     }
 
     public class ApplicationOptionsUIConfig

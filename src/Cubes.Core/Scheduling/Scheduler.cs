@@ -51,7 +51,7 @@ namespace Cubes.Core.Scheduling
             this.logger = logger;
 
             var configurationPath = cubesEnvironment
-                .GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_Scheduling);
+                .GetFileOnPath(CubesFolderKind.Config, CubesConstants.Files_Scheduling);
             schedulerConfiguration = new ConfigurationBuilder()
                 .AddYamlFile(configurationPath, optional: true, reloadOnChange: true)
                 .Build();

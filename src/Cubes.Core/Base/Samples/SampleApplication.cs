@@ -9,10 +9,10 @@ namespace Cubes.Core.Base.Samples
     {
         public const string OptionsFile = "Core.SampleApplication.yaml";
 
-        public override IEnumerable<ApplicationOptionsUIConfig> GetUISettings()
+        public override IEnumerable<ApplicationOptionsUIConfig> GetUIConfig()
         {
             return base
-                .GetUISettings()
+                .GetUIConfig()
                 .Append(new ApplicationOptionsUIConfig
                 {
                     DisplayName     = "Sample Application",
@@ -32,7 +32,7 @@ namespace Cubes.Core.Base.Samples
         public override IConfigurationBuilder ConfigureAppConfiguration(IConfigurationBuilder configuration, ICubesEnvironment cubes)
         {
             return configuration.AddYamlFile(
-                cubes.GetFileOnPath(CubesFolderKind.Settings, SampleApplication.OptionsFile),
+                cubes.GetFileOnPath(CubesFolderKind.Config, SampleApplication.OptionsFile),
                 optional: true,
                 reloadOnChange: true);
         }

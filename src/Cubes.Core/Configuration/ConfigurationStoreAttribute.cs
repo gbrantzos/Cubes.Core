@@ -17,6 +17,6 @@ namespace Cubes.Core.Configuration
         }
 
         public ConfigurationStoreAttribute(string filePath)
-            : this(CubesFolderKind.Settings, filePath) { }
+            : this(CubesFolderKind.Config, filePath) { }
     }
 }

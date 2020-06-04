@@ -15,7 +15,7 @@ Command Line Parameter | Environment Variable | Value
 
 #### AppSettings 
 
-To avoid overwriting `appsettings.json` file, Cubes tries to load settings from Settings folder (CUBES_ROOT\Settings). 
+To avoid overwriting `appsettings.json` file, Cubes tries to load settings from Configuration folder (CUBES_ROOT\Config). 
 Since this file is added last on the configuration builder, settings defined there override previous values.
 
 #### Common Libraries

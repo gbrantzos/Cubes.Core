@@ -45,7 +45,7 @@ namespace Cubes.Core.Tests.Environment
                     It.IsAny<Func<Object, Exception, string>>()), Times.Exactly(2));
 
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetStorageFolder()));
-            Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetSettingsFolder()));
+            Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetConfigurationFolder()));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Content)));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Temp)));
             Assert.True(fileSystem.Directory.Exists(unitUnderTest.GetFolder(CubesFolderKind.Logs)));

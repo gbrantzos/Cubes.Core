@@ -10,10 +10,10 @@ namespace Cubes.Core.DataAccess
     {
         public static Dictionary<string, string> RegisteredProviders { get; private set; }
 
-        private readonly DataAccessSettings settings;
+        private readonly DataAccessOptions options;
 
-        public ConnectionManager(IOptionsSnapshot<DataAccessSettings> options)
-            => this.settings = options.Value;
+        public ConnectionManager(IOptionsSnapshot<DataAccessOptions> options)
+            => this.options = options.Value;
 
         public static void RegisterProviders()
         {
@@ -43,7 +43,7 @@ namespace Cubes.Core.DataAccess
 
         public DbConnection GetConnection(string connectionName)
         {
-            var connectionInfo = settings
+            var connectionInfo = options
                 .Connections
                 .Find(i => i.Name.Equals(connectionName, StringComparison.CurrentCultureIgnoreCase));
             if (connectionInfo != null)

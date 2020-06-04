@@ -6,14 +6,14 @@ namespace Cubes.Core.DataAccess
 {
     public class QueryManager : IQueryManager
     {
-        private readonly DataAccessSettings settings;
+        private readonly DataAccessOptions options;
 
-        public QueryManager(IOptionsSnapshot<DataAccessSettings> options) =>
-            this.settings = options.Value;
+        public QueryManager(IOptionsSnapshot<DataAccessOptions> options) =>
+            this.options = options.Value;
 
         public Query GetSqlQuery(string queryName)
         {
-            var queries = settings.Queries;
+            var queries = options.Queries;
             var result = queries.Find(i => i.Name.Equals(queryName, StringComparison.CurrentCultureIgnoreCase));
             if (result == null)
                 throw new ArgumentException($"Could not find query with name {queryName.IfNullOrEmpty("(null OR Empty )")}");

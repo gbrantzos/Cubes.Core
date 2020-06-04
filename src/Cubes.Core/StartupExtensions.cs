@@ -37,21 +37,21 @@ namespace Cubes.Core
         {
             config.AddCubesConfigurationProvider(cubesEnvironment);
             config.AddYamlFile(
-                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_DataAccess),
+                cubesEnvironment.GetFileOnPath(CubesFolderKind.Config, CubesConstants.Files_DataAccess),
                 optional: true,
                 reloadOnChange: true);
             config.AddYamlFile(
-                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_StaticContent),
+                cubesEnvironment.GetFileOnPath(CubesFolderKind.Config, CubesConstants.Files_StaticContent),
                 optional: true,
                 reloadOnChange: true);
             config.AddYamlFile(
-                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_SmtpSettings),
+                cubesEnvironment.GetFileOnPath(CubesFolderKind.Config, CubesConstants.Files_SmtpSettings),
                 optional: true,
                 reloadOnChange: true);
 
             // Installation specific app settings
             config.AddJsonFile(
-                cubesEnvironment.GetFileOnPath(CubesFolderKind.Settings, CubesConstants.Files_AppSettings),
+                cubesEnvironment.GetFileOnPath(CubesFolderKind.Config, CubesConstants.Files_AppSettings),
                 optional: true,
                 reloadOnChange: true);
 

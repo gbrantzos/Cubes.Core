@@ -9,9 +9,9 @@ namespace Cubes.Core.Web.UIHelpers.Lookups.Providers
     {
         public string Name => LookupProviders.DataQueries;
 
-        public DataAccessSettings settings { get; }
+        public DataAccessOptions settings { get; }
 
-        public DataQueryLookupProvider(IOptionsSnapshot<DataAccessSettings> optionsSnapshot)
+        public DataQueryLookupProvider(IOptionsSnapshot<DataAccessOptions> optionsSnapshot)
         {
             this.settings = optionsSnapshot.Value;
         }

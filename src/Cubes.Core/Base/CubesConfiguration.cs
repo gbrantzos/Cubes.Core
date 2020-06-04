@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 namespace Cubes.Core.Base
 {
     /// <summary>
-    /// Exposes Cubes environment and settings information through <see cref="IConfiguration"/>.
+    /// Exposes Cubes environment and configuration through <see cref="IConfiguration"/>.
     /// </summary>
     public class CubesConfiguration
     {
@@ -15,7 +15,7 @@ namespace Cubes.Core.Base
         public string ContentFolder                { get; set; }
         public string LibrariesFolder              { get; set; }
         public string LogsFolder                   { get; set; }
-        public string SettingsFolder               { get; set; }
+        public string ConfigFolder                 { get; set; }
         public string StorageFolder                { get; set; }
         public string TempFolder                   { get; set; }
         public string WebRootFolder                { get; set; }
@@ -37,7 +37,7 @@ namespace Cubes.Core.Base
                     { $"{section}:ContentFolder"  , cubes.GetFolder(CubesFolderKind.Content) },
                     { $"{section}:LibrariesFolder", cubes.GetFolder(CubesFolderKind.Libraries) },
                     { $"{section}:LogsFolder"     , cubes.GetFolder(CubesFolderKind.Logs) },
-                    { $"{section}:SettingsFolder" , cubes.GetSettingsFolder() },
+                    { $"{section}:ConfigFolder"   , cubes.GetConfigurationFolder() },
                     { $"{section}:StorageFolder"  , cubes.GetStorageFolder() },
                     { $"{section}:TempFolder"     , cubes.GetFolder(CubesFolderKind.Temp) },
                     { $"{section}:WebRootFolder"  , cubes.GetFolder(CubesFolderKind.WebRoot) },

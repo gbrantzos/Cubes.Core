@@ -41,8 +41,8 @@ namespace Cubes.Core.Configuration
             var toWrite = new ExpandoObject();
             toWrite.TryAdd(configType.Name, configInstance);
 
-            var settingsRaw = serializer.Serialize(toWrite);
-            File.WriteAllText(path, settingsRaw);
+            var configRaw = serializer.Serialize(toWrite);
+            File.WriteAllText(path, configRaw);
         }
 
         public void Save(string configTypeName, object configInstance)

@@ -26,7 +26,7 @@ namespace Cubes.Core.Base
         public virtual IEnumerable<string> GetSwaggerXmlFiles()
             => Enumerable.Empty<string>();
 
-        public virtual IEnumerable<ApplicationOptionsUIConfig> GetUISettings()
+        public virtual IEnumerable<ApplicationOptionsUIConfig> GetUIConfig()
             => Enumerable.Empty<ApplicationOptionsUIConfig>();
 
         protected string ApplicationPath()

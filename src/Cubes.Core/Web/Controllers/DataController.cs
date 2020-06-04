@@ -16,13 +16,13 @@ namespace Cubes.Core.Web.Controllers
     {
         private readonly IQueryManager queryManager;
         private readonly IConnectionManager connectionManager;
-        private readonly DataAccessSettings settings;
+        private readonly DataAccessOptions settings;
         private readonly ILocalStorage localStorage;
         private readonly IDefaultQueries defaultQueries;
 
         public DataController(IConnectionManager connectionManager,
             IQueryManager queryManager,
-            IOptionsSnapshot<DataAccessSettings> options,
+            IOptionsSnapshot<DataAccessOptions> options,
             ILocalStorage localStorage,
             IDefaultQueries defaultQueries)
         {

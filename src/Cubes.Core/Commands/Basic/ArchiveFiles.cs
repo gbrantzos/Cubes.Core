@@ -39,7 +39,7 @@ namespace Cubes.Core.Commands.Basic
 //
 // {
 //   "sourcePath": "D:\\Code\\CubesNEXT\\Core\\src\\Cubes.Host\\bin\\Debug\\netcoreapp3.1",
-//   "filter": "Settings\\*.yaml|Logs\\*",
+//   "filter": "Config\\*.yaml|Logs\\*",
 //   "targets": ["D:\\wrk_Temp"],
 //   "archiveName": "Backup.{dt:yyyyMMddHHmm}.zip",
 //   "FilesToKeep": 2

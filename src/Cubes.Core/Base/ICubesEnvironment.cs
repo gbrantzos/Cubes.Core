@@ -66,10 +66,10 @@ namespace Cubes.Core.Base
     public enum CubesFolderKind
     {
         Root,
+        Config,
         Content,
         Libraries,
         Logs,
-        Settings,
         Storage,
         Temp,
         WebRoot
@@ -79,8 +79,8 @@ namespace Cubes.Core.Base
     {
         public static string GetRootFolder(this ICubesEnvironment cubesEnvironment)
             => cubesEnvironment.GetFolder(CubesFolderKind.Root);
-        public static string GetSettingsFolder(this ICubesEnvironment cubesEnvironment)
-            => cubesEnvironment.GetFolder(CubesFolderKind.Settings);
+        public static string GetConfigurationFolder(this ICubesEnvironment cubesEnvironment)
+            => cubesEnvironment.GetFolder(CubesFolderKind.Config);
         public static string GetStorageFolder(this ICubesEnvironment cubesEnvironment)
             => cubesEnvironment.GetFolder(CubesFolderKind.Storage);
 

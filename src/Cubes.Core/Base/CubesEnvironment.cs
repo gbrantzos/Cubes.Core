@@ -22,7 +22,7 @@ namespace Cubes.Core.Base
         private static readonly List<(string Filename, Func<object> CreateDefaultObject)> configurationFiles
             = new List<(string, Func<object>)>
         {
-            (CubesConstants.Files_DataAccess,    DataAccessSettings.Create),
+            (CubesConstants.Files_DataAccess,    DataAccessOptions.Create),
             (CubesConstants.Files_Scheduling,    SchedulerSettings.Create),
             (CubesConstants.Files_SmtpSettings,  SmtpSettingsProfiles.Create),
             (CubesConstants.Files_StaticContent, StaticContentSettings.Create)
@@ -132,14 +132,14 @@ namespace Cubes.Core.Base
             // Gather Swagger files
             CollectSwaggerXmlFiles();
 
-            // Create settings files
-            CreateSettingsFile();
+            // Create configuration files
+            CreateConfigFiles();
 
             // Load data providers
             ConnectionManager.RegisterProviders();
         }
 
-        private void CreateSettingsFile()
+        private void CreateConfigFiles()
         {
             // TODO We always use YAML serializer. Why??
             var serializer = new SerializerBuilder().Build();
@@ -152,7 +152,7 @@ namespace Cubes.Core.Base
 
             foreach (var (Filename, CreateDefaultObject) in configurationFiles)
             {
-                var filePath = this.GetFileOnPath(CubesFolderKind.Settings, Filename);
+                var filePath = this.GetFileOnPath(CubesFolderKind.Config, Filename);
                 if (!fileSystem.File.Exists(filePath))
                 {
                     var toWrite  = new ExpandoObject();
