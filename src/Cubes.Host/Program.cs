@@ -5,14 +5,15 @@ using Autofac.Extensions.DependencyInjection;
 using Cubes.Core;
 using Cubes.Core.Base;
 using Cubes.Core.Utilities;
+using Cubes.Core.Web;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NLog.Web;
+using NLog;
 using NLog.Extensions.Logging;
-using Cubes.Core.Web;
+using NLog.Web;
 
 namespace Cubes.Host
 {
@@ -25,7 +26,7 @@ namespace Cubes.Host
                 var rootFolder   = CubesEnvironmentHelpers.GetRootFolder(args);
                 var adminPath    = CubesEnvironmentHelpers.GetAdminPath(args);
                 var applications = CubesEnvironmentHelpers.GetApplications(rootFolder, args);
-                using ILoggerProvider loggerProvider = GetNLogProvider(rootFolder);
+                using var loggerProvider = GetNLogProvider(rootFolder);
 
                 var cubesEnvironment = new CubesEnvironment(
                     rootFolder   : rootFolder,
@@ -55,11 +56,11 @@ namespace Cubes.Host
             {
                 // Ensure to flush and stop internal timers/threads
                 // before application-exit (Avoid segmentation fault on Linux)
-                NLog.LogManager.Shutdown();
+                LogManager.Shutdown();
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubes)
+        private static IHostBuilder CreateHostBuilder(string[] args, ICubesEnvironment cubes)
             => Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
@@ -101,15 +102,16 @@ namespace Cubes.Host
         // This is the only Host specific method, and can be changed with no Core changes!
         private static ILoggerProvider GetNLogProvider(string basedir)
         {
-            var programPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-            var configFile  = Path.Combine(programPath, CubesConstants.NLog_ConfigFile);
+            var binariesPath = Path.GetDirectoryName(typeof(Program).Assembly.Location) ?? basedir;
+            var configFile = Path.Combine(binariesPath, CubesConstants.NLog_ConfigFile);
             if (!File.Exists(configFile))
             {
-                var sampleFile = Path.Combine(programPath, CubesConstants.NLog_SampleFile);
+                var sampleFile = Path.Combine(binariesPath, CubesConstants.NLog_SampleFile);
                 File.Copy(sampleFile, configFile);
             }
-            NLogBuilder.ConfigureNLog(configFile);
-            NLog.LogManager.Configuration.Variables["cubesRoot"] = basedir;
+            var installationConfig = Path.Combine(basedir, "Config", CubesConstants.NLog_ConfigFile);
+            NLogBuilder.ConfigureNLog(File.Exists(installationConfig) ? installationConfig : configFile);
+            LogManager.Configuration.Variables["cubesRoot"] = basedir;
 
             return new NLogLoggerProvider();
         }

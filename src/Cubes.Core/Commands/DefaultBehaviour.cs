@@ -31,6 +31,19 @@ namespace Cubes.Core.Commands
                 sw.Stop();
 
                 logger.LogInformation("Request executed, elapsed {elapsedTime}ms", sw.ElapsedMilliseconds);
+                if (result is IResult requestResult)
+                {
+                    if (requestResult.HasErrors)
+                    {
+                        logger.LogWarning($"Request result has errors >> {requestResult.Message}");
+                        if (requestResult.ExceptionThrown != null)
+                            logger.LogWarning(requestResult.ExceptionThrown, "Exception thrown:");
+                    }
+                    else
+                    {
+                        logger.LogInformation(requestResult.Message);
+                    }
+                }
                 return result;
             }
             catch (Exception x)

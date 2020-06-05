@@ -33,11 +33,12 @@
       width: 100%;
     }
 
-      .logo img {
-        margin-left: auto;
-        margin-right: auto;
-        display: block;
-      }
+    .logo img {
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      max-width: 80%;
+    }
 
     .welcome {
       font-size: 2.7rem;
@@ -89,7 +90,7 @@
 
   <script type="text/javascript">
     // When document is loaded
-    document.addEventListener("DOMContentLoaded", function(event) {
+    document.addEventListener("DOMContentLoaded", function (event) {
       getVersion();
     });
 
@@ -97,24 +98,24 @@
     function getVersion() {
       var req = new XMLHttpRequest();
 
-      req.onreadystatechange = function() {
-          if (req.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-            if (req.status == 200) {
-                console.log('Cubes Version: ' + req.responseText);
-                document.getElementById("version").innerHTML = 'Your Cubes server is up and running, version <b>' + req.responseText;
-            }
-            else if (req.status == 400) {
-                alert('There was an error 400');
-            }
-            else {
-                alert('something else other than 200 was returned');
-            }
+      req.onreadystatechange = function () {
+        if (req.readyState == XMLHttpRequest.DONE) {   // 'XMLHttpRequest.DONE == 4'
+          if (req.status == 200) {
+            console.log('Cubes Version: ' + req.responseText);
+            document.getElementById("version").innerHTML = 'Your Cubes server is up and running, version <b>' + req.responseText;
           }
+          else if (req.status == 400) {
+            alert('There was an error 400');
+          }
+          else {
+            alert('something else other than 200 was returned');
+          }
+        }
       };
 
       req.open("GET", "api/system/version", true);
       req.send();
-  }
+    }
   </script>
 </body>
 </html>
