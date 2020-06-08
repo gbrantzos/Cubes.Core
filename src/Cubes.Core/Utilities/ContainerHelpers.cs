@@ -68,7 +68,7 @@ namespace Cubes.Core.Utilities
             return builder;
         }
 
-        public static ContainerBuilder RegisterCubesRequestValidator(this ContainerBuilder builder, params Assembly[] assemblies)
+        public static ContainerBuilder RegisterCubesRequestValidators(this ContainerBuilder builder, params Assembly[] assemblies)
         {
             if (assemblies == null)
                 assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
