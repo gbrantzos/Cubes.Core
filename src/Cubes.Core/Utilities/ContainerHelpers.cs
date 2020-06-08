@@ -60,8 +60,20 @@ namespace Cubes.Core.Utilities
 
         public static ContainerBuilder RegisterCubesRequestHandlers(this ContainerBuilder builder, params Assembly[] assemblies)
         {
+            if (assemblies == null)
+                assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
             builder.RegisterAssemblyTypes(assemblies)
                 .Where(t => t.IsCubesRequestHandler())
+                .AsImplementedInterfaces();
+            return builder;
+        }
+
+        public static ContainerBuilder RegisterCubesRequestValidator(this ContainerBuilder builder, params Assembly[] assemblies)
+        {
+            if (assemblies == null)
+                assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
+            builder.RegisterAssemblyTypes(assemblies)
+                .Where(t => t.IsValidator())
                 .AsImplementedInterfaces();
             return builder;
         }
