@@ -26,8 +26,8 @@ namespace Cubes.Host
                 var rootFolder   = CubesEnvironmentHelpers.GetRootFolder(args);
                 var adminPath    = CubesEnvironmentHelpers.GetAdminPath(args);
                 var applications = CubesEnvironmentHelpers.GetApplications(rootFolder, args);
-                using var loggerProvider = GetNLogProvider(rootFolder);
 
+                using var loggerProvider = GetNLogProvider(rootFolder);
                 var cubesEnvironment = new CubesEnvironment(
                     rootFolder   : rootFolder,
                     adminPath    : adminPath,
@@ -109,7 +109,9 @@ namespace Cubes.Host
                 var sampleFile = Path.Combine(binariesPath, CubesConstants.NLog_SampleFile);
                 File.Copy(sampleFile, configFile);
             }
-            var installationConfig = Path.Combine(basedir, "Config", CubesConstants.NLog_ConfigFile);
+            var installationConfig = Path.Combine(basedir,
+                nameof(CubesFolderKind.Config),
+                CubesConstants.NLog_ConfigFile);
             NLogBuilder.ConfigureNLog(File.Exists(installationConfig) ? installationConfig : configFile);
             LogManager.Configuration.Variables["cubesRoot"] = basedir;
 
