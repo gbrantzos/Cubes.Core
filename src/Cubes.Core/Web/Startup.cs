@@ -67,6 +67,10 @@ namespace Cubes.Core.Web
 
             // Routing
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints => endpoints.MapControllers());
        }
     }

@@ -23,5 +23,8 @@ namespace Cubes.Core.Base
 
         public const string Serializer_JSON              = "JSON";
         public const string Serializer_YAML              = "YAML";
+
+        public const string Authentication_InternalAdmin = "cubes";
+        public const string Authentication_Persistence   = "Core.UsersStorage.db";
     }
 }

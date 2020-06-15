@@ -1,5 +1,6 @@
 using System.Reflection;
 using Autofac;
+using Cubes.Core.Security;
 using Cubes.Core.Base;
 using Cubes.Core.Commands;
 using Cubes.Core.Commands.Basic;
@@ -38,6 +39,11 @@ namespace Cubes.Core.Utilities
 
             builder.RegisterType<ArchiveFilesHandler>().AsImplementedInterfaces();
             builder.RegisterType<QueryResultsAsEmailHandler>().AsImplementedInterfaces();
+
+            builder.RegisterType<AuthenticateUserHandler>().AsImplementedInterfaces();
+            builder.RegisterType<AuthenticateUserValidator>().AsImplementedInterfaces();
+            builder.RegisterType<SaveUserHandler>().AsImplementedInterfaces();
+            builder.RegisterType<SaveUserValidator>().AsImplementedInterfaces();
 
             // Register serializers, use them by name
             builder.RegisterType<JsonSerializer>()

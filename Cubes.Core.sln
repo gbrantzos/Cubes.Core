@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{5C0907B4-9
 		.gitignore = .gitignore
 		Cubes.Core.sln.vsspell = Cubes.Core.sln.vsspell
 		README.md = README.md
+		Version.txt = Version.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Host", "src\Cubes.Host\Cubes.Host.csproj", "{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}"

@@ -49,7 +49,7 @@ namespace Cubes.Core
                 optional: true,
                 reloadOnChange: true);
 
-            // Installation specific app settings
+            // Installation specific application settings
             config.AddJsonFile(
                 cubesEnvironment.GetFileOnPath(CubesFolderKind.Config, CubesConstants.Files_AppSettings),
                 optional: true,

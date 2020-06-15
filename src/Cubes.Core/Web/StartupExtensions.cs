@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Cubes.Core.Security;
 using Cubes.Core.Base;
 using Cubes.Core.Web.Filters;
 using Cubes.Core.Web.Formatters;
@@ -48,6 +49,14 @@ namespace Cubes.Core.Web
                 options.Filters.Add(typeof(ValidateModelFilterAttribute));
                 options.InputFormatters.Insert(0, new RawStringInputFormatter());
             });
+
+            var secretKey = configuration.GetValue<string>("ApiKey", String.Empty);
+            if (!String.IsNullOrEmpty(secretKey))
+            {
+                if (secretKey.Length < 16)
+                    throw new ArgumentException("Api key should be more at least 16 characters long");
+                services.AddCubesAuthentication(o => o.SecretKey = secretKey);
+            }
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
