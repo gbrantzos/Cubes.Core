@@ -50,12 +50,20 @@ namespace Cubes.Core.Web
                 options.InputFormatters.Insert(0, new RawStringInputFormatter());
             });
 
-            var secretKey = configuration.GetValue<string>("ApiKey", String.Empty);
+            var secretKey = configuration.GetValue<string>(CubesConstants.Config_ApiKey, String.Empty);
             if (!String.IsNullOrEmpty(secretKey))
             {
                 if (secretKey.Length < 16)
-                    throw new ArgumentException("Api key should be more at least 16 characters long");
-                services.AddCubesAuthentication(o => o.SecretKey = secretKey);
+                    throw new ArgumentException("Api key should be at least 16 characters long");
+
+                // https://blog.ploeh.dk/2019/11/25/timespan-configuration-values-in-net-core/
+                var tokenLifetime = configuration.GetValue(CubesConstants.Config_KeyLifetime, TimeSpan.FromHours(2));
+
+                services.AddCubesAuthentication(o =>
+                {
+                    o.SecretKey     = secretKey;
+                    o.TokenLifetime = tokenLifetime;
+                });
             }
         }
 

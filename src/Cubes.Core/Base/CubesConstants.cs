@@ -14,6 +14,8 @@ namespace Cubes.Core.Base
         public const string Config_HostWrapPath          = "Host:WrapPath";
         public const string Config_HostWrapPathExclude   = "Host:WrapPathExclude";
         public const string Config_HostCorsPolicies      = "Host:CorsPolicies";
+        public const string Config_ApiKey                = "ApiKey";
+        public const string Config_KeyLifetime           = "KeyLifetime";
 
         public const string NLog_ConfigFile              = "NLog.config";
         public const string NLog_SampleFile              = "NLog.Sample.config";
