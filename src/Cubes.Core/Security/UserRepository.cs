@@ -86,6 +86,23 @@ namespace Cubes.Core.Security
             return Task.CompletedTask;
         }
 
+        public Task<IEnumerable<UserDetails>> GetAll()
+        {
+            using var storage = GetStorage();
+            var users = storage
+                .GetCollection<User>()
+                .FindAll()
+                .Select(u => new UserDetails
+                {
+                    UserName = u.UserName,
+                    DisplayName = u.DisplayName,
+                    Roles = u.Roles.ToList()
+                })
+                .ToList();
+
+            return Task.FromResult(users.AsEnumerable());
+        }
+
         private LiteDatabase GetStorage() => new LiteDatabase(dbPath);
 
         private string ComputeHash(string input)

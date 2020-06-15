@@ -40,6 +40,7 @@ namespace Cubes.Core.Security
                 });
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddSingleton<InternalAdminPassword>();
             services.AddHostedService<InternalAdminPasswordService>();
 

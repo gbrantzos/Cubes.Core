@@ -44,6 +44,11 @@ namespace Cubes.Core.Utilities
             builder.RegisterType<AuthenticateUserValidator>().AsImplementedInterfaces();
             builder.RegisterType<SaveUserHandler>().AsImplementedInterfaces();
             builder.RegisterType<SaveUserValidator>().AsImplementedInterfaces();
+            builder.RegisterType<SaveRolesHandler>().AsImplementedInterfaces();
+            builder.RegisterType<SaveRolesValidator>().AsImplementedInterfaces();
+
+            builder.RegisterType<GetUsersHandler>().AsImplementedInterfaces();
+            builder.RegisterType<GetRolesHandler>().AsImplementedInterfaces();
 
             // Register serializers, use them by name
             builder.RegisterType<JsonSerializer>()

@@ -16,10 +16,12 @@ namespace Cubes.Core.Security
 
     public class Role
     {
-        public static Role AdminRole = new Role { Code = "admin", Description = "Administrator" };
+        public static Role AdminRole = new Role { Code = "admin", Description = "Administrator", IsSystem = true };
+        public static IEnumerable<Role> SystemRoles = new Role[] { AdminRole };
 
         public string Code { get; set; }
         public string Description { get; set; }
+        public bool IsSystem { get; set; }
     }
 
     public static class UserExtensions

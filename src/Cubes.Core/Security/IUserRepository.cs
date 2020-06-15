@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Cubes.Core.Security
@@ -26,5 +27,11 @@ namespace Cubes.Core.Security
         /// <param name="userName"></param>
         /// <returns></returns>
         Task DeleteUser(string userName);
+
+        /// <summary>
+        /// Get all users.
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<UserDetails>> GetAll();
     }
 }
