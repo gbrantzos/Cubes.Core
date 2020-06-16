@@ -34,7 +34,7 @@ namespace Cubes.Core.Security
                     ID          = -1,
                     UserName    = CubesConstants.Authentication_InternalAdmin,
                     DisplayName = "Cubes Administrator",
-                    Roles       = new List<Role> { Role.AdminRole }
+                    Roles       = new List<string> { Role.AdminRole.Code }
                 };
 
                 return Task.FromResult(adminUser);

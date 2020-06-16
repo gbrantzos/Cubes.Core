@@ -5,6 +5,6 @@ namespace Cubes.Core.Security
 {
     public class SaveRoles : Request<bool>
     {
-        public IEnumerable<Role> Roles { get; set; }
+        public IEnumerable<Role> Roles { get; set; } = new List<Role>();
     }
 }

@@ -26,7 +26,7 @@ namespace Cubes.Core.Security
             };
             var roles = user
                 .Roles
-                .Select(r => new Claim(ClaimTypes.Role, r.Code));
+                .Select(r => new Claim(ClaimTypes.Role, r));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

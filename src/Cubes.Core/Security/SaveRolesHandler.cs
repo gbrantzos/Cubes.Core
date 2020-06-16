@@ -22,8 +22,6 @@ namespace Cubes.Core.Security
             var users = await this.userRepository.GetAll();
             var usedRoles = users
                 .SelectMany(u => u.Roles)
-                .Where(r => !r.IsSystem)
-                .Select(r => r.Code)
                 .ToList();
             var requestRoles = request
                 .Roles

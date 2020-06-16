@@ -15,7 +15,7 @@ namespace Cubes.Core.Security
             UserName    = user.UserName;
             DisplayName = user.DisplayName;
             Token       = token;
-            Roles       = user.Roles.Select(r => r.Code).ToList();
+            Roles       = user.Roles.ToList();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Cubes.Core.Security
         public string PasswordSalt { get; set; }
         public string DisplayName { get; set; }
 
-        public List<Role> Roles { get; set; } = new List<Role>();
+        public List<string> Roles { get; set; } = new List<string>();
     }
 
     public class Role
