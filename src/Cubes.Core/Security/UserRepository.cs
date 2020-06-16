@@ -70,6 +70,7 @@ namespace Cubes.Core.Security
                 user.Password = ComputeHash(user.PasswordSalt + password);
             }
             userCollection.Upsert(user);
+            userCollection.EnsureIndex(u => u.UserName, true);
 
             return Task.CompletedTask;
         }

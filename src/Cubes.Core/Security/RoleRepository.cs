@@ -35,6 +35,7 @@ namespace Cubes.Core.Security
             var rolesCollection = storage.GetCollection<Role>();
             rolesCollection.DeleteAll();
             rolesCollection.InsertBulk(roles.Where(r => !r.IsSystem));
+            rolesCollection.EnsureIndex(r => r.Code, true);
 
             return Task.CompletedTask;
         }
