@@ -23,7 +23,7 @@ namespace Cubes.Core.Security
                 throw new InvalidUserOrPasswordException("Invalid user name or password!") { UserName = request.UserName };
 
             var token = tokenGenerator.GenerateToken(user);
-            MessageToReturn = $"Successfully authenticated user {request.UserName}";
+            MessageToReturn = $"Successfully authenticated user {user.DisplayName}";
 
             return new AuthenticateUserResponse(user, token);
         }

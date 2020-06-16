@@ -34,5 +34,13 @@ namespace Cubes.Core.Security
                 DisplayName = user.DisplayName,
                 Roles       = user.Roles.ToList()
             };
+
+        public static UserDetails UserDetails(this User user)
+            => new UserDetails
+            {
+                UserName    = user.UserName,
+                DisplayName = user.DisplayName,
+                Roles       = user.Roles.ToList()
+            };
     }
 }

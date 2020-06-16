@@ -46,6 +46,8 @@ namespace Cubes.Core.Utilities
             builder.RegisterType<SaveUserValidator>().AsImplementedInterfaces();
             builder.RegisterType<SaveRolesHandler>().AsImplementedInterfaces();
             builder.RegisterType<SaveRolesValidator>().AsImplementedInterfaces();
+            builder.RegisterType<ResetUserPasswordHandler>().AsImplementedInterfaces();
+            builder.RegisterType<ResetUserPasswordValidator>().AsImplementedInterfaces();
 
             builder.RegisterType<GetUsersHandler>().AsImplementedInterfaces();
             builder.RegisterType<GetRolesHandler>().AsImplementedInterfaces();

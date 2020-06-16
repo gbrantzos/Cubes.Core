@@ -93,12 +93,7 @@ namespace Cubes.Core.Security
             var users = storage
                 .GetCollection<User>()
                 .FindAll()
-                .Select(u => new UserDetails
-                {
-                    UserName = u.UserName,
-                    DisplayName = u.DisplayName,
-                    Roles = u.Roles.ToList()
-                })
+                .Select(u => u.UserDetails())
                 .ToList();
 
             return Task.FromResult(users.AsEnumerable());
