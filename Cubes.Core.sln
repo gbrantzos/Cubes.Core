@@ -36,6 +36,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F5F88370-3
 		docs\UI.Elements.md = docs\UI.Elements.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Linux", "Linux", "{74EC7A40-BCD1-408A-9845-CE0A3AB279DB}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Linux\cubes = docs\Linux\cubes
+		docs\Linux\CubesNEXT.service = docs\Linux\CubesNEXT.service
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReleaseNotes", "ReleaseNotes", "{433A0D4A-0B91-4ADC-B0CE-F35D52CE7D89}"
+	ProjectSection(SolutionItems) = preProject
+		docs\ReleaseNotes\Template.md = docs\ReleaseNotes\Template.md
+		docs\ReleaseNotes\v5.1.3.md = docs\ReleaseNotes\v5.1.3.md
+		docs\ReleaseNotes\v5.1.4.md = docs\ReleaseNotes\v5.1.4.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +103,8 @@ Global
 		{0FDF6A57-CCC1-469E-BC7E-34ACD9921847} = {1A676AAA-69D1-4200-BE90-7B37C283421E}
 		{97BAA786-237F-4B17-A87B-F5A5047AE76C} = {356E6292-C991-4133-9AD2-54A4A3FD5B66}
 		{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D} = {1A676AAA-69D1-4200-BE90-7B37C283421E}
+		{74EC7A40-BCD1-408A-9845-CE0A3AB279DB} = {F5F88370-397C-4308-ADFC-09BDE881DB85}
+		{433A0D4A-0B91-4ADC-B0CE-F35D52CE7D89} = {F5F88370-397C-4308-ADFC-09BDE881DB85}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B76577B1-BE46-4AFD-9822-244124C362DB}
