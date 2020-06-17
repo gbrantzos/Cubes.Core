@@ -54,7 +54,7 @@ namespace Cubes.Core.Web.Swager
             {
                 c.InjectStylesheet("/ui/swagger-css");
                 c.DocExpansion(DocExpansion.List);
-                c.SwaggerEndpoint(swaggerUrl, "Cubes API V1");
+                c.SwaggerEndpoint(swaggerUrl, "Cubes API v1");
                 c.RoutePrefix = "docs/api";
 
                 c.DisplayRequestDuration();

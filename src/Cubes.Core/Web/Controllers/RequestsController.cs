@@ -44,7 +44,7 @@ namespace Cubes.Core.Web.Controllers
 
                     return new
                     {
-                        FullName     = t.FullName,
+                        t.FullName,
                         Display      = display,
                         EmptyCommand = Activator.CreateInstance(t)
                     };
@@ -76,7 +76,6 @@ namespace Cubes.Core.Web.Controllers
             if (instance == null)
                 return BadRequest($"Given instance is not a valid JSON object of type '{requestType}'");
 
-            // TODO Check this
             IResult result = await mediator.Send(instance) as IResult;
             if (result.ExceptionThrown != null)
                 throw new Exception($"Request execution failed!{Environment.NewLine}{requestInst}", result.ExceptionThrown);
