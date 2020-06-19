@@ -51,6 +51,7 @@ namespace Cubes.Core.Utilities
 
             builder.RegisterType<GetUsersHandler>().AsImplementedInterfaces();
             builder.RegisterType<GetRolesHandler>().AsImplementedInterfaces();
+            builder.RegisterType<DeleteUserHandler>().AsImplementedInterfaces();
 
             // Register serializers, use them by name
             builder.RegisterType<JsonSerializer>()

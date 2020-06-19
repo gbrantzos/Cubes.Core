@@ -34,6 +34,7 @@ namespace Cubes.Core.Security
                     ID          = -1,
                     UserName    = CubesConstants.Authentication_InternalAdmin,
                     DisplayName = "Cubes Administrator",
+                    Email       = "admin@cubes.local",
                     Roles       = new List<string> { Role.AdminRole.Code }
                 };
 
@@ -44,6 +45,8 @@ namespace Cubes.Core.Security
             var user = storage
                 .GetCollection<User>()
                 .FindOne(u => u.UserName.Equals(userName, StringComparison.OrdinalIgnoreCase));
+            if (user == null)
+                return Task.FromResult<User>(null);
 
             var hashedPassword = ComputeHash(user.PasswordSalt + password);
             if (hashedPassword == user.Password)
@@ -57,12 +60,13 @@ namespace Cubes.Core.Security
             using var storage = GetStorage();
             var userCollection = storage.GetCollection<User>();
             var existing = userCollection
-                .FindOne(u => u.UserName.Equals(userDetails.UserName, StringComparison.OrdinalIgnoreCase));
+                .FindOne(u => u.ID == userDetails.ID);
             bool isNew = existing == null;
 
             var user = isNew ? new User() : existing;
             user.UserName     = userDetails.UserName;
             user.DisplayName  = userDetails.DisplayName;
+            user.Email        = userDetails.Email;
             user.Roles        = userDetails.Roles.ToList();
             if (!String.IsNullOrEmpty(password))
             {

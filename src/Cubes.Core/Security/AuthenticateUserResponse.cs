@@ -7,6 +7,7 @@ namespace Cubes.Core.Security
     {
         public string UserName { get; }
         public string DisplayName { get; }
+        public string Email { get; set; }
         public string Token { get; }
         public List<string> Roles { get; set; }
 
@@ -14,6 +15,7 @@ namespace Cubes.Core.Security
         {
             UserName    = user.UserName;
             DisplayName = user.DisplayName;
+            Email       = user.Email;
             Token       = token;
             Roles       = user.Roles.ToList();
         }

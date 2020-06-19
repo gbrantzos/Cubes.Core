@@ -24,7 +24,7 @@ namespace Cubes.Core.Web.Controllers
         /// </remarks>
         /// <returns><see cref="IEnumerable{User}"/></returns>
         [HttpGet]
-        [Produces(MediaTypeNames.Application.Json, Type = typeof(IEnumerable<User>))]
+        [Produces(MediaTypeNames.Application.Json, Type = typeof(IEnumerable<UserDetails>))]
         public async Task<IActionResult> Get()
         {
             var result = await this.mediator.Send(new GetUsers());
@@ -89,6 +89,21 @@ namespace Cubes.Core.Web.Controllers
         public async Task<IActionResult> ResetPassword([FromBody] ResetUserPassword resetUserPassword)
         {
             var result = await this.mediator.Send(resetUserPassword);
+            if (result.HasErrors)
+                return BadRequest(result.Message);
+
+            return Ok(result.Response);
+        }
+
+        /// <summary>
+        /// Delete user
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        [HttpDelete("{userName}")]
+        public async Task<IActionResult> Delete(string userName)
+        {
+            var result = await this.mediator.Send(new DeleteUser { UserName = userName });
             if (result.HasErrors)
                 return BadRequest(result.Message);
 

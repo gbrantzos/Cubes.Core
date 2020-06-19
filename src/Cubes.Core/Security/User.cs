@@ -10,6 +10,7 @@ namespace Cubes.Core.Security
         public string Password { get; set; }
         public string PasswordSalt { get; set; }
         public string DisplayName { get; set; }
+        public string Email { get; set; }
 
         public List<string> Roles { get; set; } = new List<string>();
     }
@@ -32,15 +33,18 @@ namespace Cubes.Core.Security
                 ID          = user.ID,
                 UserName    = user.UserName,
                 DisplayName = user.DisplayName,
+                Email       = user.Email,
                 Roles       = user.Roles.ToList()
             };
 
         public static UserDetails UserDetails(this User user)
             => new UserDetails
             {
+                ID          = user.ID,
                 UserName    = user.UserName,
                 DisplayName = user.DisplayName,
-                Roles       = user.Roles.ToList()
+                Roles       = user.Roles.ToList(),
+                Email       = user.Email
             };
     }
 }

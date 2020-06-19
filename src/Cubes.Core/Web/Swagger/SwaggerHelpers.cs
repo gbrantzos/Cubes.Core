@@ -32,7 +32,7 @@ namespace Cubes.Core.Web.Swager
                         .GetCustomAttribute(typeof(SwaggerCategoryAttribute)) as SwaggerCategoryAttribute;
                     var categ = attr?.Category.IfNullOrEmpty("Undefined");
                     var order = categ == "Core" ? 0 : 1;
-                    var ctrl  = $"{api.ActionDescriptor.RouteValues["controller"]}_{api.HttpMethod}";
+                    var ctrl  = $"{api.ActionDescriptor.RouteValues["controller"]}_{MethodSortingIndex(api.HttpMethod)}";
 
                     return $"{order}_{categ}_{ctrl}";
                 });
@@ -44,6 +44,18 @@ namespace Cubes.Core.Web.Swager
                 foreach (var xmlfile in swaggerFiles)
                     c.IncludeXmlComments(xmlfile);
             });
+        }
+
+        private static int MethodSortingIndex(string method)
+        {
+            return (method.ToLower()) switch
+            {
+                "get" => 1,
+                "post" => 2,
+                "put" => 3,
+                "delete" => 4,
+                _ => 10,
+            };
         }
 
         public static IApplicationBuilder UseCubesSwagger(this IApplicationBuilder app)
