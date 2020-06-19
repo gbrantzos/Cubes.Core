@@ -91,7 +91,7 @@ namespace Cubes.Core.Web.Controllers
         public string Version()
         {
             var envInfo = cubesEnvironment.GetEnvironmentInformation();
-            return envInfo.Version;
+            return envInfo.BuildVersion;
         }
     }
 }

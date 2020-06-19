@@ -51,20 +51,19 @@ namespace Cubes.Core.Web
             });
 
             var secretKey = configuration.GetValue<string>(CubesConstants.Config_ApiKey, String.Empty);
-            if (!String.IsNullOrEmpty(secretKey))
+            if (String.IsNullOrEmpty(secretKey))
+                throw new Exception("You must define an API key!");
+            if (secretKey.Length < 16)
+                throw new ArgumentException("Api key should be at least 16 characters long");
+
+            // https://blog.ploeh.dk/2019/11/25/timespan-configuration-values-in-net-core/
+            var tokenLifetime = configuration.GetValue(CubesConstants.Config_KeyLifetime, TimeSpan.FromHours(2));
+
+            services.AddCubesAuthentication(o =>
             {
-                if (secretKey.Length < 16)
-                    throw new ArgumentException("Api key should be at least 16 characters long");
-
-                // https://blog.ploeh.dk/2019/11/25/timespan-configuration-values-in-net-core/
-                var tokenLifetime = configuration.GetValue(CubesConstants.Config_KeyLifetime, TimeSpan.FromHours(2));
-
-                services.AddCubesAuthentication(o =>
-                {
-                    o.SecretKey     = secretKey;
-                    o.TokenLifetime = tokenLifetime;
-                });
-            }
+                o.SecretKey     = secretKey;
+                o.TokenLifetime = tokenLifetime;
+            });
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,

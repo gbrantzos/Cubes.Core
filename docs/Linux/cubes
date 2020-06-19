@@ -2,6 +2,7 @@
 
 export CUBES_ROOT="/opt/Cubes"
 export CUBES_ADMIN="/opt/Cubes/Zippies/CubesManagement.zip"
+export URLS="http://*:4100"
 
 dotnet /opt/Cubes/Versions/Current/Cubes.Host.dll
 
