@@ -74,7 +74,7 @@ namespace Cubes.Core.Utilities
 
         public static ContainerBuilder RegisterCubesRequestHandlers(this ContainerBuilder builder, params Assembly[] assemblies)
         {
-            if (assemblies == null)
+            if (assemblies == null || assemblies.Length == 0)
                 assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
             builder.RegisterAssemblyTypes(assemblies)
                 .Where(t => t.IsCubesRequestHandler())
@@ -84,7 +84,7 @@ namespace Cubes.Core.Utilities
 
         public static ContainerBuilder RegisterCubesRequestValidators(this ContainerBuilder builder, params Assembly[] assemblies)
         {
-            if (assemblies == null)
+            if (assemblies == null || assemblies.Length == 0)
                 assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
             builder.RegisterAssemblyTypes(assemblies)
                 .Where(t => t.IsValidator())

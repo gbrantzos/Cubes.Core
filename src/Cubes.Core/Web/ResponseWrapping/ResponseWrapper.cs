@@ -43,6 +43,50 @@ namespace Cubes.Core.Web.ResponseWrapping
             this.excludePath = configuration.GetValue(CubesConstants.Config_HostWrapPathExclude, "");
         }
 
+        // https://stackoverflow.com/a/47183053/3410871
+        public async Task Invoke_New(HttpContext context)
+        {
+            //Hold on to original body for downstream calls
+            Stream originalBody = context.Response.Body;
+            try
+            {
+                string responseBody = null;
+                using (var memStream = new MemoryStream())
+                {
+                    //Replace stream for upstream calls.
+                    context.Response.Body = memStream;
+                    //continue up the pipeline
+                    await next(context);
+                    //back from upstream call.
+                    //memory stream now hold the response data
+                    //reset position to read data stored in response stream
+                    memStream.Position = 0;
+                    responseBody = new StreamReader(memStream).ReadToEnd();
+                }//dispose of previous memory stream.
+                 //lets convert responseBody to something we can use
+                 // TODO Check for simple string or other...
+                var data = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                //create your wrapper response and convert to JSON
+                var json = new BaseClass
+                {
+                    data = data,
+                    apiVersion = "1.2",
+                    otherInfoHere = "here"
+                };
+                //convert json to a stream
+                var buffer = Encoding.UTF8.GetBytes(json.ToString());
+                using (var output = new MemoryStream(buffer))
+                {
+                    await output.CopyToAsync(originalBody);
+                }//dispose of output stream
+            }
+            finally
+            {
+                //and finally, reset the stream for downstream calls
+                context.Response.Body = originalBody;
+            }
+        }
+
         public async Task Invoke(HttpContext context)
         {
             // Honor include and exclude paths
@@ -170,6 +214,15 @@ namespace Cubes.Core.Web.ResponseWrapping
             context.Response.StatusCode = apiResponse.StatusCode;
 
             return context.Response.WriteAsync(wrappedBody);
+        }
+
+        private class BaseClass
+        {
+            public string apiVersion { get; set; }
+            public string otherInfoHere { get; set; }
+            public object data { get; set; }
+
+            public override string ToString() => JsonConvert.SerializeObject(this);
         }
     }
 
