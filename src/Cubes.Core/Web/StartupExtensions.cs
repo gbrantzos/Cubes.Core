@@ -70,7 +70,8 @@ namespace Cubes.Core.Web
             IConfiguration configuration,
             IWebHostEnvironment env,
             IApiResponseBuilder responseBuilder,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            JsonSerializerSettings serializerSettings)
         {
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
@@ -79,7 +80,7 @@ namespace Cubes.Core.Web
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
-                app.UseCustomExceptionHandler(responseBuilder, loggerFactory);
+                app.UseCustomExceptionHandler(responseBuilder, loggerFactory, serializerSettings);
 
             var corsPolicies = configuration
                 .GetCorsPolicies()
@@ -93,13 +94,14 @@ namespace Cubes.Core.Web
                 .UseAdminPage(configuration, loggerFactory)
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
-                .UseCubesMiddleware(loggerFactory, responseBuilder)
+                .UseCubesMiddleware(loggerFactory, responseBuilder, serializerSettings)
                 .UseResponseWrapper();
         }
 
         public static IApplicationBuilder UseCubesMiddleware(this IApplicationBuilder app,
             ILoggerFactory loggerFactory,
-            IApiResponseBuilder responseBuilder)
+            IApiResponseBuilder responseBuilder,
+            JsonSerializerSettings serializerSettings)
         {
             app.Use(async (ctx, next) =>
             {
@@ -133,7 +135,7 @@ namespace Cubes.Core.Web
 
                 // Inform user
                 logger.LogInformation("{IP} [{startedAt}] \"{info}\", {statusCode}, {elapsed} ms",
-                    httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    httpContextAccessor.HttpContext.Connection.RemoteIpAddress,
                     context.StartedAt,
                     context.SourceInfo,
                     ctx.Response.StatusCode,
@@ -144,7 +146,6 @@ namespace Cubes.Core.Web
             {
                 context.HttpContext.Response.ContentType = "application/json";
                 var apiResponse = responseBuilder.Create()
-                    .WithErrors()
                     .WithStatusCode(context.HttpContext.Response.StatusCode)
                     .WithMessage($"Invalid request, status code: {context.HttpContext.Response.StatusCode}")
                     .WithData(new
@@ -154,7 +155,7 @@ namespace Cubes.Core.Web
                 await context
                     .HttpContext
                     .Response
-                    .WriteAsync(apiResponse.ToString());
+                    .WriteAsync(apiResponse.AsJson(serializerSettings));
             });
 
             return app;
@@ -162,7 +163,8 @@ namespace Cubes.Core.Web
 
         public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app,
             IApiResponseBuilder responseBuilder,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            JsonSerializerSettings serializerSettings)
         {
             var logger = loggerFactory.CreateLogger("Cubes.Web.CustomExceptionHandler");
             app.UseExceptionHandler(appError =>
@@ -191,7 +193,6 @@ namespace Cubes.Core.Web
                             .AppendLine(fileInfo);
 
                         var apiResponse = responseBuilder.Create()
-                            .WithErrors()
                             .WithStatusCode(context.Response.StatusCode)
                             .WithMessage("An unhandled exception occurred while processing the request.")
                             .WithData(new
@@ -201,21 +202,11 @@ namespace Cubes.Core.Web
                             });
                         await context
                             .Response
-                            .WriteAsync(apiResponse.ToString());
+                            .WriteAsync(apiResponse.AsJson(serializerSettings));
                     }
                 });
             });
             return app;
-        }
-
-        private sealed class ErrorDetails
-        {
-            public int StatusCode { get; set; }
-            public string Message { get; set; }
-            public string Details { get; set; }
-            public string RequestInfo { get; set; }
-
-            public override string ToString() => JsonConvert.SerializeObject(this);
         }
     }
 }

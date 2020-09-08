@@ -6,6 +6,8 @@ using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Cubes.Core.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using OfficeOpenXml;
 
 namespace Cubes.Core
@@ -27,6 +29,13 @@ namespace Cubes.Core
                 .AddSingleton<IContextProvider, ContextProvider>()
                 .AddTransient<IConfigurationWriter, ConfigurationWriter>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
+
+            // Global JSON convert settings
+            var serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
+            };
+            services.AddSingleton(serializerSettings);
 
             return services;
         }

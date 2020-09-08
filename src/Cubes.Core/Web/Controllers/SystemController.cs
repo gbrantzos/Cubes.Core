@@ -33,13 +33,19 @@ namespace Cubes.Core.Web.Controllers
         {
             var envInfo = cubesEnvironment.GetEnvironmentInformation();
             var proc = Process.GetCurrentProcess();
+            if (proc == null || proc.MainModule == null)
+                throw new Exception("Could not get Cubes process information");
+            var asm = Assembly.GetEntryAssembly();
+            if (asm == null)
+                throw new Exception("Could not get Cubes entry assembly information");
+
             var info = new
             {
                 ProcID           = proc.Id,
                 proc.ProcessName,
                 Executable       = Path.GetFileName(proc.MainModule.FileName),
-                Assembly         = Assembly.GetEntryAssembly().GetName().Name,
-                WorkingFolder    = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                Assembly         = asm.GetName().Name,
+                WorkingFolder    = Path.GetDirectoryName(asm.Location),
                 Machine          = proc.MachineName,
                 envInfo.Hostname,
                 CoreVersion      = envInfo.BuildVersion,
@@ -92,6 +98,13 @@ namespace Cubes.Core.Web.Controllers
         {
             var envInfo = cubesEnvironment.GetEnvironmentInformation();
             return envInfo.BuildVersion;
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet("file")]
+        public IActionResult File()
+        {
+            return Content("css", "text/css");
         }
     }
 }

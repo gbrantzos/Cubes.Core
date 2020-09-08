@@ -11,11 +11,15 @@ namespace Cubes.Core.Web.ResponseWrapping
 
     public class ApiResponseBuilder : IApiResponseBuilder
     {
+        private readonly IContextProvider contextProvider;
         private readonly CubesConfiguration cubesConfig;
 
-        public ApiResponseBuilder(IOptions<CubesConfiguration> options)
-            => this.cubesConfig = options.Value;
+        public ApiResponseBuilder(IOptions<CubesConfiguration> options, IContextProvider contextProvider)
+        {
+            this.contextProvider = contextProvider;
+            this.cubesConfig = options.Value;
+        }
 
-        public ApiResponse Create() => new ApiResponse(DateTime.UtcNow, cubesConfig.Version);
+        public ApiResponse Create() => new ApiResponse(DateTime.UtcNow, cubesConfig.Version, contextProvider.Current.ID);
     }
 }

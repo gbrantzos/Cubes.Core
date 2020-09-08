@@ -1,71 +1,51 @@
 using System;
 using Cubes.Core.Utilities;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Cubes.Core.Web.ResponseWrapping
 {
     public class ApiResponse
     {
-        private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
-        };
-
+        public string RequestID   { get; set; }
         public string Version     { get; set; }
         public DateTime CreatedAt { get; set; }
         public int StatusCode     { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Message     { get; set; }
-        public bool HasErrors     { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public object Data        { get; set; }
 
-        public override string ToString()
-            => JsonConvert.SerializeObject(this, serializerSettings);
-
-        internal ApiResponse(DateTime createdAt, string version)
+        internal ApiResponse(DateTime createdAt, string version, string requestID)
         {
             CreatedAt = createdAt;
             Version   = version.ThrowIfEmpty(nameof(Version));
+            RequestID = requestID;
         }
 
-        internal static ApiResponse CreateResponse() => new ApiResponse(DateTime.UtcNow, String.Empty);
+        internal static ApiResponse CreateResponse(string requestID)
+            => new ApiResponse(DateTime.UtcNow, string.Empty, requestID);
     }
 
     public static class ApiResponseExtensions
     {
-        public static ApiResponse WithErrors(this ApiResponse response)
-        {
-            (response ?? ApiResponse.CreateResponse()).HasErrors = true;
-            return response;
-        }
-
         public static ApiResponse WithStatusCode(this ApiResponse apiResponse, int statusCode)
         {
-            (apiResponse ?? ApiResponse.CreateResponse()).StatusCode = statusCode;
+            apiResponse.StatusCode = statusCode;
             return apiResponse;
         }
 
         public static ApiResponse WithMessage(this ApiResponse apiResponse, string message)
         {
-            (apiResponse ?? ApiResponse.CreateResponse()).Message = message;
+            apiResponse.Message = message;
             return apiResponse;
         }
 
         public static ApiResponse WithData(this ApiResponse apiResponse, object data)
         {
-            (apiResponse ?? ApiResponse.CreateResponse()).Data = data;
+            apiResponse.Data = data;
             return apiResponse;
-        }
-
-        public static ApiResponse WithExceptionMessages(this ApiResponse response, Exception ex)
-        {
-            var exceptionMessages = ex.GetAllMessages();
-            (response ?? ApiResponse.CreateResponse()).Message = String.Join(Environment.NewLine, exceptionMessages);
-            return response;
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Cubes.Core.Web
 {
@@ -47,9 +48,10 @@ namespace Cubes.Core.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var useSsl          = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
-            var loggerFactory   = app.ApplicationServices.GetService<ILoggerFactory>();
-            var responseBuilder = app.ApplicationServices.GetService<IApiResponseBuilder>();
+            var useSsl             = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
+            var loggerFactory      = app.ApplicationServices.GetService<ILoggerFactory>();
+            var responseBuilder    = app.ApplicationServices.GetService<IApiResponseBuilder>();
+            var serializerSettings = app.ApplicationServices.GetService<JsonSerializerSettings>();
 
             if (useSsl)
             {
@@ -63,7 +65,7 @@ namespace Cubes.Core.Web
             app.UseStaticFiles();
 
             // Should be called as soon as possible.
-            app.UseCubesApi(configuration, env, responseBuilder, loggerFactory);
+            app.UseCubesApi(configuration, env, responseBuilder, loggerFactory, serializerSettings);
 
             // Routing
             app.UseRouting();
