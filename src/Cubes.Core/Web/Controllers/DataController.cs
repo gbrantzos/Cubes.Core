@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Cubes.Core.DataAccess;
@@ -62,9 +63,13 @@ namespace Cubes.Core.Web.Controllers
 
                 return Ok("Connection was successful!");
             }
+            catch (DbException dx)
+            {
+                return BadRequest(dx.Message);
+            }
             catch (ArgumentException ax)
             {
-                return NotFound(new { ax.Message });
+                return NotFound(ax.Message);
             }
         }
 
@@ -189,9 +194,13 @@ namespace Cubes.Core.Web.Controllers
 
                 return Ok(new { Results = result });
             }
+            catch (DbException dx)
+            {
+                return BadRequest(dx.Message);
+            }
             catch (ArgumentException ax)
             {
-                return NotFound(new { ax.Message });
+                return NotFound(ax.Message);
             }
         }
 
