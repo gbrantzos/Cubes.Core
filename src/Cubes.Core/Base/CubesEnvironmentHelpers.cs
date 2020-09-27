@@ -48,7 +48,7 @@ namespace Cubes.Core.Base
             var toProcess = new List<string>();
             var toReturn = new List<ApplicationManifest>();
 
-            var appsFromVariable = Environment.GetEnvironmentVariable("CUBES_APPLICATIONS");
+            var appsFromVariable = Environment.GetEnvironmentVariable("CUBES_APPLICATION");
             if (!String.IsNullOrEmpty(appsFromVariable))
                 toProcess.AddRange(appsFromVariable.Split(Separators, StringSplitOptions.RemoveEmptyEntries));
 
