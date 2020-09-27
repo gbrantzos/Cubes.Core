@@ -35,6 +35,6 @@ namespace Cubes.Core.DataAccess
             return provider.GetQuery();
         }
 
-        public IEnumerable<string> GetQueryNames() => queryProviders.Select(p => p.QueryName).ToList();
+        public IEnumerable<string> GetQueryNames() => queryProviders.Select(p => p.QueryName).OrderBy(n => n).ToList();
     }
 }

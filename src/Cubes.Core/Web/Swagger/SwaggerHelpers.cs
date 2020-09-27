@@ -32,7 +32,7 @@ namespace Cubes.Core.Web.Swager
                         .GetCustomAttribute(typeof(SwaggerCategoryAttribute)) as SwaggerCategoryAttribute;
                     var categ = attr?.Category.IfNullOrEmpty("Undefined");
                     var order = categ == "Core" ? 0 : 1;
-                    var ctrl  = $"{api.ActionDescriptor.RouteValues["controller"]}_{MethodSortingIndex(api.HttpMethod)}";
+                    var ctrl  = $"{api.ActionDescriptor.RouteValues["controller"]}_{MethodSortingIndex(api.HttpMethod ?? "GET")}";
 
                     return $"{order}_{categ}_{ctrl}";
                 });
