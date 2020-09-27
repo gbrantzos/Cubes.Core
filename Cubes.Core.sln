@@ -30,9 +30,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{21A9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F5F88370-397C-4308-ADFC-09BDE881DB85}"
 	ProjectSection(SolutionItems) = preProject
+		docs\Applications.Options.md = docs\Applications.Options.md
 		docs\Commands.md = docs\Commands.md
 		docs\Host.Configuration.md = docs\Host.Configuration.md
-		docs\TODOs.txt = docs\TODOs.txt
+		docs\ReleaseProcess.md = docs\ReleaseProcess.md
 		docs\UI.Elements.md = docs\UI.Elements.md
 	EndProjectSection
 EndProject
