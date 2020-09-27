@@ -48,6 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReleaseNotes", "ReleaseNote
 		docs\ReleaseNotes\Template.md = docs\ReleaseNotes\Template.md
 		docs\ReleaseNotes\v5.1.3.md = docs\ReleaseNotes\v5.1.3.md
 		docs\ReleaseNotes\v5.1.4.md = docs\ReleaseNotes\v5.1.4.md
+		docs\ReleaseNotes\v5.1.5.md = docs\ReleaseNotes\v5.1.5.md
 	EndProjectSection
 EndProject
 Global
