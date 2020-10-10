@@ -9,6 +9,7 @@ using Cubes.Core.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OfficeOpenXml;
+using System.Text;
 
 namespace Cubes.Core
 {
@@ -16,6 +17,9 @@ namespace Cubes.Core
     {
         public static IServiceCollection AddCubesCore(this IServiceCollection services, IConfiguration configuration)
         {
+            // Encodings
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             // EPPlus license
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
