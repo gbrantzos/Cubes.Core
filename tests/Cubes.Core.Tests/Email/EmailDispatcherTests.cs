@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Mail;
 using Cubes.Core.Email;
+using MimeKit;
 using Moq;
 using Xunit;
 
@@ -30,16 +30,15 @@ namespace Cubes.Core.Tests.Email
                 Host = "localhost",
                 Port = 25,
                 UseSsl = false,
-
             };
             smtpClientMock.SetupAllProperties();
-            smtpClientMock.Setup(m => m.Send(It.IsAny<MailMessage>())).Verifiable();
+            smtpClientMock.Setup(m => m.Send(It.IsAny<MimeMessage>(), It.IsAny<SmtpSettings>())).Verifiable();
 
             //When
             sut.DispatchEmail(emailContent, smtpSettings);
 
             //Then
-            smtpClientMock.Verify(m => m.Send(It.IsAny<MailMessage>()), Times.Once());
+            smtpClientMock.Verify(m => m.Send(It.IsAny<MimeMessage>(), It.IsAny<SmtpSettings>()), Times.Once());
         }
     }
 }

@@ -1,18 +1,10 @@
 using System;
-using System.Net;
-using System.Net.Mail;
+using MimeKit;
 
 namespace Cubes.Core.Email
 {
-    public interface ISmtpClient : IDisposable
+    public interface ISmtpClient
     {
-        string Host { get; set; }
-        int Port { get; set; }
-        bool EnableSsl { get; set; }
-        bool UseDefaultCredentials { get; set; }
-        SmtpDeliveryMethod DeliveryMethod { get; set; }
-        ICredentialsByHost Credentials { get; set; }
-
-        void Send(MailMessage message);
+        void Send(MimeMessage message, SmtpSettings smtpSettings);
     }
 }

@@ -30,7 +30,7 @@ namespace Cubes.Core.DataAccess
                 if (firstRow != null)
                 {
                     var headers = firstRow.Keys.ToArray();
-                    var values = firstRow.Values.Select(v => v.GetType()).ToArray();
+                    var values = firstRow.Values.Select(v => v?.GetType()).ToArray(); // TODO Handle nulls (Flow results)
                     queryResult.Columns = headers
                         .Zip(values, (h, v) => new QueryResult.Column
                         {

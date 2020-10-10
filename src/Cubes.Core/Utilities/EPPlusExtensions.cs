@@ -110,7 +110,7 @@ namespace Cubes.Core.Utilities
                 for (int i = 0; i < props.Length; i++)
                 {
                     ws.Cells[iRow, ++iColumn].Value = props[i].GetValue(obj);
-                    if (props[i].PropertyType.Equals(typeof(DateTime)))
+                    if (props[i].PropertyType.Equals(typeof(DateTime))) // TODO Should not expect null
                         ws.Cells[iRow, iColumn].Style.Numberformat.Format = formattingSettings.DateFormat;
                 }
                 iRow++;
@@ -164,7 +164,7 @@ namespace Cubes.Core.Utilities
                 for (int i = 0; i < length; i++)
                 {
                     ws.Cells[iRow, ++iColumn].Value = obj[columns[i].Name];
-                    if (columns[i].ColumnType.Equals(typeof(DateTime)))
+                    if (columns[i].ColumnType?.Equals(typeof(DateTime)) == true)
                         ws.Cells[iRow, iColumn].Style.Numberformat.Format = formattingSettings.DateFormat;
                 }
                 iRow++;

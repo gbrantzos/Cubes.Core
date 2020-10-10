@@ -7,7 +7,8 @@ namespace Cubes.Core.Email
     {
         public static IServiceCollection AddEmailDispatcher(this IServiceCollection services, IConfiguration config)
             => services
-                .AddScoped<IEmailDispatcher>(_ => new EmailDispatcher(new SmtpClientWrapper()))
+                .AddTransient<ISmtpClient, MailKitSmtpClient>()
+                .AddScoped<IEmailDispatcher, EmailDispatcher>()
                 .Configure<SmtpSettingsProfiles>(config.GetSection(nameof(SmtpSettingsProfiles)));
     }
 }
