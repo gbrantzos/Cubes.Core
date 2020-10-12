@@ -13,7 +13,7 @@ using Quartz;
 
 namespace Cubes.Core.Scheduling.Jobs
 {
-    [Display("Execute Request")]
+    [Display("Execute Command/Request")]
     public class ExecuteRequestJob : BaseQuartzJob
     {
         private static readonly string Request_Type          = "RequestType";

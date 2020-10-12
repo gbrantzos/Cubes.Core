@@ -235,5 +235,28 @@ namespace Cubes.Core.Utilities
             return type?.BaseType?.IsGenericType == true
                 && type.BaseType.GetGenericTypeDefinition() == handlerType;
         }
+
+        /// <summary>
+        /// Convert a value to the requested type. If ean exception occurs the <paramref name="defaultValue"/> is returned.
+        /// </summary>
+        /// <remarks>
+        /// Attention: when converting to types with lower presicion roundings may apper!
+        /// </remarks>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static T SafeCast<T>(this object value, T defaultValue = default)
+        {
+            if (value == null) return defaultValue;
+            if (value is T) return (T)value;
+
+            try
+            {
+                //return (T)value;
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+            catch { return defaultValue; }
+        }
     }
 }

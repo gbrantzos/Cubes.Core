@@ -1,6 +1,8 @@
 using System;
 using System.Text;
+using Cubes.Core.Commands;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Cubes.Core.Web
@@ -30,7 +32,7 @@ namespace Cubes.Core.Web
         }
 
         /// <summary>
-        /// Convert any object to JSON
+        /// Convert any object to JSON.
         /// </summary>
         /// <param name="object">Object to convert</param>
         /// <param name="serializerSettings">Json serializer settings</param>
@@ -48,5 +50,16 @@ namespace Cubes.Core.Web
         /// <returns></returns>
         public static bool IsSuccess(this HttpResponse response)
             => response.StatusCode >= 200 && response.StatusCode <= 299 && response.StatusCode != 204;
+
+        /// <summary>
+        /// Create <see cref="IActionResult"/> from <paramref name="result"/>.
+        /// </summary>
+        /// <typeparam name="TResponse"></typeparam>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static IActionResult ToActionResult<TResponse>(this Result<TResponse> result)
+            => result.HasErrors ?
+                (IActionResult)new BadRequestObjectResult(result.Message) :
+                (IActionResult)new OkObjectResult(result.Response);
     }
 }
