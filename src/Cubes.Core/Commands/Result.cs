@@ -30,6 +30,11 @@ namespace Cubes.Core.Commands
         /// To be used when Response type is not known
         /// </summary>
         object IResult.Response { get => Response; }
+
+        /// <summary>
+        /// Default message in case of success.
+        /// </summary>
+        public string DefaultMessage => $"{this.GetType().Name} was executed successfully!";
     }
 
     // Helper interface
@@ -54,5 +59,10 @@ namespace Cubes.Core.Commands
         /// Any <see cref="Exception"/> thrown during execution and not handled by request handler
         /// </summary>
         Exception ExceptionThrown { get; }
+
+        /// <summary>
+        /// Default message in case of success.
+        /// </summary>
+        string DefaultMessage { get; }
     }
 }

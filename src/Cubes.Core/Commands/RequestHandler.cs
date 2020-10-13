@@ -31,7 +31,7 @@ namespace Cubes.Core.Commands
             try
             {
                 toReturn.Response = await this.HandleInternal(request, cancellationToken);
-                toReturn.Message = MessageToReturn.IfNullOrEmpty($"{typeof(TRequest).Name} was executed successfully!");
+                toReturn.Message = MessageToReturn.IfNullOrEmpty(toReturn.DefaultMessage);
 
                 if (failed)
                 {

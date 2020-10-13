@@ -21,7 +21,7 @@ namespace Cubes.Core.Commands
             CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
-            logger.LogInformation("Executing request {requestType}: {request}", typeof(TRequest).Name, request);
+            logger.LogDebug("Executing => [{requestType}] {request}", typeof(TRequest).Name, request);
             try
             {
                 var sw = new Stopwatch();
@@ -30,19 +30,30 @@ namespace Cubes.Core.Commands
                 var result = await next();
                 sw.Stop();
 
-                logger.LogInformation("Request executed, elapsed {elapsedTime}ms", sw.ElapsedMilliseconds);
                 if (result is IResult requestResult)
                 {
                     if (requestResult.HasErrors)
                     {
-                        logger.LogWarning($"Request result has errors >> {requestResult.Message}");
                         if (requestResult.ExceptionThrown != null)
-                            logger.LogWarning(requestResult.ExceptionThrown, "Exception thrown:");
+                        {
+                            logger.LogWarning(requestResult.ExceptionThrown,
+                                $"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {requestResult.Message}\r\nException thrown:");
+                        }
+                        else
+                            logger.LogWarning($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {requestResult.Message}");
                     }
                     else
                     {
-                        logger.LogInformation(requestResult.Message);
+                        var msg = requestResult.Message == requestResult.DefaultMessage ?
+                            String.Empty :
+                            $", message:\r\n{requestResult.Message}";
+                        logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} in {sw.ElapsedMilliseconds}ms{msg}");
                     }
+                }
+                else
+                {
+                    // No more details to display
+                    logger.LogInformation($"Request executed, {typeof(TRequest).Name}: {request} [{sw.ElapsedMilliseconds}ms]");
                 }
                 return result;
             }
