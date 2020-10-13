@@ -110,7 +110,7 @@ namespace Cubes.Core.Utilities
                 for (int i = 0; i < props.Length; i++)
                 {
                     ws.Cells[iRow, ++iColumn].Value = props[i].GetValue(obj);
-                    if (props[i].PropertyType.Equals(typeof(DateTime))) // TODO Should not expect null
+                    if (props[i].PropertyType.Equals(typeof(DateTime)))
                         ws.Cells[iRow, iColumn].Style.Numberformat.Format = formattingSettings.DateFormat;
                 }
                 iRow++;
@@ -129,11 +129,12 @@ namespace Cubes.Core.Utilities
 
         private static void AddQueryResultPage(ExcelPackage package, QueryResult result, ExcelFormattingSettings formattingSettings)
         {
-            // Columns
-            int length = result.Columns.Count();
-
             //Create a sheet
             var ws = package.Workbook.Worksheets.Add(result.Name);
+
+            // Columns
+            int length = result.Columns.Count();
+            if (length == 0) return;
 
             // Default style
             ws.Cells.Style.Font.Size   = formattingSettings.DefaultFont.Size;

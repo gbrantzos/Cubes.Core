@@ -30,7 +30,7 @@ namespace Cubes.Core.DataAccess
                 if (firstRow != null)
                 {
                     var headers = firstRow.Keys.ToArray();
-                    var values = firstRow.Values.Select(v => v?.GetType()).ToArray(); // TODO Handle nulls (Flow results)
+                    var values = firstRow.Values.Select(v => (v?.GetType()) ?? typeof(object)).ToArray();
                     queryResult.Columns = headers
                         .Zip(values, (h, v) => new QueryResult.Column
                         {
@@ -54,8 +54,8 @@ namespace Cubes.Core.DataAccess
     public class QueryResult
     {
         public string Name { get; set; }
-        public IEnumerable<dynamic> Data { get; set; }
-        public IEnumerable<Column> Columns { get; set; }
+        public IEnumerable<dynamic> Data { get; set; } = new List<dynamic>();
+        public IEnumerable<Column> Columns { get; set; } = new List<Column>();
 
         public  class Column
         {
