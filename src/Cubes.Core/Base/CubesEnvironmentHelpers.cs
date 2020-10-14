@@ -110,7 +110,7 @@ namespace Cubes.Core.Base
 
             if (args.Length > 0)
             {
-                int argIndex = argsList.FindIndex(arg => arg.Equals("--adminPath", StringComparison.OrdinalIgnoreCase));
+                int argIndex = argsList.FindIndex(arg => arg.Equals("--admin", StringComparison.OrdinalIgnoreCase));
                 if (argIndex != -1 && (argIndex + 1) < args.Length)
                     toReturn = argsList[argIndex + 1];
             }

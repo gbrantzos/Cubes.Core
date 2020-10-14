@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Cubes.Core.Utilities;
@@ -32,6 +34,7 @@ namespace Cubes.Core.Commands
 
                 if (result is IResult requestResult)
                 {
+                    var formattedMessage = AddIndent(requestResult.Message);
                     if (requestResult.HasErrors)
                     {
                         if (requestResult.ExceptionThrown != null)
@@ -40,13 +43,13 @@ namespace Cubes.Core.Commands
                                 $"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {requestResult.Message}\r\nException thrown:");
                         }
                         else
-                            logger.LogWarning($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {requestResult.Message}");
+                            logger.LogWarning($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {formattedMessage}");
                     }
                     else
                     {
                         var msg = requestResult.Message == requestResult.DefaultMessage ?
                             String.Empty :
-                            $", message:\r\n{requestResult.Message}";
+                            $", message:\r\n{formattedMessage}";
                         logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} in {sw.ElapsedMilliseconds}ms{msg}");
                     }
                 }
@@ -65,6 +68,19 @@ namespace Cubes.Core.Commands
 
                 throw;
             }
+        }
+
+        private string AddIndent(string message)
+        {
+            if (String.IsNullOrEmpty(message))
+                return message;
+
+            var lines = message.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var sb = new StringBuilder();
+            foreach (var line in lines)
+                sb.AppendLine($"    {line}");
+
+            return sb.ToString().Trim(new char[] { '\r', '\n' });
         }
     }
 }

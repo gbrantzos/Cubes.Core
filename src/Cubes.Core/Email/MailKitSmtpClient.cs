@@ -14,6 +14,7 @@ namespace Cubes.Core.Email
                 smtpSettings.UseSsl ? SecureSocketOptions.Auto : SecureSocketOptions.None);
             if (smtpSettings.Credentials != null)
                 client.Authenticate(smtpSettings.Credentials.UserName, smtpSettings.Credentials.Password);
+            client.Timeout = 3 * 60 * 1000; // 3 minutes!
 
             client.Send(message);
             client.Disconnect(true);

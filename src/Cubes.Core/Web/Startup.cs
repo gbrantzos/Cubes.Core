@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Cubes.Core.Base;
 using Cubes.Core.Web.ResponseWrapping;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,7 @@ namespace Cubes.Core.Web
             var mvcBuilder = services
                 .AddControllers()
                 .AddControllersAsServices()
+                .AddFluentValidation()
                 .AddNewtonsoftJson();
 
             // Add applications assemblies

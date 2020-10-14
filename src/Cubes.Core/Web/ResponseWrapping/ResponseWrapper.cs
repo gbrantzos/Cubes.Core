@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +7,6 @@ using Cubes.Core.Base;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Cubes.Core.Web.ResponseWrapping
@@ -18,6 +17,13 @@ namespace Cubes.Core.Web.ResponseWrapping
         {
             "/api/system/version"
         };
+
+        private static readonly List<string> ContentType2Handle = new List<string>
+        {
+            "application/json",
+            "application/problem+json"
+        };
+
         private readonly RequestDelegate next;
         private readonly IApiResponseBuilder responseBuilder;
         private readonly JsonSerializerSettings jsonSerializerSettings;
@@ -60,7 +66,7 @@ namespace Cubes.Core.Web.ResponseWrapping
 
                 // Check if we are about to return JSON data
                 var responseContentType = context.Response.ContentType ?? String.Empty;
-                if (responseContentType.Contains("application/json", StringComparison.CurrentCultureIgnoreCase))
+                if (ContentTypeIsHandled(responseContentType))
                 {
                     // Memory stream now hold the response data
                     // Reset position to read data stored in response stream
@@ -76,6 +82,7 @@ namespace Cubes.Core.Web.ResponseWrapping
 
                     // Copy wrapped response to original body
                     var buffer = Encoding.UTF8.GetBytes(apiResponse.AsJson(jsonSerializerSettings));
+                    context.Response.ContentLength = null; // buffer.Length;
                     await using var output = new MemoryStream(buffer);
                     await output.CopyToAsync(originalBody);
                 }
@@ -100,6 +107,16 @@ namespace Cubes.Core.Web.ResponseWrapping
                              (!String.IsNullOrEmpty(this.excludePath) && requestPath.StartsWith(this.excludePath)) ||
                              Excluded.Contains(requestPath);
             return shouldSkip;
+        }
+
+        private bool ContentTypeIsHandled(string content)
+        {
+            foreach (var knownType in ContentType2Handle)
+            {
+                if (content.Contains(knownType, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
         }
     }
 
