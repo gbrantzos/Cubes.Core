@@ -39,7 +39,7 @@ namespace Cubes.Core.Web.StaticContent
 
                 if (!Directory.Exists(contentPath))
                 {
-                    logger.LogError($"Cannot load Static Content on relative URL '{item.RequestPath}', path does not exist >> {contentPath}!");
+                    logger.LogWarning($"Cannot load Static Content on relative URL '{item.RequestPath}', path does not exist >> {contentPath}!");
                     continue;
                 }
 

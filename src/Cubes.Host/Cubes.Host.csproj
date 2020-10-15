@@ -10,6 +10,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <ApplicationIcon>Cubes.ico</ApplicationIcon>
     <OutputType>Exe</OutputType>
+    <UserSecretsId>6b400126-6c1d-4469-9b25-42d30b16c81a</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -134,7 +134,11 @@ namespace Cubes.Core.Web
                 var httpContextAccessor = ctx.RequestServices.GetService<IHttpContextAccessor>();
 
                 // Inform user
-                logger.LogInformation("{IP} [{startedAt}] \"{info}\", {statusCode}, {elapsed} ms",
+                var level =
+                    ctx.Response.StatusCode >= 400 && ctx.Response.StatusCode < 500 ? LogLevel.Warning :
+                    ctx.Response.StatusCode >= 500 ? LogLevel.Error : LogLevel.Information;
+
+                logger.Log(level, "{IP} [{startedAt}] \"{info}\", {statusCode}, {elapsed} ms",
                     httpContextAccessor.HttpContext.Connection.RemoteIpAddress,
                     context.StartedAt,
                     context.SourceInfo,

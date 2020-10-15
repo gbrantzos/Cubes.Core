@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,20 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Cubes.Core.Commands
 {
-    public class DefaultBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class RequestLoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
-        private readonly ILogger<DefaultBehavior<TRequest, TResponse>> logger;
+        private readonly ILogger<RequestLoggingBehaviour<TRequest, TResponse>> _logger;
 
-        public DefaultBehavior(ILogger<DefaultBehavior<TRequest, TResponse>> logger)
-        {
-            this.logger = logger;
-        }
+        public RequestLoggingBehaviour(ILogger<RequestLoggingBehaviour<TRequest, TResponse>> logger)
+            => _logger = logger;
 
         public async Task<TResponse> Handle(TRequest request,
             CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
-            logger.LogDebug("Executing => [{requestType}] {request}", typeof(TRequest).Name, request);
+            _logger.LogDebug("Executing => [{requestType}] {request}", typeof(TRequest).Name, request);
             try
             {
                 var sw = new Stopwatch();
@@ -39,24 +36,24 @@ namespace Cubes.Core.Commands
                     {
                         if (requestResult.ExceptionThrown != null)
                         {
-                            logger.LogWarning(requestResult.ExceptionThrown,
+                            _logger.LogWarning(requestResult.ExceptionThrown,
                                 $"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {requestResult.Message}\r\nException thrown:");
                         }
                         else
-                            logger.LogWarning($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {formattedMessage}");
+                            _logger.LogWarning($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {formattedMessage}");
                     }
                     else
                     {
                         var msg = requestResult.Message == requestResult.DefaultMessage ?
                             String.Empty :
                             $", message:\r\n{formattedMessage}";
-                        logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} in {sw.ElapsedMilliseconds}ms{msg}");
+                        _logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} in {sw.ElapsedMilliseconds}ms{msg}");
                     }
                 }
                 else
                 {
                     // No more details to display
-                    logger.LogInformation($"Request executed, {typeof(TRequest).Name}: {request} [{sw.ElapsedMilliseconds}ms]");
+                    _logger.LogInformation($"Request executed, {typeof(TRequest).Name}: {request} [{sw.ElapsedMilliseconds}ms]");
                 }
                 return result;
             }
@@ -64,13 +61,13 @@ namespace Cubes.Core.Commands
             {
                 var all     = x.GetAllMessages();
                 var message = String.Join(Environment.NewLine, all);
-                logger.LogError(x, "Request execution failed: {message}\r\n{@request}", message, request);
+                _logger.LogError(x, "Request execution failed: {message}\r\n{@request}", message, request);
 
                 throw;
             }
         }
 
-        private string AddIndent(string message)
+        private static string AddIndent(string message)
         {
             if (String.IsNullOrEmpty(message))
                 return message;

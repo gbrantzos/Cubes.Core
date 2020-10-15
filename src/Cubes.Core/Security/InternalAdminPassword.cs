@@ -2,8 +2,8 @@ namespace Cubes.Core.Security
 {
     public class InternalAdminPassword
     {
-        private static readonly string password = PasswordGenerator.GeneratePassword();
+        private static readonly string _password = PasswordGenerator.GeneratePassword();
 
-        public string Password => password;
+        public string Password => _password;
     }
 }

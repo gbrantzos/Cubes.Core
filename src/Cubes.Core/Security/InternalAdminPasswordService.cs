@@ -7,19 +7,18 @@ namespace Cubes.Core.Security
 {
     public class InternalAdminPasswordService : IHostedService
     {
-        private readonly ILogger<InternalAdminPasswordService> logger;
-        private readonly InternalAdminPassword adminPassword;
+        private readonly ILogger<InternalAdminPasswordService> _logger;
+        private readonly InternalAdminPassword _adminPassword;
 
         public InternalAdminPasswordService(ILogger<InternalAdminPasswordService> logger, InternalAdminPassword adminPassword)
         {
-            this.logger = logger;
-            this.adminPassword = adminPassword;
+            _logger = logger;
+            _adminPassword = adminPassword;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            this.logger.LogWarning("Cubes administrator credentials are : cubes / {admin_password}",
-                adminPassword.Password);
+            _logger.LogInformation("Cubes administrator credentials are : cubes / {admin_password}", _adminPassword.Password);
             return Task.CompletedTask;
         }
 

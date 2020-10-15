@@ -33,6 +33,17 @@
         "ASPNETCORE_ENVIRONMENT": "Production",
         "CUBES_APPLICATION": "D:\\Code\\Cubes\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
       }
+    },
+    "WSL 2": {
+      "commandName": "WSL2",
+      "launchUrl": "https://localhost:5001/api/values",
+      "environmentVariables": {
+        "ASPNETCORE_URLS": "https://localhost:5001;http://localhost:5000",
+        "CUBES_ADMIN": "D:\\Code\\Cubes\\Core.WebApp\\dist\\CubesManagement.zip",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CUBES_APPLICATION": "D:\\Code\\Cubes\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
+      },
+      "distributionName": ""
     }
   }
 }

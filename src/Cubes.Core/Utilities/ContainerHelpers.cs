@@ -24,7 +24,7 @@ namespace Cubes.Core.Utilities
             });
 
             // Simple MediatR pipeline
-            builder.RegisterGeneric(typeof(DefaultBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+            builder.RegisterGeneric(typeof(RequestLoggingBehaviour<,>)).As(typeof(IPipelineBehavior<,>));
             builder.RegisterGeneric(typeof(ValidatorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
             // We could also add
             // - History of execution
