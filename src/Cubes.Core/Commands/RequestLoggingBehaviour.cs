@@ -34,20 +34,23 @@ namespace Cubes.Core.Commands
                     var formattedMessage = AddIndent(requestResult.Message);
                     if (requestResult.HasErrors)
                     {
+                        // TODO This can be controlled by options
                         if (requestResult.ExceptionThrown != null)
                         {
-                            _logger.LogWarning(requestResult.ExceptionThrown,
-                                $"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {requestResult.Message}\r\nException thrown:");
+                            _logger.LogError(requestResult.ExceptionThrown,
+                                $"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms)\r\n{formattedMessage}");
+                            // TODO This can be controlled by options
+                            //_logger.LogError("{@request}", request);
                         }
                         else
-                            _logger.LogWarning($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms): {formattedMessage}");
+                            _logger.LogError($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms)\r\n{formattedMessage}");
                     }
                     else
                     {
                         var msg = requestResult.Message == requestResult.DefaultMessage ?
                             String.Empty :
-                            $", message:\r\n{formattedMessage}";
-                        _logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} in {sw.ElapsedMilliseconds}ms{msg}");
+                            $"\r\n{formattedMessage}";
+                        _logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms){msg}");
                     }
                 }
                 else
