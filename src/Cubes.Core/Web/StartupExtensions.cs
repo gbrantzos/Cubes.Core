@@ -22,6 +22,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Net.Mime;
+using Prometheus;
+using Cubes.Core.Commands;
 
 [assembly: SwaggerCategory("Core")]
 namespace Cubes.Core.Web
@@ -35,6 +39,7 @@ namespace Cubes.Core.Web
         {
             services.AddHttpContextAccessor();
             services.AddCorsConfiguration(configuration);
+            services.AddHealthChecks();
 
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
@@ -64,6 +69,17 @@ namespace Cubes.Core.Web
                 o.SecretKey     = secretKey;
                 o.TokenLifetime = tokenLifetime;
             });
+
+            var assemblies = AppDomain
+               .CurrentDomain
+               .GetAssemblies();
+
+            var providers = assemblies
+                .SelectMany(t => t.GetTypes())
+                .Where(t => t.IsClass && t.GetInterfaces().Contains(typeof(IRequestSampleProvider)))
+                .ToList();
+            foreach (var prv in providers)
+                services.AddTransient(prv);
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
@@ -89,12 +105,40 @@ namespace Cubes.Core.Web
             foreach (var policy in corsPolicies)
                 app.UseCors(policy);
 
+            // Based on:
+            // https://gunnarpeipman.com/aspnet-core-health-checks/
+            // https://www.youtube.com/watch?v=bdgtYbGYsK0
+            // https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
+
+            var options = new HealthCheckOptions();
+            options.AllowCachingResponses = false;
+            options.ResponseWriter = async (context, result) =>
+            {
+                context.Response.ContentType = MediaTypeNames.Application.Json;
+                var response = new
+                {
+                    Status = result.Status.ToString(),
+                    Checks = result.Entries.Select(e => new
+                    {
+                        Component   = e.Key,
+                        Description = e.Value.Description,
+                        Status      = e.Value.Status,
+                        Duration    = e.Value.Duration
+                    }).ToList(),
+                    Duration = result.TotalDuration
+                };
+
+                await context.Response.WriteAsync(response.AsJson());
+            };
+            app.UseHealthChecks("/healthcheck", options); // TODO This can be controlled by options
+
             return app
                 .UseHomePage()
                 .UseAdminPage(configuration, loggerFactory)
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
                 .UseCubesMiddleware(loggerFactory, responseBuilder, serializerSettings)
+                .UseMetricServer("/metrics")  // TODO This can be controlled by options
                 .UseResponseWrapper();
         }
 

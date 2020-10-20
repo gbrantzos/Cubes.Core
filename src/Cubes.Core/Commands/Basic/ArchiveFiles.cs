@@ -1,5 +1,10 @@
+using System.IO;
+using Cubes.Core.Base;
+using Cubes.Core.Utilities;
+
 namespace Cubes.Core.Commands.Basic
 {
+    [Display("Archive files"), RequestSample(typeof(ArchiveFilesSampleProvider))]
     public class ArchiveFiles : Request<ArchiveFilesResult>
     {
         /// <summary>
@@ -32,6 +37,24 @@ namespace Cubes.Core.Commands.Basic
         /// </summary>
         /// <value></value>
         public int FilesToKeep { get; set; }
+
+        public override string ToString() => $"Backup files (filter: {Filter})";
+    }
+
+    public class ArchiveFilesSampleProvider : IRequestSampleProvider
+    {
+        private readonly ICubesEnvironment _environment;
+        public ArchiveFilesSampleProvider(ICubesEnvironment environment) => _environment = environment;
+
+        public object GetSample() =>
+            new ArchiveFiles
+            {
+                SourcePath  = _environment.GetRootFolder(),
+                Filter      = "Config\\*.yaml | Logs\\*",
+                Targets     = new string[] { Path.Combine(_environment.GetRootFolder(), "Backup") },
+                ArchiveName = "Backup.{dt:yyyyMMddHHmm}.zip",
+                FilesToKeep = 7
+            };
     }
 }
 

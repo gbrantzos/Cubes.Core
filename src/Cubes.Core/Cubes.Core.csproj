@@ -15,22 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Web\Resources\daffy-duck.png" />
-    <None Remove="Web\Resources\index.html" />
-    <None Remove="Web\Swagger\Themes\theme-feeling-blue.css" />
-    <None Remove="Web\Swagger\Themes\theme-flattop.css" />
-    <None Remove="Web\Swagger\Themes\theme-material.css" />
-    <None Remove="Web\Swagger\Themes\theme-monokai.css" />
-    <None Remove="Web\Swagger\Themes\theme-muted.css" />
-    <None Remove="Web\Swagger\Themes\theme-newspaper.css" />
-    <None Remove="Web\Swagger\Themes\theme-outline.css" />
-    <None Include="Cubes.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -64,6 +48,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.5" />
     <PackageReference Include="NETCore.MailKit" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="4.0.0" />
     <PackageReference Include="System.IO.Abstractions" Version="11.0.7" PrivateAssets="All" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" PrivateAssets="All" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />

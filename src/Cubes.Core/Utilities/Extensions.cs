@@ -109,6 +109,7 @@ namespace Cubes.Core.Utilities
                 var stopRecursion = propType.IsPrimitive ||
                     propType.Equals(typeof(string)) ||
                     propType.Equals(typeof(DataTable)) ||
+                    propType.IsArray ||
                     (propType.IsGenericType && propType.GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>))) ||
                     (propType.IsGenericType && propType.GetGenericTypeDefinition().IsAssignableFrom(typeof(IEnumerable<>)));
 

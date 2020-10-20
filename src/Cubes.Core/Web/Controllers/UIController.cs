@@ -9,6 +9,7 @@ using Cubes.Core.Web.UIHelpers.Lookups;
 using Cubes.Core.Web.UIHelpers.Schema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -33,18 +34,21 @@ namespace Cubes.Core.Web.Controllers
         private readonly ITypeResolver typeResolver;
         private readonly ILookupManager lookupManager;
         private readonly ICubesEnvironment cubesEnvironment;
+        private readonly IServiceScopeFactory scopeFactory;
 
         public UIController(IConfiguration configuration,
             ILookupManager lookupManager,
             ITypeResolver typeResolver,
             ISchemaManager schemaManager,
-            ICubesEnvironment cubesEnvironment)
+            ICubesEnvironment cubesEnvironment,
+            IServiceScopeFactory scopeFactory)
         {
             this.configuration    = configuration;
             this.schemaManager    = schemaManager;
             this.typeResolver     = typeResolver;
             this.lookupManager    = lookupManager;
             this.cubesEnvironment = cubesEnvironment;
+            this.scopeFactory     = scopeFactory;
         }
 
         [HttpGet("swagger-css")]
@@ -85,7 +89,8 @@ namespace Cubes.Core.Web.Controllers
             if (type == null)
                 return BadRequest($"Could not create provider '{providerName}'!");
 
-            var provider = Activator.CreateInstance(type) as IRequestSampleProvider;
+            using var scope = scopeFactory.CreateScope();
+            var provider =  scope.ServiceProvider.GetService(type) as IRequestSampleProvider;
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver()
