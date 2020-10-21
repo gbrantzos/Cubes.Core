@@ -38,7 +38,7 @@ namespace Cubes.Core.Commands.Basic
         /// <value></value>
         public int FilesToKeep { get; set; }
 
-        public override string ToString() => $"Backup files (filter: {Filter})";
+        public override string ToString() => $"Archive files (filter: {Filter})";
     }
 
     public class ArchiveFilesSampleProvider : IRequestSampleProvider
