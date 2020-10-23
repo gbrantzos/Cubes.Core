@@ -34,10 +34,15 @@ namespace Cubes.Core.Commands
                 var result = await next();
                 sw.Stop();
 
+                var reguestType = typeof(TRequest).Name;
                 _metrics
-                    .GetCounter(CubesCoreMetrics.CubesRequests)
-                    .WithLabels(typeof(TRequest).Name)
+                    .GetCounter(CubesCoreMetrics.CubesCoreRequestsCount)
+                    .WithLabels(reguestType)
                     .Inc();
+                _metrics
+                    .GetHistogram(CubesCoreMetrics.CubesCoreRequestsDuration)
+                    .WithLabels(reguestType)
+                    .Observe(sw.Elapsed.TotalSeconds);
 
                 if (result is IResult requestResult)
                 {

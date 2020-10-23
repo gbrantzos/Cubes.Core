@@ -5,7 +5,9 @@ namespace Cubes.Core.Metrics
     public interface IMetrics
     {
         Counter GetCounter(string name);
+        Counter RegisterCounter(string name, string help, params string[] labels);
 
-        // TODO Setup counter functionality
+        Histogram GetHistogram(string name);
+        Histogram RegisterHistogram(string name, string help, double[] buckets, params string[] labels);
     }
 }

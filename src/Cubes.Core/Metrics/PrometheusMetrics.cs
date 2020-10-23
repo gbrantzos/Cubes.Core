@@ -6,52 +6,66 @@ using Prometheus;
 
 namespace Cubes.Core.Metrics
 {
-    public static class CubesCoreMetrics
-    {
-        public static string CubesRequests = "cubes_requests";
-    }
-
     public class PrometheusMetrics : IMetrics
     {
-        private class CounterSetup
-        {
-            public string Name { get; }
-            public string Help { get; }
-            public string[] Labels { get; }
-
-            public CounterSetup(string name, string help, string[] labels)
-            {
-                Name = name;
-                Help = help.IfNullOrEmpty(Name.Humanize(LetterCasing.Sentence));
-                Labels = labels ?? new string[] { };
-            }
-            public CounterSetup(string name, string[] labels) : this(name, String.Empty, labels) { }
-
-            public CounterConfiguration GetConfiguration()
-                => Labels.Length > 0 ? new CounterConfiguration { LabelNames = Labels } : null;
-        }
-
-        private readonly Dictionary<string, CounterSetup> _counters = new Dictionary<string, CounterSetup>
-        {
-            {
-                CubesCoreMetrics.CubesRequests,
-                new CounterSetup(CubesCoreMetrics.CubesRequests,new [] { "request_type" })
-            }
-        };
+        private readonly Dictionary<string, Counter> _counters = new Dictionary<string, Counter>();
+        private readonly Dictionary<string, Histogram> _histograms = new Dictionary<string, Histogram>();
 
         public PrometheusMetrics()
         {
-            // Add known counters
-            foreach (var counter in _counters)
-                Prometheus.Metrics.CreateCounter(counter.Key, counter.Value.Help, counter.Value.GetConfiguration());
+            // Add known metrics
+            foreach (var counter in CubesCoreMetrics.Counters)
+                RegisterCounter(counter.Name, counter.Help, counter.Labels);
+            foreach (var histogram in CubesCoreMetrics.Histograms)
+                RegisterHistogram(histogram.Name, histogram.Help, histogram.Buckets, histogram.Labels);
         }
 
         public Counter GetCounter(string name)
         {
             if (_counters.TryGetValue(name, out var counter))
-                return Prometheus.Metrics.CreateCounter(counter.Name, counter.Help, counter.GetConfiguration());
+                return counter;
 
             throw new ArgumentException($"Could not find counter with name {name}");
+        }
+
+        public Counter RegisterCounter(string name, string help, params string[] labels)
+        {
+            if (_counters.TryGetValue(name, out var existing))
+                return existing;
+
+            var counter = Prometheus
+                .Metrics
+                .CreateCounter(name, help.IfNullOrEmpty(name.Humanize(LetterCasing.Sentence)), labels);
+            _counters.Add(name, counter);
+
+            return counter;
+        }
+
+        public Histogram GetHistogram(string name)
+        {
+            if (_histograms.TryGetValue(name, out var histogram))
+                return histogram;
+
+            throw new ArgumentException($"Could not find histogram with name {name}");
+        }
+
+        public Histogram RegisterHistogram(string name, string help, double[] buckets, params string[] labels)
+        {
+            if (_histograms.TryGetValue(name, out var existing))
+                return existing;
+
+            var histogram = Prometheus
+                .Metrics
+                .CreateHistogram(name,
+                    help.IfNullOrEmpty(name.Humanize(LetterCasing.Sentence)),
+                    new HistogramConfiguration
+                    {
+                        LabelNames = labels,
+                        Buckets = buckets
+                    });
+            _histograms.Add(name, histogram);
+
+            return histogram;
         }
     }
 }

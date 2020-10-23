@@ -7,6 +7,8 @@ namespace Cubes.Core.Metrics
     {
         public static IServiceCollection AddMetrics(this IServiceCollection services, IConfiguration configuration)
         {
+            CubesCoreMetrics.AddFromConfiguration(configuration);
+
             return services.AddSingleton<IMetrics>(new PrometheusMetrics());
         }
     }

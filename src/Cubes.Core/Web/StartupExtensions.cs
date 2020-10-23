@@ -120,25 +120,31 @@ namespace Cubes.Core.Web
                     Status = result.Status.ToString(),
                     Checks = result.Entries.Select(e => new
                     {
-                        Component   = e.Key,
-                        Description = e.Value.Description,
-                        Status      = e.Value.Status,
-                        Duration    = e.Value.Duration
+                        Component = e.Key,
+                        e.Value.Description,
+                        e.Value.Status,
+                        e.Value.Duration
                     }).ToList(),
                     Duration = result.TotalDuration
                 };
 
                 await context.Response.WriteAsync(response.AsJson());
             };
-            app.UseHealthChecks("/healthcheck", options); // TODO This can be controlled by options
+            var hcEndpoint = configuration.GetValue(CubesConstants.Config_HostHealthCheckEndpoint, "/healthcheck");
+            if (!hcEndpoint.StartsWith("/"))
+                hcEndpoint = "/" + hcEndpoint;
+            app.UseHealthChecks(hcEndpoint, options);
 
+            var metricsEndpoint = configuration.GetValue(CubesConstants.Config_HostMetricsEndpoint, "/metrics");
+            if (!metricsEndpoint.StartsWith("/"))
+                metricsEndpoint = "/" + metricsEndpoint;
             return app
                 .UseHomePage()
                 .UseAdminPage(configuration, loggerFactory)
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
                 .UseCubesMiddleware(loggerFactory, responseBuilder, serializerSettings)
-                .UseMetricServer("/metrics")  // TODO This can be controlled by options
+                .UseMetricServer(metricsEndpoint)
                 .UseResponseWrapper();
         }
 
