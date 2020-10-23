@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Cubes.Core.Base;
 using Cubes.Core.Web.ResponseWrapping;
 using FluentValidation.AspNetCore;
@@ -15,9 +17,10 @@ namespace Cubes.Core.Web
 {
     public class Startup
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
 
-        public Startup(IConfiguration configuration) => this.configuration = configuration;
+        public Startup(IConfiguration configuration)
+            => _configuration = configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -31,6 +34,31 @@ namespace Cubes.Core.Web
             // Setup WebAPI
             var mvcBuilder = services
                 .AddControllers()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    var builtInFactory = options.InvalidModelStateResponseFactory;
+                    options.InvalidModelStateResponseFactory = context =>
+                    {
+                        var logger = context
+                            .HttpContext
+                            .RequestServices
+                            .GetService<ILoggerFactory>()
+                            .CreateLogger<Startup>();
+
+                        var sb = new StringBuilder();
+                        foreach (var item in context.ModelState)
+                        {
+                            sb.Append("    ").Append(item.Key).AppendLine(":");
+                            foreach (var error in item.Value.Errors)
+                                sb.Append("      - ").AppendLine(error.ErrorMessage);
+                        }
+
+                        logger.LogWarning("Model validation failed! {action}\r\n" + sb.ToString(),
+                            context.ActionDescriptor.DisplayName);
+
+                        return builtInFactory(context);
+                    };
+                })
                 .AddControllersAsServices()
                 .AddFluentValidation()
                 .AddNewtonsoftJson();
@@ -44,13 +72,13 @@ namespace Cubes.Core.Web
             }
 
             // Setup Cubes
-            services.AddCubesWeb(configuration, mvcBuilder);
+            services.AddCubesWeb(_configuration, mvcBuilder);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var useSsl             = configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
+            var useSsl             = _configuration.GetValue<bool>(CubesConstants.Config_HostUseSSL, false);
             var loggerFactory      = app.ApplicationServices.GetService<ILoggerFactory>();
             var responseBuilder    = app.ApplicationServices.GetService<IApiResponseBuilder>();
             var serializerSettings = app.ApplicationServices.GetService<JsonSerializerSettings>();
@@ -67,7 +95,7 @@ namespace Cubes.Core.Web
             app.UseStaticFiles();
 
             // Should be called as soon as possible.
-            app.UseCubesApi(configuration, env, responseBuilder, loggerFactory, serializerSettings);
+            app.UseCubesApi(_configuration, env, responseBuilder, loggerFactory, serializerSettings);
 
             // Routing
             app.UseRouting();
