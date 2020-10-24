@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Cubes.Core.Metrics;
 using Cubes.Core.Utilities;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -12,9 +13,13 @@ namespace Cubes.Core.Commands
     public class RequestLoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
         private readonly ILogger<RequestLoggingBehaviour<TRequest, TResponse>> _logger;
+        private readonly IMetrics _metrics;
 
-        public RequestLoggingBehaviour(ILogger<RequestLoggingBehaviour<TRequest, TResponse>> logger)
-            => _logger = logger;
+        public RequestLoggingBehaviour(ILogger<RequestLoggingBehaviour<TRequest, TResponse>> logger, IMetrics metrics)
+        {
+            _logger = logger;
+            _metrics = metrics;
+        }
 
         public async Task<TResponse> Handle(TRequest request,
             CancellationToken cancellationToken,
@@ -28,6 +33,16 @@ namespace Cubes.Core.Commands
 
                 var result = await next();
                 sw.Stop();
+
+                var reguestType = typeof(TRequest).Name;
+                _metrics
+                    .GetCounter(CubesCoreMetrics.CubesCoreRequestsCount)
+                    .WithLabels(reguestType)
+                    .Inc();
+                _metrics
+                    .GetHistogram(CubesCoreMetrics.CubesCoreRequestsDuration)
+                    .WithLabels(reguestType)
+                    .Observe(sw.Elapsed.TotalSeconds);
 
                 if (result is IResult requestResult)
                 {

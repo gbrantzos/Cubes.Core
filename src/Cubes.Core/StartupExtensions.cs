@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OfficeOpenXml;
 using System.Text;
+using Cubes.Core.Metrics;
 
 namespace Cubes.Core
 {
@@ -28,9 +29,10 @@ namespace Cubes.Core
             services.AddDataAccess(configuration)
                 .AddEmailDispatcher(configuration)
                 .AddScheduler(typeof(StartupExtensions).Assembly)
+                .AddMetrics(configuration)
+                .AddSingleton<IContextProvider, ContextProvider>()
                 .AddTransient<ITypeResolver, TypeResolver>()
                 .AddTransient<ILocalStorage>(_ => new LocalStorage(cubesConfig.StorageFolder))
-                .AddSingleton<IContextProvider, ContextProvider>()
                 .AddTransient<IConfigurationWriter, ConfigurationWriter>()
                 .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
 

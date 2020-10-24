@@ -38,6 +38,8 @@ namespace Cubes.Core.Commands.Basic
             var targetFiles = new List<string>();
             foreach (var target in request.Targets)
             {
+                if (!Directory.Exists(target))
+                    Directory.CreateDirectory(target);
                 CleanupArchives(target, request);
 
                 var targetFile = Path.Combine(target, archiveName);
@@ -88,7 +90,7 @@ namespace Cubes.Core.Commands.Basic
             var requestFilter = String.IsNullOrEmpty(request.Filter) ? "*" : request.Filter;
             foreach (var filter in (string[])requestFilter.Split('|', StringSplitOptions.RemoveEmptyEntries))
             {
-                toReturn.AddRange(Directory.GetFiles(request.SourcePath, filter));
+                toReturn.AddRange(Directory.GetFiles(request.SourcePath, filter.Trim()));
             }
             return toReturn;
         }

@@ -22,6 +22,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Net.Mime;
+using Prometheus;
+using Cubes.Core.Commands;
+using Cubes.Core.Metrics;
 
 [assembly: SwaggerCategory("Core")]
 namespace Cubes.Core.Web
@@ -35,6 +40,7 @@ namespace Cubes.Core.Web
         {
             services.AddHttpContextAccessor();
             services.AddCorsConfiguration(configuration);
+            services.AddHealthChecks();
 
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
             if (enableCompression)
@@ -64,6 +70,17 @@ namespace Cubes.Core.Web
                 o.SecretKey     = secretKey;
                 o.TokenLifetime = tokenLifetime;
             });
+
+            var assemblies = AppDomain
+               .CurrentDomain
+               .GetAssemblies();
+
+            var providers = assemblies
+                .SelectMany(t => t.GetTypes())
+                .Where(t => t.IsClass && t.GetInterfaces().Contains(typeof(IRequestSampleProvider)))
+                .ToList();
+            foreach (var prv in providers)
+                services.AddTransient(prv);
         }
 
         public static IApplicationBuilder UseCubesApi(this IApplicationBuilder app,
@@ -71,6 +88,7 @@ namespace Cubes.Core.Web
             IWebHostEnvironment env,
             IApiResponseBuilder responseBuilder,
             ILoggerFactory loggerFactory,
+            IMetrics metrics,
             JsonSerializerSettings serializerSettings)
         {
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
@@ -89,18 +107,53 @@ namespace Cubes.Core.Web
             foreach (var policy in corsPolicies)
                 app.UseCors(policy);
 
+            // Based on:
+            // https://gunnarpeipman.com/aspnet-core-health-checks/
+            // https://www.youtube.com/watch?v=bdgtYbGYsK0
+            // https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
+
+            var options = new HealthCheckOptions();
+            options.AllowCachingResponses = false;
+            options.ResponseWriter = async (context, result) =>
+            {
+                context.Response.ContentType = MediaTypeNames.Application.Json;
+                var response = new
+                {
+                    Status = result.Status.ToString(),
+                    Checks = result.Entries.Select(e => new
+                    {
+                        Component = e.Key,
+                        e.Value.Description,
+                        e.Value.Status,
+                        e.Value.Duration
+                    }).ToList(),
+                    Duration = result.TotalDuration
+                };
+
+                await context.Response.WriteAsync(response.AsJson());
+            };
+            var hcEndpoint = configuration.GetValue(CubesConstants.Config_HostHealthCheckEndpoint, "/healthcheck");
+            if (!hcEndpoint.StartsWith("/"))
+                hcEndpoint = "/" + hcEndpoint;
+            app.UseHealthChecks(hcEndpoint, options);
+
+            var metricsEndpoint = configuration.GetValue(CubesConstants.Config_HostMetricsEndpoint, "/metrics");
+            if (!metricsEndpoint.StartsWith("/"))
+                metricsEndpoint = "/" + metricsEndpoint;
             return app
                 .UseHomePage()
                 .UseAdminPage(configuration, loggerFactory)
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
-                .UseCubesMiddleware(loggerFactory, responseBuilder, serializerSettings)
+                .UseCubesMiddleware(loggerFactory, responseBuilder, metrics, serializerSettings)
+                .UseMetricServer(metricsEndpoint)
                 .UseResponseWrapper();
         }
 
         public static IApplicationBuilder UseCubesMiddleware(this IApplicationBuilder app,
             ILoggerFactory loggerFactory,
             IApiResponseBuilder responseBuilder,
+            IMetrics metrics,
             JsonSerializerSettings serializerSettings)
         {
             app.Use(async (ctx, next) =>
@@ -118,10 +171,10 @@ namespace Cubes.Core.Web
                 var context = new Context(requestID, requestInfo);
                 ctxProvider.Current = context;
 
-                var watcher = Stopwatch.StartNew();
+                var watch = Stopwatch.StartNew();
                 ctx.Response.OnStarting(() =>
                 {
-                    watcher.Stop();
+                    watch.Stop();
                     ctx.Response.Headers.Add(CUBES_HEADER_REQUEST_ID, new[] { requestID });
                     return Task.FromResult(0);
                 });
@@ -129,7 +182,7 @@ namespace Cubes.Core.Web
                 await next.Invoke();
 
                 // Just in case...
-                watcher.Stop();
+                watch.Stop();
 
                 var httpContextAccessor = ctx.RequestServices.GetService<IHttpContextAccessor>();
 
@@ -143,7 +196,17 @@ namespace Cubes.Core.Web
                     context.StartedAt,
                     context.SourceInfo,
                     ctx.Response.StatusCode,
-                    watcher.ElapsedMilliseconds);
+                    watch.ElapsedMilliseconds);
+
+                // Metrics
+                metrics
+                    .GetCounter(CubesCoreMetrics.CubesCoreApiCallsCount)
+                    .WithLabels(ctx.Request.Method, ctx.Request.Path)
+                    .Inc();
+                metrics
+                    .GetHistogram(CubesCoreMetrics.CubesCoreApiCallsDuration)
+                    .WithLabels(ctx.Request.Method, ctx.Request.Path)
+                    .Observe(watch.Elapsed.TotalSeconds);
             });
 
             app.UseStatusCodePages(async context =>
