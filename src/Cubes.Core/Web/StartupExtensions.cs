@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Net.Mime;
 using Prometheus;
 using Cubes.Core.Commands;
+using Cubes.Core.Metrics;
 
 [assembly: SwaggerCategory("Core")]
 namespace Cubes.Core.Web
@@ -87,6 +88,7 @@ namespace Cubes.Core.Web
             IWebHostEnvironment env,
             IApiResponseBuilder responseBuilder,
             ILoggerFactory loggerFactory,
+            IMetrics metrics,
             JsonSerializerSettings serializerSettings)
         {
             var enableCompression = configuration.GetValue<bool>(CubesConstants.Config_HostEnableCompression, true);
@@ -143,7 +145,7 @@ namespace Cubes.Core.Web
                 .UseAdminPage(configuration, loggerFactory)
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
-                .UseCubesMiddleware(loggerFactory, responseBuilder, serializerSettings)
+                .UseCubesMiddleware(loggerFactory, responseBuilder, metrics, serializerSettings)
                 .UseMetricServer(metricsEndpoint)
                 .UseResponseWrapper();
         }
@@ -151,6 +153,7 @@ namespace Cubes.Core.Web
         public static IApplicationBuilder UseCubesMiddleware(this IApplicationBuilder app,
             ILoggerFactory loggerFactory,
             IApiResponseBuilder responseBuilder,
+            IMetrics metrics,
             JsonSerializerSettings serializerSettings)
         {
             app.Use(async (ctx, next) =>
@@ -168,10 +171,10 @@ namespace Cubes.Core.Web
                 var context = new Context(requestID, requestInfo);
                 ctxProvider.Current = context;
 
-                var watcher = Stopwatch.StartNew();
+                var watch = Stopwatch.StartNew();
                 ctx.Response.OnStarting(() =>
                 {
-                    watcher.Stop();
+                    watch.Stop();
                     ctx.Response.Headers.Add(CUBES_HEADER_REQUEST_ID, new[] { requestID });
                     return Task.FromResult(0);
                 });
@@ -179,7 +182,7 @@ namespace Cubes.Core.Web
                 await next.Invoke();
 
                 // Just in case...
-                watcher.Stop();
+                watch.Stop();
 
                 var httpContextAccessor = ctx.RequestServices.GetService<IHttpContextAccessor>();
 
@@ -193,7 +196,17 @@ namespace Cubes.Core.Web
                     context.StartedAt,
                     context.SourceInfo,
                     ctx.Response.StatusCode,
-                    watcher.ElapsedMilliseconds);
+                    watch.ElapsedMilliseconds);
+
+                // Metrics
+                metrics
+                    .GetCounter(CubesCoreMetrics.CubesCoreApiCallsCount)
+                    .WithLabels(ctx.Request.Method, ctx.Request.Path)
+                    .Inc();
+                metrics
+                    .GetHistogram(CubesCoreMetrics.CubesCoreApiCallsDuration)
+                    .WithLabels(ctx.Request.Method, ctx.Request.Path)
+                    .Observe(watch.Elapsed.TotalSeconds);
             });
 
             app.UseStatusCodePages(async context =>

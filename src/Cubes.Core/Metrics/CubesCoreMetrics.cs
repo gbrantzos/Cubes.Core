@@ -5,8 +5,11 @@ namespace Cubes.Core.Metrics
 {
     public static class CubesCoreMetrics
     {
-        public static string CubesCoreRequestsCount = "cubes_core_requests_count";
+        public static string CubesCoreRequestsCount    = "cubes_core_requests_count";
         public static string CubesCoreRequestsDuration = "cubes_core_requests_duration_seconds";
+
+        public static string CubesCoreApiCallsCount    = "cubes_core_apicall_count";
+        public static string CubesCoreApiCallsDuration = "cubes_core_apicalls_duration_seconds";
 
         public abstract class BaseMetric
         {
@@ -40,6 +43,21 @@ namespace Cubes.Core.Metrics
                 Help = "Cubes Core requests duration in seconds",
                 Labels = new string[] { "request_type" },
                 Buckets = Prometheus.Histogram.ExponentialBuckets(1, 2, 8)
+            });
+
+            Counters.Add(new CounterDetails
+            {
+                Name = CubesCoreApiCallsCount,
+                Help = "Cubes Core api calls count",
+                Labels = new string[] { "method", "path" }
+            });
+
+            Histograms.Add(new HistogramDetails
+            {
+                Name = CubesCoreApiCallsDuration,
+                Help = "Cubes Core api calls duration in seconds",
+                Labels = new string[] { "method", "path" },
+                Buckets = new double[] { 0.1, 0.2, 0.5, 0.8, 1, 2, 5, 8 }
             });
         }
 

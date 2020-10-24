@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Cubes.Core.Base;
+using Cubes.Core.Metrics;
 using Cubes.Core.Web.ResponseWrapping;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -82,6 +83,7 @@ namespace Cubes.Core.Web
             var loggerFactory      = app.ApplicationServices.GetService<ILoggerFactory>();
             var responseBuilder    = app.ApplicationServices.GetService<IApiResponseBuilder>();
             var serializerSettings = app.ApplicationServices.GetService<JsonSerializerSettings>();
+            var metrics            = app.ApplicationServices.GetService<IMetrics>();
 
             if (useSsl)
             {
@@ -95,7 +97,7 @@ namespace Cubes.Core.Web
             app.UseStaticFiles();
 
             // Should be called as soon as possible.
-            app.UseCubesApi(_configuration, env, responseBuilder, loggerFactory, serializerSettings);
+            app.UseCubesApi(_configuration, env, responseBuilder, loggerFactory, metrics, serializerSettings);
 
             // Routing
             app.UseRouting();
