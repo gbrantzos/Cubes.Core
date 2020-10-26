@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using Cubes.Core.DataAccess;
 using OfficeOpenXml;
 
@@ -99,7 +101,10 @@ namespace Cubes.Core.Utilities
                 ws.Cells[1, 1, 1, props.Length].Style.Font.Italic = formattingSettings.HeaderSettings.Font.IsItalic;
 
                 foreach (var prop in props)
-                    ws.Cells[1, ++iColumn].Value = prop.Name;
+                {
+                    var columnSettings = prop.GetCustomAttribute<ColumnSettingsAttribute>();
+                    ws.Cells[1, ++iColumn].Value = columnSettings == null ? prop.Name : columnSettings.Header;
+                }
             }
 
             // Add data

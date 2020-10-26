@@ -3,7 +3,6 @@ using System.Text;
 using Cubes.Core.Commands;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Cubes.Core.Web
 {
@@ -29,18 +28,6 @@ namespace Cubes.Core.Web
                 }
             }
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Convert any object to JSON.
-        /// </summary>
-        /// <param name="object">Object to convert</param>
-        /// <param name="serializerSettings">Json serializer settings</param>
-        /// <returns></returns>
-        public static string AsJson(this object @object, JsonSerializerSettings serializerSettings = null)
-        {
-            var settings = serializerSettings ?? new JsonSerializerSettings();
-            return JsonConvert.SerializeObject(@object, settings);
         }
 
         /// <summary>

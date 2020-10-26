@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using NLog.Config;
 
 #if (DEBUG && WINDOWS)
 using System.Diagnostics;
@@ -132,6 +133,7 @@ namespace Cubes.Host
                 CubesConstants.NLog_ConfigFile);
             NLogBuilder.ConfigureNLog(File.Exists(installationConfig) ? installationConfig : configFile);
             LogManager.Configuration.Variables["cubesRoot"] = basedir;
+            ConfigurationItemFactory.Default.JsonConverter = new NLogJsonSerializer();
 
             return new NLogLoggerProvider();
         }

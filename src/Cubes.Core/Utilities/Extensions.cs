@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Cubes.Core.Commands;
 using FluentValidation;
+using Newtonsoft.Json;
 
 namespace Cubes.Core.Utilities
 {
@@ -196,6 +197,18 @@ namespace Cubes.Core.Utilities
             input = input.Trim();
             return (input.StartsWith("{") && input.EndsWith("}"))
                    || (input.StartsWith("[") && input.EndsWith("]"));
+        }
+
+        /// <summary>
+        /// Convert any object to JSON.
+        /// </summary>
+        /// <param name="object">Object to convert</param>
+        /// <param name="serializerSettings">Json serializer settings</param>
+        /// <returns></returns>
+        public static string AsJson(this object @object, JsonSerializerSettings serializerSettings = null)
+        {
+            var settings = serializerSettings ?? new JsonSerializerSettings();
+            return JsonConvert.SerializeObject(@object, settings);
         }
 
         /// <summary>
