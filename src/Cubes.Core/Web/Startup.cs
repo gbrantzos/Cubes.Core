@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Cubes.Core.Base;
 using Cubes.Core.Metrics;
+using Cubes.Core.Web.IpRestrictions;
 using Cubes.Core.Web.ResponseWrapping;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +27,9 @@ namespace Cubes.Core.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // IP restrictions settings
+            services.Configure<IpRestrictionsMiddlewareOptions>(_configuration.GetSection(CubesConstants.Config_IpRestrictionsOptions));
+
             var assemblies = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
@@ -92,6 +96,9 @@ namespace Cubes.Core.Web
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+
+            // IP restrictions middleware
+            app.UseIpRestrictions();
 
             // Server files from WebRoot folder
             app.UseStaticFiles();

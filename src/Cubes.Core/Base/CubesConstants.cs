@@ -18,6 +18,7 @@ namespace Cubes.Core.Base
         public const string Config_HostMetricsEndpoint     = "Host:MetricsEndpoint";
         public const string Config_ApiKey                  = "ApiKey";
         public const string Config_KeyLifetime             = "KeyLifetime";
+        public const string Config_IpRestrictionsOptions   = "Host:IpRestrictionsOptions";
 
         public const string NLog_ConfigFile                = "NLog.config";
         public const string NLog_SampleFile                = "NLog.Sample.config";

@@ -27,6 +27,7 @@ using System.Net.Mime;
 using Prometheus;
 using Cubes.Core.Commands;
 using Cubes.Core.Metrics;
+using Cubes.Core.Web.IpRestrictions;
 
 [assembly: SwaggerCategory("Core")]
 namespace Cubes.Core.Web
@@ -47,6 +48,7 @@ namespace Cubes.Core.Web
                 services.AddResponseCompression();
             services.AddCubesSwaggerServices(configuration);
             services.AddSingleton<IApiResponseBuilder, ApiResponseBuilder>();
+            services.AddSingleton<IIpMatcher, IpMatcher>();
 
             services.AddUIServices();
 
