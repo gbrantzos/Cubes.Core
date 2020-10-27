@@ -76,7 +76,7 @@ namespace Cubes.Core.Web.Controllers
             if (instance == null)
                 return BadRequest($"Given instance is not a valid JSON object of type '{requestType}'");
 
-            IResult result = await mediator.Send(instance) as IResult;
+            var result = await mediator.Send(instance) as Result;
             if (result.ExceptionThrown != null)
                 throw new Exception($"Request execution failed!{Environment.NewLine}{requestInst}", result.ExceptionThrown);
             if (result.HasErrors)

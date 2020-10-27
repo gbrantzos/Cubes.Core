@@ -18,7 +18,7 @@ namespace Cubes.Host
         {
             _settings = new JsonSerializerSettings
             {
-                Formatting = Formatting.Indented,
+                Formatting = Formatting.None,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
             _jsonSerializer = JsonSerializer.CreateDefault(_settings);

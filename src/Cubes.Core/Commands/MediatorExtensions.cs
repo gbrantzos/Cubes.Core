@@ -11,7 +11,7 @@ namespace Cubes.Core.Commands
         /// Send a request without knowing the result type.
         /// <para>
         /// Although this method returns dynamic we can safely assume it will return an await-able
-        /// with <see cref="IResult"/> instance as result.
+        /// with <see cref="Result"/> instance as result.
         /// </para>
         /// </summary>
         /// <param name="mediator">Command bus</param>

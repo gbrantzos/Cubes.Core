@@ -68,7 +68,7 @@ namespace Cubes.Core.Scheduling.Jobs
             logger.LogInformation($"Executing '{requestType.Name}', {requestInstance} ...");
             var requestResponse = await mediator.Send(requestInstance);
 
-            if (requestResponse is IResult result)
+            if (requestResponse is Result result)
             {
                 if (result.HasErrors)
                 {
@@ -87,8 +87,17 @@ namespace Cubes.Core.Scheduling.Jobs
                 else
                 {
                     logger.LogInformation(result.Message);
-                    DispatchResult(result.Response/*, jobParams*/);
-                    context.Put(Scheduler.MessageKey, result.Message);
+                    object response = ((dynamic)result).Response;
+                    if (response == null)
+                    {
+                        logger.LogWarning("Cannot dispatch null object! {@result}", result);
+                        return;
+                    }
+                    else
+                    {
+                        DispatchResult(response/*, jobParams*/);
+                        context.Put(Scheduler.MessageKey, result.Message);
+                    }
                 }
             }
         }
@@ -104,7 +113,6 @@ namespace Cubes.Core.Scheduling.Jobs
             if (dispatcherType == null)
                 throw new ArgumentException($"Could not resolve dispatcher with type {dispatcherTypeName}!");
                 */
-
             var dispatcher = emailDispatcher;
             {
                 // If results contain an EmailContent property sent email

@@ -44,7 +44,7 @@ namespace Cubes.Core.Commands
                     .WithLabels(reguestType)
                     .Observe(sw.Elapsed.TotalSeconds);
 
-                if (result is IResult requestResult)
+                if (result is Result requestResult)
                 {
                     var formattedMessage = AddIndent(requestResult.Message);
                     if (requestResult.HasErrors)
@@ -62,7 +62,7 @@ namespace Cubes.Core.Commands
                     }
                     else
                     {
-                        var msg = requestResult.Message == requestResult.DefaultMessage ?
+                        var msg = requestResult.Message == requestResult.DefaultMessage() ?
                             String.Empty :
                             $"\r\n{formattedMessage}";
                         _logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms){msg}");

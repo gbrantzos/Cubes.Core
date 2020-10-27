@@ -31,7 +31,7 @@ namespace Cubes.Core.Commands
             try
             {
                 toReturn.Response = await this.HandleInternal(request, cancellationToken);
-                toReturn.Message = MessageToReturn.IfNullOrEmpty(toReturn.DefaultMessage);
+                toReturn.Message = MessageToReturn.IfNullOrEmpty(toReturn.DefaultMessage());
 
                 if (failed)
                 {
@@ -49,7 +49,7 @@ namespace Cubes.Core.Commands
                     .Select(x => x.Message)
                     .Distinct()
                     .ToList();
-                toReturn.Message = MessageToReturn.IfNullOrEmpty(String.Join(System.Environment.NewLine, allMesages));
+                toReturn.Message = MessageToReturn.IfNullOrEmpty(String.Join(Environment.NewLine, allMesages));
             }
             return toReturn;
         }
