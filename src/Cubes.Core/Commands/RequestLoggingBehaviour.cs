@@ -5,8 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cubes.Core.Metrics;
 using Cubes.Core.Utilities;
+using DotNet.Globbing;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Cubes.Core.Commands
 {
@@ -14,18 +16,24 @@ namespace Cubes.Core.Commands
     {
         private readonly ILogger<RequestLoggingBehaviour<TRequest, TResponse>> _logger;
         private readonly IMetrics _metrics;
+        private readonly RequestLoggingOptions _options;
 
-        public RequestLoggingBehaviour(ILogger<RequestLoggingBehaviour<TRequest, TResponse>> logger, IMetrics metrics)
+        public RequestLoggingBehaviour(ILogger<RequestLoggingBehaviour<TRequest, TResponse>> logger,
+            IMetrics metrics,
+            IOptionsSnapshot<RequestLoggingOptions> optionsSnapshot)
         {
             _logger = logger;
             _metrics = metrics;
+            _options = optionsSnapshot.Value;
         }
 
         public async Task<TResponse> Handle(TRequest request,
             CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
-            _logger.LogDebug("Executing => [{requestType}] {request}", typeof(TRequest).Name, request);
+            var requestName = typeof(TRequest).Name;
+            var requestType = typeof(TRequest).FullName;
+            _logger.LogDebug("[{requestName:l}] Executing => {request}", requestName, request);
             try
             {
                 var sw = new Stopwatch();
@@ -34,14 +42,13 @@ namespace Cubes.Core.Commands
                 var result = await next();
                 sw.Stop();
 
-                var reguestType = typeof(TRequest).Name;
                 _metrics
                     .GetCounter(CubesCoreMetrics.CubesCoreRequestsCount)
-                    .WithLabels(reguestType)
+                    .WithLabels(requestType)
                     .Inc();
                 _metrics
                     .GetHistogram(CubesCoreMetrics.CubesCoreRequestsDuration)
-                    .WithLabels(reguestType)
+                    .WithLabels(requestType)
                     .Observe(sw.Elapsed.TotalSeconds);
 
                 if (result is Result requestResult)
@@ -49,29 +56,28 @@ namespace Cubes.Core.Commands
                     var formattedMessage = AddIndent(requestResult.Message);
                     if (requestResult.HasErrors)
                     {
-                        // TODO This can be controlled by options
-                        if (requestResult.ExceptionThrown != null)
-                        {
-                            _logger.LogError(requestResult.ExceptionThrown,
-                                $"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms)\r\n{formattedMessage}");
-                            // TODO This can be controlled by options
-                            //_logger.LogError("{@request}", request);
-                        }
-                        else
-                            _logger.LogError($"Result has errors => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms)\r\n{formattedMessage}");
+                        _logger.LogError($"[{requestName}] Request result has errors => {request} ({sw.ElapsedMilliseconds}ms)\r\n{formattedMessage}");
+
+                        if (requestResult.ExceptionThrown != null && ShouldLogException(requestType))
+                            _logger.LogError(requestResult.ExceptionThrown, $"[{requestName}] Exception thrown =>");
+                        if (ShouldLogRequest(requestType))
+                            _logger.LogError("[{requestName:l}] Request details =>\r\nRequest type :: {requestType:l}\r\n{@request}",
+                                requestName,
+                                requestType,
+                                request);
                     }
                     else
                     {
                         var msg = requestResult.Message == requestResult.DefaultMessage() ?
                             String.Empty :
                             $"\r\n{formattedMessage}";
-                        _logger.LogInformation($"Executed => [{typeof(TRequest).Name}] {request} ({sw.ElapsedMilliseconds}ms){msg}");
+                        _logger.LogInformation($"[{requestName}] Executed => {request} ({sw.ElapsedMilliseconds}ms){msg}");
                     }
                 }
                 else
                 {
-                    // No more details to display
-                    _logger.LogInformation($"Request executed, {typeof(TRequest).Name}: {request} [{sw.ElapsedMilliseconds}ms]");
+                    // No details to display
+                    _logger.LogInformation($"Request executed, {requestName}: {request} [{sw.ElapsedMilliseconds}ms]");
                 }
                 return result;
             }
@@ -96,6 +102,28 @@ namespace Cubes.Core.Commands
                 sb.AppendLine($"    {line}");
 
             return sb.ToString().Trim(new char[] { '\r', '\n' });
+        }
+
+        private bool ShouldLogException(string requestType)
+        {
+            foreach (var item in _options.LogExceptionsForRequests)
+            {
+                var glob = Glob.Parse(item);
+                if (glob.IsMatch(requestType))
+                    return true;
+            }
+            return false;
+        }
+
+        private bool ShouldLogRequest(string requestType)
+        {
+            foreach (var item in _options.LogFailedRequests)
+            {
+                var glob = Glob.Parse(item);
+                if (glob.IsMatch(requestType))
+                    return true;
+            }
+            return false;
         }
     }
 }

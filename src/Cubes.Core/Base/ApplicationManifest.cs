@@ -14,6 +14,7 @@ namespace Cubes.Core.Base
         /// </summary>
         public bool Active { get; set; }
 
+        // TODO Rename to ApplicationRootPath
         /// <summary>
         /// The manifest file path. Can be used to define relative paths inside manifest file.
         /// </summary>

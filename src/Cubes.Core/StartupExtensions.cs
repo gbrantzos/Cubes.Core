@@ -1,16 +1,17 @@
+using System.Text;
+using Cubes.Core.Base;
+using Cubes.Core.Commands;
+using Cubes.Core.Configuration;
 using Cubes.Core.DataAccess;
 using Cubes.Core.Email;
-using Cubes.Core.Base;
+using Cubes.Core.Metrics;
 using Cubes.Core.Scheduling;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Cubes.Core.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OfficeOpenXml;
-using System.Text;
-using Cubes.Core.Metrics;
 
 namespace Cubes.Core
 {
@@ -34,7 +35,8 @@ namespace Cubes.Core
                 .AddTransient<ITypeResolver, TypeResolver>()
                 .AddTransient<ILocalStorage>(_ => new LocalStorage(cubesConfig.StorageFolder))
                 .AddTransient<IConfigurationWriter, ConfigurationWriter>()
-                .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section));
+                .Configure<CubesConfiguration>(configuration.GetSection(CubesConstants.Configuration_Section))
+                .Configure<RequestLoggingOptions>(configuration.GetSection(nameof(RequestLoggingOptions)));
 
             // Global JSON convert settings
             var serializerSettings = new JsonSerializerSettings
