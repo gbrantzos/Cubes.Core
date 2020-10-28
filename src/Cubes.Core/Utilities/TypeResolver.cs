@@ -4,6 +4,8 @@ namespace Cubes.Core.Utilities
 {
     public class TypeResolver : ITypeResolver
     {
+        public static readonly TypeResolver Default = new TypeResolver();
+
         public Type GetByName(string typeName)
         {
             var type = Type.GetType(typeName);

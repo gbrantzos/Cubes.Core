@@ -4,6 +4,7 @@ using System.Linq;
 using Cubes.Core.Base;
 using Cubes.Core.Configuration;
 using Cubes.Core.Scheduling.Jobs;
+using Cubes.Core.Utilities;
 using Quartz;
 
 namespace Cubes.Core.Scheduling
@@ -106,7 +107,7 @@ namespace Cubes.Core.Scheduling
             if (String.IsNullOrEmpty(JobType))
                 throw new ArgumentException($"JobType not defined for: {Name}");
 
-            var jobType = Type.GetType(JobType);
+            var jobType = TypeResolver.Default.GetByName(JobType);
             if (jobType == null)
                 throw new ArgumentException($"Could not create type for job: {JobType}");
 

@@ -114,26 +114,27 @@ namespace Cubes.Core.Web
             // https://gunnarpeipman.com/aspnet-core-health-checks/
             // https://www.youtube.com/watch?v=bdgtYbGYsK0
             // https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
-
-            var options = new HealthCheckOptions();
-            options.AllowCachingResponses = false;
-            options.ResponseWriter = async (context, result) =>
+            var options = new HealthCheckOptions
             {
-                context.Response.ContentType = MediaTypeNames.Application.Json;
-                var response = new
+                AllowCachingResponses = false,
+                ResponseWriter = async (context, result) =>
                 {
-                    Status = result.Status.ToString(),
-                    Checks = result.Entries.Select(e => new
+                    context.Response.ContentType = MediaTypeNames.Application.Json;
+                    var response = new
                     {
-                        Component = e.Key,
-                        e.Value.Description,
-                        e.Value.Status,
-                        e.Value.Duration
-                    }).ToList(),
-                    Duration = result.TotalDuration
-                };
+                        Status = result.Status.ToString(),
+                        Checks = result.Entries.Select(e => new
+                        {
+                            Component = e.Key,
+                            e.Value.Description,
+                            e.Value.Status,
+                            e.Value.Duration
+                        }).ToList(),
+                        Duration = result.TotalDuration
+                    };
 
-                await context.Response.WriteAsync(response.AsJson());
+                    await context.Response.WriteAsync(response.AsJson());
+                }
             };
             var hcEndpoint = configuration.GetValue(CubesConstants.Config_HostHealthCheckEndpoint, "/healthcheck");
             if (!hcEndpoint.StartsWith("/"))
@@ -148,8 +149,9 @@ namespace Cubes.Core.Web
                 .UseAdminPage(configuration, loggerFactory)
                 .UseCubesSwagger()
                 .UseStaticContent(configuration, loggerFactory)
-                .UseCubesMiddleware(loggerFactory, responseBuilder, metrics, serializerSettings)
                 .UseMetricServer(metricsEndpoint)
+                .UseCubesMiddleware(loggerFactory, responseBuilder, metrics, serializerSettings)
+                // TODO Add UseCubesApplications to provide a "hook" for application while setting the pipeline
                 .UseResponseWrapper();
         }
 

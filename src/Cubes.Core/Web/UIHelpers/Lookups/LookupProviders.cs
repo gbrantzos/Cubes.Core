@@ -7,5 +7,6 @@ namespace Cubes.Core.Web.UIHelpers.Lookups
         public static readonly string DataQueries       = "Core:DataQueries";
         public static readonly string SchedulerJobTypes = "Core:SchedulerJobTypes";
         public static readonly string RequestTypes      = "Core:RequestTypes";
+        public static readonly string SmptSettings      = "Core:SmtpSettings";
     }
 }
