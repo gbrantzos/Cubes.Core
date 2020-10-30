@@ -1,10 +1,10 @@
 # ------------------------------------------------------------------------------
 # Script parameters
 param(
-    [string] $version,
-    [switch] $deploy,
-    [switch] $allowDirty,
-    [string] $configuration
+    [string] $Version,
+    [switch] $Deploy,
+    [switch] $AllowDirty,
+    [string] $Configuration
 )
 # ------------------------------------------------------------------------------
 

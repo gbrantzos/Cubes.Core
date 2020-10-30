@@ -71,7 +71,7 @@ namespace Cubes.Core.Commands
                         var msg = requestResult.Message == requestResult.DefaultMessage() ?
                             String.Empty :
                             $"\r\n{formattedMessage}";
-                        _logger.LogInformation($"[{requestName}] Executed => {request} ({sw.ElapsedMilliseconds}ms){msg}");
+                        _logger.LogInformation($"[{requestName}] Executed successfully => {request} ({sw.ElapsedMilliseconds}ms){msg}");
                     }
                 }
                 else

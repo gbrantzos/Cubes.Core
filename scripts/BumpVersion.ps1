@@ -3,7 +3,7 @@
 
 param(
     [Parameter(Mandatory)]
-    [string]$version
+    [string]$Version
 )
 
 # ------------------------------------------------------------------------------

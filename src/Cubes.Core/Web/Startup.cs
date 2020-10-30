@@ -103,15 +103,17 @@ namespace Cubes.Core.Web
             // Server files from WebRoot folder
             app.UseStaticFiles();
 
-            // Should be called as soon as possible.
-            app.UseCubesApi(_configuration, env, responseBuilder, loggerFactory, metrics, serializerSettings);
-
             // Routing
             app.UseRouting();
 
+            // Security
             app.UseAuthentication();
             app.UseAuthorization();
 
+            // Should be called as soon as possible.
+            app.UseCubesApi(_configuration, env, responseBuilder, loggerFactory, metrics, serializerSettings);
+
+            // Endpoints
             app.UseEndpoints(endpoints => endpoints.MapControllers());
        }
     }

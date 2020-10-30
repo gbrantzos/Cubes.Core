@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -163,6 +164,8 @@ namespace Cubes.Core.Web
         {
             app.Use(async (ctx, next) =>
             {
+                var endpoint = ctx.GetEndpoint();
+
                 // Prepare
                 var logger = loggerFactory.CreateLogger(CUBES_MIDDLEWARE_LOGGER);
                 var requestID = Guid.NewGuid().ToString("N");
@@ -204,13 +207,14 @@ namespace Cubes.Core.Web
                     watch.ElapsedMilliseconds);
 
                 // Metrics
+                var path = (endpoint as RouteEndpoint)?.RoutePattern?.RawText ?? ctx.Request.Path;
                 metrics
                     .GetCounter(CubesCoreMetrics.CubesCoreApiCallsCount)
-                    .WithLabels(ctx.Request.Method, ctx.Request.Path)
+                    .WithLabels(ctx.Request.Method, path)
                     .Inc();
                 metrics
                     .GetHistogram(CubesCoreMetrics.CubesCoreApiCallsDuration)
-                    .WithLabels(ctx.Request.Method, ctx.Request.Path)
+                    .WithLabels(ctx.Request.Method, path)
                     .Observe(watch.Elapsed.TotalSeconds);
             });
 
