@@ -128,7 +128,7 @@ namespace Cubes.Core.Web
                         {
                             Component = e.Key,
                             e.Value.Description,
-                            e.Value.Status,
+                            Status = e.Value.Status.ToString(),
                             e.Value.Duration
                         }).ToList(),
                         Duration = result.TotalDuration
