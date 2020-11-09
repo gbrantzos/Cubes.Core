@@ -8,7 +8,7 @@ namespace Cubes.Core.Metrics
         public static string CubesCoreRequestsCount    = "cubes_core_requests_count";
         public static string CubesCoreRequestsDuration = "cubes_core_requests_duration_seconds";
 
-        public static string CubesCoreApiCallsCount    = "cubes_core_apicall_count";
+        public static string CubesCoreApiCallsCount    = "cubes_core_apicalls_count";
         public static string CubesCoreApiCallsDuration = "cubes_core_apicalls_duration_seconds";
 
         public abstract class BaseMetric
