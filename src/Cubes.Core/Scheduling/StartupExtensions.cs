@@ -2,6 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
+using Cubes.Core.Scheduling.ExecutionHistory;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Quartz.Impl;
@@ -41,6 +42,9 @@ namespace Cubes.Core.Scheduling
 
             // Jobs scheduler
             services.AddSingleton<IScheduler, Scheduler>();
+
+            // Execution history
+            services.AddSingleton<IExecutionHistoryManager, LiteDbExecutionHistoryManager>();
 
             // Add jobs
             if (assemblies?.Length>0)

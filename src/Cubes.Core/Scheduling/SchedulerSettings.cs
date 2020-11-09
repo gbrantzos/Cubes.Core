@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cubes.Core.Base;
 using Cubes.Core.Configuration;
+using Cubes.Core.Scheduling.ExecutionHistory;
 using Cubes.Core.Scheduling.Jobs;
 using Cubes.Core.Utilities;
 using Quartz;
@@ -12,6 +13,8 @@ namespace Cubes.Core.Scheduling
     [ConfigurationStore(CubesConstants.Files_Scheduling)]
     public class SchedulerSettings
     {
+        public static Retention DefaultRetention = Retention.LastTen;
+
         public ICollection<SchedulerJob> Jobs { get; set; } = new HashSet<SchedulerJob>();
 
         public void Validate()

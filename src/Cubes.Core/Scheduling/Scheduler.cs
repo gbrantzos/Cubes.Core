@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CronExpressionDescriptor;
 using Cubes.Core.Base;
+using Cubes.Core.Scheduling.ExecutionHistory;
 using Cubes.Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,11 +32,12 @@ namespace Cubes.Core.Scheduling
             public string LastExecutionMessage      { get; set; }
         }
 
-        private readonly IJobFactory jobFactory;
-        private readonly ISchedulerFactory schedulerFactory;
-        private readonly IConfigurationRoot schedulerConfiguration;
-        private readonly ILogger<Scheduler> logger;
-        private ICollection<SchedulerJobDetails> internalDetails = new HashSet<SchedulerJobDetails>();
+        private readonly IJobFactory _jobFactory;
+        private readonly ISchedulerFactory _schedulerFactory;
+        private readonly IConfigurationRoot _schedulerConfiguration;
+        private readonly ILogger<Scheduler> _logger;
+        private readonly IExecutionHistoryManager _historyManager;
+        private ICollection<SchedulerJobDetails> _internalDetails = new HashSet<SchedulerJobDetails>();
 
         private Quartz.IScheduler quartzScheduler;
         private bool failedToLoad;
@@ -44,15 +46,16 @@ namespace Cubes.Core.Scheduling
             IJobFactory jobFactory,
             ISchedulerFactory schedulerFactory,
             ILogger<Scheduler> logger,
+            IExecutionHistoryManager historyManager,
             ICubesEnvironment cubesEnvironment)
         {
-            this.schedulerFactory = schedulerFactory;
-            this.jobFactory = jobFactory;
-            this.logger = logger;
-
+            _schedulerFactory = schedulerFactory;
+            _jobFactory = jobFactory;
+            _logger = logger;
+            _historyManager = historyManager;
             var configurationPath = cubesEnvironment
                 .GetFileOnPath(CubesFolderKind.Config, CubesConstants.Files_Scheduling);
-            schedulerConfiguration = new ConfigurationBuilder()
+            _schedulerConfiguration = new ConfigurationBuilder()
                 .AddYamlFile(configurationPath, optional: true, reloadOnChange: true)
                 .Build();
         }
@@ -65,7 +68,7 @@ namespace Cubes.Core.Scheduling
                 var initialized = await InitialiseScheduler(cancellationToken);
                 if (!initialized)
                 {
-                    logger.LogError("Failed to initialize scheduler.");
+                    _logger.LogError("Failed to initialize scheduler.");
                     return;
                 }
             }
@@ -76,16 +79,16 @@ namespace Cubes.Core.Scheduling
             var triggers = await quartzScheduler.GetTriggerKeys(GroupMatcher<TriggerKey>.AnyGroup());
             int activeJobs = triggers.Count;
 
-            logger.LogInformation($"Configuration loaded, {allJobs} jobs found, {activeJobs} active.");
+            _logger.LogInformation($"Configuration loaded, {allJobs} jobs found, {activeJobs} active.");
 
             await quartzScheduler.Start(cancellationToken);
             if (activeJobs == 0)
-                logger.LogWarning("Scheduler will be started, but has no active jobs!");
+                _logger.LogWarning("Scheduler will be started, but has no active jobs!");
             else
-                logger.LogInformation("Scheduler started.");
+                _logger.LogInformation("Scheduler started.");
 
             if (allJobs > 0)
-                logger.LogInformation(await GetJobsQuickInfo());
+                _logger.LogInformation(await GetJobsQuickInfo());
         }
 
         private async Task<string> GetJobsQuickInfo()
@@ -111,7 +114,7 @@ namespace Cubes.Core.Scheduling
         {
             if (!quartzScheduler.InStandbyMode)
             {
-                logger.LogInformation("Stopping scheduler...");
+                _logger.LogInformation("Stopping scheduler...");
                 return quartzScheduler.Standby(cancellationToken);
             }
             return Task.CompletedTask;
@@ -150,7 +153,7 @@ namespace Cubes.Core.Scheduling
                 var triggers = await quartzScheduler.GetTriggersOfJob(key, cancellationToken);
                 var trigger = triggers.FirstOrDefault();
 
-                var internalDetail = internalDetails.First(dt => dt.JobKey.Equals(jobDetail.Key));
+                var internalDetail = _internalDetails.First(dt => dt.JobKey.Equals(jobDetail.Key));
                 var name = internalDetail.Name;
                 var cronExpression = internalDetail.CronExpression;
 
@@ -188,7 +191,7 @@ namespace Cubes.Core.Scheduling
 
         public async Task ExecuteJob(string name, CancellationToken cancellationToken = default)
         {
-            var internalDetail = internalDetails
+            var internalDetail = _internalDetails
                 .FirstOrDefault(dt => dt.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             if (internalDetail == null)
                 throw new ArgumentException($"Unknown job name: {name}");
@@ -209,8 +212,8 @@ namespace Cubes.Core.Scheduling
         private async Task<bool> InitialiseScheduler(CancellationToken cancellationToken = default)
         {
             // First time initialization of Scheduler
-            quartzScheduler = await schedulerFactory.GetScheduler(cancellationToken);
-            quartzScheduler.JobFactory = jobFactory;
+            quartzScheduler = await _schedulerFactory.GetScheduler(cancellationToken);
+            quartzScheduler.JobFactory = _jobFactory;
             quartzScheduler.ListenerManager.AddJobListener(new JobListener(this));
 
             // Load configuration
@@ -226,13 +229,13 @@ namespace Cubes.Core.Scheduling
                     throw new InvalidOperationException($"{nameof(LoadConfiguration)} should be called when {nameof(Scheduler)} is stopped.");
 
                 // Load configuration
-                var settings = schedulerConfiguration
+                var settings = _schedulerConfiguration
                     .GetSection(nameof(SchedulerSettings))
                     .Get<SchedulerSettings>();
                 if (settings == null)
                     throw new ArgumentException("Scheduler settings cannot be null!");
                 await quartzScheduler.Clear();
-                internalDetails = new HashSet<SchedulerJobDetails>();
+                _internalDetails = new HashSet<SchedulerJobDetails>();
 
                 // Validate settings
                 settings.Validate();
@@ -254,7 +257,7 @@ namespace Cubes.Core.Scheduling
 
                     details.JobKey = quartzJob.Key;
                     details.RefireIfMissed = job.RefireIfMissed;
-                    internalDetails.Add(details);
+                    _internalDetails.Add(details);
                 }
 
                 failedToLoad = false;
@@ -262,14 +265,14 @@ namespace Cubes.Core.Scheduling
             }
             catch (Exception x)
             {
-                logger.LogError(x, $"Failed to load scheduler settings: {x.Message}");
+                _logger.LogError(x, $"Failed to load scheduler settings: {x.Message}");
                 return false;
             }
         }
 
         internal void AddExecutionResults(JobKey jobKey, Exception exception, string message, bool logicalError = false)
         {
-            var internalDetail = internalDetails
+            var internalDetail = _internalDetails
                 .FirstOrDefault(dt => dt.JobKey.Equals(jobKey));
             if (internalDetail == null)
                 throw new ArgumentException($"Invalid job key: {jobKey}");
