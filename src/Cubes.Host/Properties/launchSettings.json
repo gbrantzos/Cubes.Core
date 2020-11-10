@@ -21,9 +21,9 @@
       "commandName": "Project",
       "launchUrl": "api/values",
       "environmentVariables": {
-        "CUBES_ADMIN": "D:\\Code\\Cubes\\Core.WebApp\\dist\\CubesManagement.zip",
+        "CUBES_ADMIN": "C:\\Code\\Cubes\\Core.WebApp\\dist\\CubesManagement.zip",
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CUBES_APPLICATION": "D:\\Code\\Cubes\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
+        "CUBES_APPLICATION": "C:\\Code\\Cubes\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },

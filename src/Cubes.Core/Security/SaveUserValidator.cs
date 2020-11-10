@@ -16,7 +16,7 @@ namespace Cubes.Core.Security
                 .WithMessage("Display name cannot be null!")
                 .When(x => x.UserDetails != null);
             RuleFor(x => x.UserDetails.Roles)
-                .NotEmpty()
+                .NotNull()
                 .WithMessage("Roles collection cannot be null!")
                 .When(x => x.UserDetails != null);
         }

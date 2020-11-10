@@ -24,6 +24,7 @@ namespace Cubes.Core.Base
         public const string NLog_SampleFile                = "NLog.Sample.config";
 
         public const string LocalStorage_File              = "Core.LocalStorage.db";
+        public const string ExecutionHistory_File          = "Core.ExecutionHistory.db";
         public const string Configuration_Section          = "CubesConfig";
 
         public const string Serializer_JSON                = "JSON";
