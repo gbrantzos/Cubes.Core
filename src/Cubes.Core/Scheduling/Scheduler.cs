@@ -301,7 +301,7 @@ namespace Cubes.Core.Scheduling
                 ExecutionFailed   = logicalError || (exception != null),
                 ExceptionThrown   = exception,
                 ExecutionMessage  = historyMessage,
-                ExecutionOnDemand = (context.SafeGet(OnDemandKey)?.ToString() ?? String.Empty) == true.ToString()
+                ExecutionOnDemand = (context.MergedJobDataMap?.GetString(OnDemandKey) ?? String.Empty) == true.ToString()
             };
             _historyManager.Save(ehd);
         }
