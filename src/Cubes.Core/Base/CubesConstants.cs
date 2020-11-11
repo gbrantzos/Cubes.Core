@@ -17,6 +17,7 @@ namespace Cubes.Core.Base
         public const string Config_HostHealthCheckEndpoint = "Host:HealthCheckEndpoint";
         public const string Config_HostMetricsEndpoint     = "Host:MetricsEndpoint";
         public const string Config_ApiKey                  = "ApiKey";
+        public const string Config_JobsHistoryRetention    = "JobsHistoryRetention";
         public const string Config_KeyLifetime             = "KeyLifetime";
         public const string Config_IpRestrictionsOptions   = "Host:IpRestrictionsOptions";
 
