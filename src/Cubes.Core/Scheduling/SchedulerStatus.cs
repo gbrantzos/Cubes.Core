@@ -32,12 +32,9 @@ namespace Cubes.Core.Scheduling
         public DateTime? NextFireTime           { get; set; }
         public bool LastExecutionFailed         { get; set; }
 
-        // This could possibly be solved in future version of system.text.Json
-        // https://github.com/dotnet/corefx/issues/40600
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string LastExecutionMessage      { get; set; }
 
         public Dictionary<string, string> JobParameters { get; set; }
     }
-
 }

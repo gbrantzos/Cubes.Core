@@ -38,11 +38,11 @@ namespace Cubes.Core.Web.Controllers
         /// <param name="jobName">Name of Job</param>
         /// <returns></returns>
         [HttpPost, Route("execute/{jobName}")]
-        public ActionResult Execute(string jobName)
+        public async Task<ActionResult> Execute(string jobName)
         {
             try
             {
-                scheduler.ExecuteJob(jobName);
+                await scheduler.ExecuteJob(jobName);
                 return Ok("Job was triggered successfully!");
             }
             catch(ArgumentException x)
