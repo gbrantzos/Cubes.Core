@@ -18,19 +18,17 @@ namespace Cubes.Core.Scheduling
 {
     public class Scheduler : IScheduler
     {
-        public static readonly string MessageKey = "CubesScheduling::JobMessage";
-        public static readonly string ResultKey  = "CubesScheduling::JobResult";
+        public static readonly string MessageKey  = "CubesScheduling::JobMessage";
+        public static readonly string ResultKey   = "CubesScheduling::JobResult";
+        public static readonly string OnDemandKey = "CubesScheduling::JobOnDemand";
 
         private class SchedulerJobDetails
         {
-            public string Name                      { get; set; }
-            public string CronExpression            { get; set; }
-            public bool RefireIfMissed              { get; set; }
-            public string JobInstanceAsJson         { get; set; }
-            public JobKey JobKey                    { get; set; }
-            public Exception LastExecutionException { get; set; }
-            public bool LastExecutionFailed         { get; set; }
-            public string LastExecutionMessage      { get; set; }
+            public string Name              { get; set; }
+            public string CronExpression    { get; set; }
+            public bool   RefireIfMissed    { get; set; }
+            public string JobInstanceAsJson { get; set; }
+            public JobKey JobKey            { get; set; }
         }
 
         private readonly IJobFactory _jobFactory;
@@ -148,14 +146,17 @@ namespace Cubes.Core.Scheduling
                 result.SchedulerState = SchedulerStatus.State.StandBy;
 
             var jobKeys = await _quartzScheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
+            var lastExecutions = _historyManager.GetLastExecutions(_internalDetails.Select(i => i.Name)).ToList();
             foreach (var key in jobKeys)
             {
                 var jobDetail = await _quartzScheduler.GetJobDetail(key, cancellationToken);
-                var triggers = await _quartzScheduler.GetTriggersOfJob(key, cancellationToken);
-                var trigger = triggers.FirstOrDefault();
+                var triggers  = await _quartzScheduler.GetTriggersOfJob(key, cancellationToken);
+                var trigger   = triggers.FirstOrDefault();
 
-                var internalDetail = _internalDetails.First(dt => dt.JobKey.Equals(jobDetail.Key));
-                var name = internalDetail.Name;
+                var internalDetail   = _internalDetails.First(dt => dt.JobKey.Equals(jobDetail.Key));
+                var executionDetails = lastExecutions.FirstOrDefault(d => d.JobName == internalDetail.Name);
+
+                var name           = internalDetail.Name;
                 var cronExpression = internalDetail.CronExpression;
 
                 var triggerActive = trigger != null &&
@@ -163,7 +164,7 @@ namespace Cubes.Core.Scheduling
 
                 var jobStatus = new SchedulerJobStatus
                 {
-                    Name                 = name,
+                    Name                 = internalDetail.Name,
                     Active               = triggerActive,
                     RefireIfMissed       = internalDetail.RefireIfMissed,
                     JobType              = jobDetail.JobType.FullName,
@@ -173,8 +174,8 @@ namespace Cubes.Core.Scheduling
                     JobParameters        = jobDetail
                         .JobDataMap
                         .ToDictionary(p  => p.Key, p => p.Value.ToString()),
-                    LastExecutionFailed  = internalDetail.LastExecutionFailed,
-                    LastExecutionMessage = internalDetail.LastExecutionMessage
+                    LastExecutionFailed  = executionDetails?.ExecutionFailed ?? false,
+                    LastExecutionMessage = executionDetails?.ExecutionMessage ?? "-- N/A --"
                 };
                 if (!String.IsNullOrEmpty(jobStatus.CronExpression))
                 {
@@ -192,8 +193,7 @@ namespace Cubes.Core.Scheduling
 
         public async Task ExecuteJob(string name, CancellationToken cancellationToken = default)
         {
-            var internalDetail = _internalDetails
-                .FirstOrDefault(dt => dt.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            var internalDetail = _internalDetails.FirstOrDefault(dt => dt.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             if (internalDetail == null)
                 throw new ArgumentException($"Unknown job name: {name}");
 
@@ -201,6 +201,7 @@ namespace Cubes.Core.Scheduling
             var jobData = new JobDataMap();
             if (jobDetail.JobDataMap != null)
                 jobData = (JobDataMap)jobDetail.JobDataMap.Clone();
+            jobData.Add(OnDemandKey, true.ToString());
 
             await _quartzScheduler.TriggerJob(
                 new JobKey(jobDetail.Key.Name, jobDetail.Key.Group),
@@ -272,23 +273,20 @@ namespace Cubes.Core.Scheduling
             }
         }
 
-        internal void AddExecutionResults(JobKey jobKey, Exception exception, string message, bool logicalError = false, IJobExecutionContext context = null)
+        internal void AddExecutionResults(IJobExecutionContext context, Exception exception, string message, bool logicalError = false)
         {
-            var internalDetail = _internalDetails.FirstOrDefault(dt => dt.JobKey.Equals(jobKey));
+            var internalDetail = _internalDetails.FirstOrDefault(dt => dt.JobKey.Equals(context.JobDetail.Key));
             if (internalDetail == null)
-                throw new ArgumentException($"Invalid job key: {jobKey}");
+                throw new ArgumentException($"Invalid job key: {context.JobDetail.Key}");
 
-            internalDetail.LastExecutionException = exception;
-            internalDetail.LastExecutionFailed = logicalError || (exception != null);
+            string historyMessage;
             if (exception != null)
             {
                 var allMesages = exception.GetAllMessages();
-                internalDetail.LastExecutionMessage = String.Join(Environment.NewLine, allMesages);
+                historyMessage = String.Join(Environment.NewLine, allMesages);
             }
             else
-                internalDetail.LastExecutionMessage = String.IsNullOrEmpty(message)
-                    ? "Execution was successful!"
-                    : message;
+                historyMessage = String.IsNullOrEmpty(message) ? "Execution was successful!" : message;
 
             var ehd = new ExecutionHistoryDetails
             {
@@ -302,8 +300,8 @@ namespace Cubes.Core.Scheduling
                 ExecutionTime     = context.JobRunTime,
                 ExecutionFailed   = logicalError || (exception != null),
                 ExceptionThrown   = exception,
-                ExecutionMessage  = message,
-                ExecutionOnDemand = context.ScheduledFireTimeUtc == context.FireTimeUtc // TODO Get from job execution!!
+                ExecutionMessage  = historyMessage,
+                ExecutionOnDemand = (context.SafeGet(OnDemandKey)?.ToString() ?? String.Empty) == true.ToString()
             };
             _historyManager.Save(ehd);
         }
@@ -332,7 +330,7 @@ namespace Cubes.Core.Scheduling
                     message = context.Result?.ToString();
                 if (String.IsNullOrEmpty(message))
                     message = "Job executed successfully, but no details are available!";
-                scheduler.AddExecutionResults(context.JobDetail.Key, jobException, message, logicalError, context);
+                scheduler.AddExecutionResults(context, jobException, message, logicalError);
                 return Task.CompletedTask;
             }
         }

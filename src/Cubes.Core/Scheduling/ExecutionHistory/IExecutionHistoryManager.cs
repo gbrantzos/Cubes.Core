@@ -16,7 +16,7 @@ namespace Cubes.Core.Scheduling.ExecutionHistory
         /// </summary>
         /// <param name="jobNames">Job names to get execution details for</param>
         /// <returns></returns>
-        IEnumerable<ExecutionHistoryDetails> GetLastExecutions(string[] jobNames);
+        IEnumerable<ExecutionHistoryDetails> GetLastExecutions(IEnumerable<string> jobNames);
 
         /// <summary>
         /// Get execution history details for job with given name.

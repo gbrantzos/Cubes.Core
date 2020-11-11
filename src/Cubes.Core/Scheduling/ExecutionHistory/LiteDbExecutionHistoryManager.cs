@@ -30,9 +30,18 @@ namespace Cubes.Core.Scheduling.ExecutionHistory
             throw new NotImplementedException();
         }
 
-        public IEnumerable<ExecutionHistoryDetails> GetLastExecutions(string[] jobNames)
+        public IEnumerable<ExecutionHistoryDetails> GetLastExecutions(IEnumerable<string> jobNames)
         {
-            throw new NotImplementedException();
+            using var db = new LiteDatabase(_liteDbPath);
+            var collection = db.GetCollection<ExecutionHistoryDetails>();
+
+            return collection
+                .Query()
+                .Where(d => jobNames.Contains(d.JobName))
+                .ToList()
+                .GroupBy(d => d.JobName)
+                .Select(g => g.OrderByDescending(d => d.ExecutedAt).First())
+                .ToList();
         }
 
         public void Save(ExecutionHistoryDetails historyDetails)
