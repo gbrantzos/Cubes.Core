@@ -17,15 +17,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{5C0907B4-9
 		.gitignore = .gitignore
 		Cubes.Core.sln.vsspell = Cubes.Core.sln.vsspell
 		README.md = README.md
-		Version.txt = Version.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cubes.Host", "src\Cubes.Host\Cubes.Host.csproj", "{ACCD1D78-DA9E-471C-B1B3-981B2FEBA02D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{21A91696-000F-4B49-BDC9-D3A24896BFCA}"
 	ProjectSection(SolutionItems) = preProject
-		scripts\build.ps1 = scripts\build.ps1
-		scripts\Cubes.Bootstrap.ps1 = scripts\Cubes.Bootstrap.ps1
+		scripts\BumpVersion.ps1 = scripts\BumpVersion.ps1
+		scripts\CleanupNugets.ps1 = scripts\CleanupNugets.ps1
+		scripts\Cubes.Bootstrap.Sample.ps1 = scripts\Cubes.Bootstrap.Sample.ps1
+		scripts\Package.ps1 = scripts\Package.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F5F88370-397C-4308-ADFC-09BDE881DB85}"

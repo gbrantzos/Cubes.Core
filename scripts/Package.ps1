@@ -23,7 +23,7 @@ param(
 # ------------------------------------------------------------------------------
 # Variables
 
-# Location 
+# Location
 $originalPath = Get-Location
 $workingPath  = ($PSScriptRoot)
 $rootPath     = (Get-Item $workingPath).Parent
@@ -60,17 +60,17 @@ function Prepare-Version {
         if (!$tag) {
             Write-Host "No Git TAG defined!"
             exit 1
-        }         
+        }
         $tmp=$tag
         $source="Git"
     } else {
         $tmp=$version
         $source="parameters"
     }
-    
+
     # Sanitize version, remove extra v
     if ($tmp.StartsWith("v")) { $tmp=$tmp.SubString(1) }
-    
+
     # Check version format
     $re=[regex]"([0-9]\.[0-9]\.[0-9])(\-){0,1}((.)*)"
     $m=$re.Match($tmp)
@@ -78,24 +78,24 @@ function Prepare-Version {
         Write-Host "Invalid version format! $tmp"
         exit 2
     }
-    
+
     $script:version = $m.Groups[1].Value
     $info = $m.Groups[3].Value
     if ($info -eq "") {
         $script:versionInfo="$script:version"
     } else {
-        
+
         $script:versionInfo="$script:version-$info"
     }
-    
+
     Write-Host "Version $script:version, full version $script:versionInfo (from $source)..."
     Write-Host "Git commit $gitHash, branch $gitBranch"
-}    
+}
 
 # Check for GIT pending changes
 function Pending-Changes {
     if ($allowDirty) { return }
-    
+
     $st = (git status -su)
     if (![string]::ISNullOrEmpty($st)) {
         Write-Host "`n`nGit repository has pending changes!`nAborting..."
@@ -122,12 +122,12 @@ function Clear-Folder {
 function Initialize-Banner {
     $script:banner = "
 
-   ______      __                 ______              
-  / ____/_  __/ /_  ___  _____   / ____/___  ________ 
+   ______      __                 ______
+  / ____/_  __/ /_  ___  _____   / ____/___  ________
  / /   / / / / __ \/ _ \/ ___/  / /   / __ \/ ___/ _ \
 / /___/ /_/ / /_/ /  __(__  )  / /___/ /_/ / /  /  __/
-\____/\__,_/_.___/\___/____/   \____/\____/_/   \___/ 
-                                                      
+\____/\__,_/_.___/\___/____/   \____/\____/_/   \___/
+
 
 "
 }
@@ -138,7 +138,7 @@ function Display-Banner { Write-Host $banner }
 # Build
 function Build-Solution {
     $config = $(if ([string]::IsNullOrEmpty($configuration)) { "Release" } else { $configuration })
-    
+
     $srcPath = Join-Path -Path $rootPath -ChildPath 'src'
     dotnet clean -c $config "$srcPath/Cubes.Core/Cubes.Core.csproj"
     dotnet build -c $config "$srcPath/Cubes.Core/Cubes.Core.csproj" `
@@ -150,7 +150,7 @@ function Build-Solution {
         -p:AssemblyVersion=$version `
         -p:FileVersion=$version `
         -p:InformationalVersion=$versionInfo
-        
+
     dotnet publish "$srcPath/Cubes.Host/Cubes.Host.csproj" `
         --no-build `
         -o $outputFolder `
@@ -170,7 +170,7 @@ function Create-Package {
     if (!(Test-Path $packageFolder)) {
         New-Item -ItemType Directory -Force -Path $packageFolder | Out-Null
     }
-    
+
     Remove-Item "$outputFolder/appsettings.Development.json"
     Compress-Archive `
         -Path "$outputFolder\*" `
@@ -183,14 +183,14 @@ function Deploy-Package {
     if ($deploy) {
         $config = $(if ([string]::IsNullOrEmpty($configuration)) { "Release" } else { $configuration })
         $srcPath = Join-Path -Path $rootPath -ChildPath 'src'
-        
+
         dotnet pack "$srcPath/Cubes.Core/Cubes.Core.csproj" `
             --no-build `
             -c $config `
             -p:PackageVersion=$versionInfo `
             -o $outputFolder
         Copy-Item -Path "$outputFolder/$project.$versionInfo.nupkg" -Destination $packageFolder
-        
+
         Write-Host 'Pushing nuget package...'
         dotnet nuget push `
             -s $nugetServer `
