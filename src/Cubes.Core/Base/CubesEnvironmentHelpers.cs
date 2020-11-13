@@ -9,6 +9,7 @@ namespace Cubes.Core.Base
 {
     public static class CubesEnvironmentHelpers
     {
+        private static readonly string BinariesPath = Path.GetDirectoryName(typeof(CubesEnvironment).Assembly.Location);
         private static readonly char[] Separators = new char[] { ',', ';' };
 
         /// <summary>
@@ -31,6 +32,7 @@ namespace Cubes.Core.Base
                 if (argIndex != -1 && (argIndex + 1) < args.Length)
                     toReturn = argsList[argIndex + 1];
             }
+            toReturn = ReplaceVariables(toReturn);
 
             return String.IsNullOrEmpty(toReturn) ?
                 Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) : toReturn;
@@ -69,8 +71,9 @@ namespace Cubes.Core.Base
 
             // Make paths to process absolute
             var absolutePaths = new List<string>();
-            foreach (var path in toProcess)
+            foreach (var p in toProcess)
             {
+                var path = ReplaceVariables(p);
                 var actualPath = File.Exists(path) ?
                     path :
                     Path.Combine(rootFolder, path);
@@ -114,11 +117,18 @@ namespace Cubes.Core.Base
                 if (argIndex != -1 && (argIndex + 1) < args.Length)
                     toReturn = argsList[argIndex + 1];
             }
+            toReturn = ReplaceVariables(toReturn);
 
             string fallBack = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 "CubesManagement.zip");
             return Path.GetFullPath(String.IsNullOrEmpty(toReturn) ? fallBack : toReturn);
+        }
+
+        private static string ReplaceVariables(string toReturn)
+        {
+            var index = toReturn.IndexOf("${BINARIES}", StringComparison.OrdinalIgnoreCase);
+            return index >= 0 ? toReturn.Replace("${BINARIES}", BinariesPath) : toReturn;
         }
     }
 }

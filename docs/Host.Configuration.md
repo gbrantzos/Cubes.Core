@@ -13,6 +13,10 @@ Command Line Parameter | Environment Variable | Value
 --application | CUBES_APPLICATION | A path to an application manifest file. 
 --admin | CUBES_ADMIN | Path to CubesManagement.zip file (web management UI).
 
+All settings can contain `${BINARIES}` variable which will be replaced by the actual binaries path 
+(where `Cubes.Core.Dll` exists) 
+
+
 #### AppSettings 
 
 To avoid overwriting `appsettings.json` file, Cubes tries to load settings from Configuration folder (CUBES_ROOT\Config). 

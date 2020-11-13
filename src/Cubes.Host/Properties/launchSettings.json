@@ -22,8 +22,8 @@
       "launchUrl": "api/values",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CUBES_ADMIN": "..\\..\\..\\Core.WebApp\\dist\\CubesManagement.zip",
-        "CUBES_APPLICATION": "..\\..\\..\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
+        "CUBES_ADMIN": "${BINARIES}\\..\\..\\..\\..\\..\\..\\Core.WebApp\\dist\\CubesManagement.zip",
+        "CUBES_APPLICATION": "${BINARIES}\\..\\..\\..\\..\\..\\..\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
@@ -31,8 +31,8 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production",
-        "CUBES_ADMIN": "..\\..\\..\\Core.WebApp\\dist\\CubesManagement.zip",
-        "CUBES_APPLICATION": "..\\..\\..\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
+        "CUBES_ADMIN": "${BINARIES}\\..\\..\\..\\..\\..\\..\\Core.WebApp\\dist\\CubesManagement.zip",
+        "CUBES_APPLICATION": "${BINARIES}\\..\\..\\..\\..\\..\\..\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
       }
     },
     "WSL 2": {
@@ -41,8 +41,8 @@
       "environmentVariables": {
         "ASPNETCORE_URLS": "https://localhost:5001;http://localhost:5000",
         "ASPNETCORE_ENVIRONMENT": "Production",
-        "CUBES_ADMIN": "..\\..\\..\\Core.WebApp\\dist\\CubesManagement.zip",
-        "CUBES_APPLICATION": "..\\..\\..\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
+        "CUBES_ADMIN": "${BINARIES}\\..\\..\\..\\..\\..\\..\\Core.WebApp\\dist\\CubesManagement.zip",
+        "CUBES_APPLICATION": "${BINARIES}\\..\\..\\..\\..\\..\\..\\Pharmex.App\\src\\Cubes.Pharmex\\bin\\Debug\\netcoreapp3.1\\Cubes.Pharmex.yaml"
       },
       "distributionName": ""
     }

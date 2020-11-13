@@ -26,7 +26,7 @@ namespace Cubes.Core.Commands
             CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
-            var context = new ValidationContext(request);
+            var context = new ValidationContext<TRequest>(request);
             var failures = _validators
                 .Select(v => v.Validate(context))
                 .SelectMany(r => r.Errors)
