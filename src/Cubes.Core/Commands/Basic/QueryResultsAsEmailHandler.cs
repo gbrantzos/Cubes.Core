@@ -47,7 +47,7 @@ namespace Cubes.Core.Commands.Basic
                     {
                         FileName    = $"{command.FileName}_{ DateTime.Now:ddMMyyyy}.xlsx",
                         ContentType = "application/vnd.ms-excel",
-                        Content     = results.ToExcelPackage()
+                        Content     = results.ToExcelWorkbook()
                     }
                 };
             }

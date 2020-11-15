@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using OfficeOpenXml;
 
 namespace Cubes.Core
 {
@@ -22,11 +21,7 @@ namespace Cubes.Core
             // Encodings
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            // EPPlus license
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             var cubesConfig = configuration.GetCubesConfiguration();
-
             services.AddDataAccess(configuration)
                 .AddEmailDispatcher(configuration)
                 .AddScheduler(typeof(StartupExtensions).Assembly)
