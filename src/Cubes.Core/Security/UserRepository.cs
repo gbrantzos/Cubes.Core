@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Cubes.Core.Base;
 using LiteDB;
-using Microsoft.Extensions.Options;
 
 namespace Cubes.Core.Security
 {
@@ -16,18 +14,18 @@ namespace Cubes.Core.Security
 
     public class UserRepository : IUserRepository
     {
-        private readonly string dbPath;
-        private readonly InternalAdminPassword adminPassword;
+        private readonly InternalAdminPassword _adminPassword;
+        private readonly SecurityStorage _storage;
 
-        public UserRepository(InternalAdminPassword adminPassword, IOptions<CubesConfiguration> configuration)
+        public UserRepository(InternalAdminPassword adminPassword, SecurityStorage storage)
         {
-            this.adminPassword = adminPassword;
-            this.dbPath = Path.Combine(configuration.Value.StorageFolder, CubesConstants.Authentication_Persistence);
+            _adminPassword = adminPassword;
+            _storage = storage;
         }
 
         public Task<User> GetUser(string userName, string password)
         {
-            if (userName == CubesConstants.Authentication_InternalAdmin && password == adminPassword.Password)
+            if (userName == CubesConstants.Authentication_InternalAdmin && password == _adminPassword.Password)
             {
                 var adminUser = new User
                 {
@@ -41,9 +39,7 @@ namespace Cubes.Core.Security
                 return Task.FromResult(adminUser);
             }
 
-            using var storage = GetStorage();
-            var user = storage
-                .GetCollection<User>()
+            var user = _storage.Users
                 .FindOne(u => u.UserName.Equals(userName, StringComparison.OrdinalIgnoreCase));
             if (user == null)
                 return Task.FromResult<User>(null);
@@ -57,8 +53,7 @@ namespace Cubes.Core.Security
 
         public Task SaveUser(UserDetails userDetails, string password)
         {
-            using var storage = GetStorage();
-            var userCollection = storage.GetCollection<User>();
+            var userCollection = _storage.Users;
             var existing = userCollection
                 .FindOne(u => u.ID == userDetails.ID);
             bool isNew = existing == null;
@@ -81,8 +76,7 @@ namespace Cubes.Core.Security
 
         public Task DeleteUser(string userName)
         {
-            using var storage = GetStorage();
-            var userCollection = storage.GetCollection<User>();
+            var userCollection = _storage.Users;
             var existing = userCollection
                 .FindOne(u => u.UserName.Equals(userName, StringComparison.OrdinalIgnoreCase));
             if (existing != null)
@@ -93,17 +87,13 @@ namespace Cubes.Core.Security
 
         public Task<IEnumerable<UserDetails>> GetAll()
         {
-            using var storage = GetStorage();
-            var users = storage
-                .GetCollection<User>()
+            var users = _storage.Users
                 .FindAll()
                 .Select(u => u.UserDetails())
                 .ToList();
 
             return Task.FromResult(users.AsEnumerable());
         }
-
-        private LiteDatabase GetStorage() => new LiteDatabase(dbPath);
 
         private string ComputeHash(string input)
         {

@@ -6,6 +6,8 @@ namespace Cubes.Core.Security
     public interface IRoleRepository
     {
         Task<IEnumerable<Role>> Get();
-        Task Save(IEnumerable<Role> roles);
+        Task AddRoles(IEnumerable<Role> roles);
+        Task DeleteByCode(IEnumerable<string> toDelete);
+        Task Update(IEnumerable<Role> toUpdate);
     }
 }

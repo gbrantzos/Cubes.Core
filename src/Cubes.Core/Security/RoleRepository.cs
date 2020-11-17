@@ -1,27 +1,19 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Cubes.Core.Base;
 using LiteDB;
-using Microsoft.Extensions.Options;
 
 namespace Cubes.Core.Security
 {
     public class RoleRepository : IRoleRepository
     {
-        private readonly string dbPath;
+        private readonly SecurityStorage _storage;
 
-        public RoleRepository(IOptions<CubesConfiguration> configuration)
-        {
-            this.dbPath = Path.Combine(configuration.Value.StorageFolder, CubesConstants.Authentication_Persistence);
-        }
+        public RoleRepository(SecurityStorage storage) => _storage = storage;
 
         public Task<IEnumerable<Role>> Get()
         {
-            using var storage = GetStorage();
-            var roles = storage
-                .GetCollection<Role>()
+            var roles = _storage.Roles
                 .FindAll()
                 .ToList();
 
@@ -29,17 +21,40 @@ namespace Cubes.Core.Security
             return Task.FromResult(toReturn.AsEnumerable());
         }
 
-        public Task Save(IEnumerable<Role> roles)
+        public Task Update(IEnumerable<Role> toUpdate)
         {
-            using var storage = GetStorage();
-            var rolesCollection = storage.GetCollection<Role>();
-            rolesCollection.DeleteAll();
-            rolesCollection.InsertBulk(roles.Where(r => !r.IsSystem));
+            var rolesCollection = _storage.Roles;
+            var existing = rolesCollection.FindAll().ToList();
+
+            foreach (var role in existing)
+            {
+                var r = toUpdate.FirstOrDefault(r => r.Code == role.Code);
+                if (r != null)
+                {
+                    rolesCollection.DeleteMany(i => i.Code == r.Code);
+                    rolesCollection.Insert(r);
+                }
+            }
             rolesCollection.EnsureIndex(r => r.Code, true);
 
             return Task.CompletedTask;
         }
 
-        private LiteDatabase GetStorage() => new LiteDatabase(dbPath);
+        public Task DeleteByCode(IEnumerable<string> toDelete)
+        {
+            var rolesCollection = _storage.Roles;
+            rolesCollection.DeleteMany(r => toDelete.Contains(r.Code));
+
+            return Task.CompletedTask;
+        }
+
+        public Task AddRoles(IEnumerable<Role> roles)
+        {
+            var rolesCollection = _storage.Roles;
+            rolesCollection.InsertBulk(roles);
+            rolesCollection.EnsureIndex(r => r.Code, true);
+
+            return Task.CompletedTask;
+        }
     }
 }
