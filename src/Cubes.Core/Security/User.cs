@@ -40,7 +40,6 @@ namespace Cubes.Core.Security
         public static UserDetails UserDetails(this User user)
             => new UserDetails
             {
-                ID          = user.ID,
                 UserName    = user.UserName,
                 DisplayName = user.DisplayName,
                 Roles       = user.Roles.ToList(),

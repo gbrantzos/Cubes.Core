@@ -55,7 +55,7 @@ namespace Cubes.Core.Security
         {
             var userCollection = _storage.Users;
             var existing = userCollection
-                .FindOne(u => u.ID == userDetails.ID);
+                .FindOne(u => u.UserName.Equals(userDetails.UserName, StringComparison.OrdinalIgnoreCase));
             bool isNew = existing == null;
 
             var user = isNew ? new User() : existing;
