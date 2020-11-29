@@ -1,15 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using MimeKit;
+using Polly;
 
 namespace Cubes.Core.Email
 {
     public class EmailDispatcher : IEmailDispatcher
     {
+        private readonly int _maxRetries = 5;
         private readonly ISmtpClient _client;
+        private readonly ILogger<EmailDispatcher> _logger;
 
-        public EmailDispatcher(ISmtpClient client) => _client = client;
+        public EmailDispatcher(ISmtpClient client, ILogger<EmailDispatcher> logger)
+        {
+            _client = client;
+            _logger = logger;
+        }
 
         public virtual void DispatchEmail(EmailContent content, SmtpSettings smtpSettings)
         {
@@ -30,7 +39,16 @@ namespace Cubes.Core.Email
                 }
             }
             mail.Body = bodyBuilder.ToMessageBody();
-            _client.Send(mail, smtpSettings);
+
+            var policy = Policy
+                .Handle<Exception>()
+                .WaitAndRetry(_maxRetries,
+                    retry => TimeSpan.FromSeconds(Math.Pow(2, retry)),
+                    onRetry: (ex, ts, retry, __) =>
+                    {
+                        _logger.LogWarning($"Mail dispatch failed: {ex.Message}. Retrying after {ts.TotalSeconds} secs (retry {retry} of {_maxRetries})...");
+                    });
+            policy.Execute(() => _client.Send(mail, smtpSettings));
 
             cleanup.ForEach(m => m?.Dispose());
         }

@@ -50,6 +50,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.9" />
     <PackageReference Include="NETCore.MailKit" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Polly" Version="7.2.1" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="4.0.0" />
     <PackageReference Include="System.IO.Abstractions" Version="12.2.21" PrivateAssets="All" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" PrivateAssets="All" />
