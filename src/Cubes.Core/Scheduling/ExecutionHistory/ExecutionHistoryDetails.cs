@@ -16,7 +16,7 @@ namespace Cubes.Core.Scheduling.ExecutionHistory
         public string JobInstance { get; set; }
         public bool ExecutionFailed { get; set; }
         public string ExecutionMessage { get; set; }
-        public Exception ExceptionThrown { get; set; }
+        public string ExceptionThrown { get; set; }
 
         public override string ToString() => $"{JobName ?? "No Job name defined"} at {ExecutedAt}";
     }

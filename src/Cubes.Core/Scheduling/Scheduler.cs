@@ -169,7 +169,7 @@ namespace Cubes.Core.Scheduling
                     RefireIfMissed       = internalDetail.RefireIfMissed,
                     JobType              = jobDetail.JobType.FullName,
                     CronExpression       = cronExpression,
-                    PreviousFireTime     = trigger?.GetPreviousFireTimeUtc()?.ToLocalTime().DateTime,
+                    PreviousFireTime     = executionDetails?.ExecutedAt,
                     NextFireTime         = trigger?.GetNextFireTimeUtc()?.ToLocalTime().DateTime,
                     JobParameters        = jobDetail
                         .JobDataMap
@@ -299,7 +299,7 @@ namespace Cubes.Core.Scheduling
                 ExecutedAt        = context.FireTimeUtc.LocalDateTime,
                 ExecutionTime     = context.JobRunTime,
                 ExecutionFailed   = logicalError || (exception != null),
-                ExceptionThrown   = exception,
+                ExceptionThrown   = exception.AsJson(),
                 ExecutionMessage  = historyMessage,
                 ExecutionOnDemand = (context.MergedJobDataMap?.GetString(OnDemandKey) ?? String.Empty) == true.ToString()
             };
