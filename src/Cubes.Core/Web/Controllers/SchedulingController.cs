@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Cubes.Core.Base;
 using Cubes.Core.Configuration;
 using Cubes.Core.Scheduling;
+using Cubes.Core.Scheduling.ExecutionHistory;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cubes.Core.Web.Controllers
@@ -11,14 +12,17 @@ namespace Cubes.Core.Web.Controllers
     [ApiController, Route("api/[controller]")]
     public class SchedulingController : ControllerBase
     {
-        private readonly IScheduler scheduler;
-        private readonly IConfigurationWriter configurationWriter;
+        private readonly IScheduler _scheduler;
+        private readonly IConfigurationWriter _configurationWriter;
+        private readonly IExecutionHistoryManager _historyManager;
 
         public SchedulingController(IScheduler scheduler,
-            IConfigurationWriter configurationWriter)
+            IConfigurationWriter configurationWriter,
+            IExecutionHistoryManager historyManager)
         {
-            this.scheduler           = scheduler;
-            this.configurationWriter = configurationWriter;
+            _scheduler           = scheduler;
+            _configurationWriter = configurationWriter;
+            _historyManager      = historyManager;
         }
 
         /// <summary>
@@ -27,7 +31,7 @@ namespace Cubes.Core.Web.Controllers
         /// <remarks>Get current scheduler status with jobs details.</remarks>
         /// <returns><see cref="SchedulerStatus"/></returns>
         [HttpGet]
-        public Task<SchedulerStatus> GetStatus() => scheduler.GetStatus();
+        public Task<SchedulerStatus> GetStatus() => _scheduler.GetStatus();
 
         /// <summary>
         /// Execute Job
@@ -42,10 +46,10 @@ namespace Cubes.Core.Web.Controllers
         {
             try
             {
-                await scheduler.ExecuteJob(jobName);
+                await _scheduler.ExecuteJob(jobName);
                 return Ok("Job was triggered successfully!");
             }
-            catch(ArgumentException x)
+            catch (ArgumentException x)
             {
                 return BadRequest(x.Message);
             }
@@ -68,13 +72,13 @@ namespace Cubes.Core.Web.Controllers
                 return BadRequest($"Command {command} is unknown!");
 
             if (command == "stop")
-                await scheduler.Stop();
+                await _scheduler.Stop();
             if (command == "start")
-                await scheduler.Start();
+                await _scheduler.Start();
             if (command == "reload")
-                await scheduler.Reload();
+                await _scheduler.Reload();
 
-            return Ok(await scheduler.GetStatus());
+            return Ok(await _scheduler.GetStatus());
         }
 
         /// <summary>
@@ -95,13 +99,24 @@ namespace Cubes.Core.Web.Controllers
             {
                 return BadRequest(x.ToString());
             }
-            this.configurationWriter.Save(settings);
+            this._configurationWriter.Save(settings);
 
             // Give some time to IConfiguration to grab changes!
             await Task.Delay(1500);
-            await scheduler.Reload();
+            await _scheduler.Reload();
 
-            return Ok(await scheduler.GetStatus());
+            return Ok(await _scheduler.GetStatus());
         }
+
+        /// <summary>
+        /// Get scheduler job execution history.
+        /// </summary>
+        /// <remarks>
+        /// Get execution history details for requested job.
+        /// </remarks>
+        /// <param name="jobName">Job name</param>
+        /// <returns>Returns execution history as an <see cref="IEnumerable{T}"/> of <see cref="ExecutionHistoryDetails"/>.</returns>
+        [HttpGet, Route("{jobName}/history")]
+        public IEnumerable<ExecutionHistoryDetails> JobHistory(string jobName) => _historyManager.Get(jobName);
     }
 }

@@ -18,7 +18,7 @@ namespace Cubes.Core.Tests.Email
         {
             //Given
             var smtpClientMock = mockRepository.Create<ISmtpClient>();
-            var sut = new EmailDispatcher(smtpClientMock.Object);
+            var sut = new EmailDispatcher(smtpClientMock.Object, null);
             var emailContent = new EmailContent
             {
                 Body        = "This is a body",
