@@ -246,13 +246,41 @@ namespace Cubes.Core.Base
             #if DEBUG
             var thisAsm = typeof(CubesEnvironment).Assembly;
             loadedAssembliesNames.Add(thisAsm.GetName().Name);
-            #endif
+#endif
 
+            var loadMessages = new List<string>();
             var applicationTypes = domainAssemblies
                 .Where(l => loadedAssembliesNames.Contains(l.GetName().Name))
-                .SelectMany(asm => asm.GetTypes())
+                .SelectMany(asm =>
+                {
+                    try
+                    {
+                        return asm.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException x)
+                    {
+                        // Unable to load one or more of the requested types.
+                        var messages = x.LoaderExceptions
+                            .Select(e => $"[{asm.GetName().Name}] {e.Message}")
+                            .Distinct()
+                            .ToList();
+                        foreach (var message in messages)
+                        {
+                            if (!loadMessages.Contains(message))
+                                loadMessages.Add(message);
+                        }
+
+                        return Array.Empty<Type>();
+                    }
+                })
                 .Where(t => typeof(IApplication).IsAssignableFrom(t) && !t.IsAbstract)
                 .ToList();
+            if (loadMessages.Count > 0)
+            {
+                var message = String.Join("\r\n", loadMessages);
+                throw new Exception($"Unable to load types!\r\n{message}");
+            }
+
             foreach (var applicationType in applicationTypes)
             {
                 var instance = Activator.CreateInstance(applicationType) as IApplication;
