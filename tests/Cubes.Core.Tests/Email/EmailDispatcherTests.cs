@@ -9,15 +9,15 @@ namespace Cubes.Core.Tests.Email
 {
     public class EmailDispatcherTests : IDisposable
     {
-        private MockRepository mockRepository;
-        public EmailDispatcherTests() => mockRepository = new MockRepository(MockBehavior.Strict);
-        public void Dispose() => mockRepository.VerifyAll();
+        private readonly MockRepository _mockRepository;
+        public EmailDispatcherTests() => _mockRepository = new MockRepository(MockBehavior.Strict);
+        public void Dispose() => _mockRepository.VerifyAll();
 
         [Fact]
         public void When_MessageDispatched_SendIsCalledOnClient()
         {
             //Given
-            var smtpClientMock = mockRepository.Create<ISmtpClient>();
+            var smtpClientMock = _mockRepository.Create<ISmtpClient>();
             var sut = new EmailDispatcher(smtpClientMock.Object, null);
             var emailContent = new EmailContent
             {

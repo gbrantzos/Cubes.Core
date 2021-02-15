@@ -54,13 +54,13 @@ namespace Cubes.Core.Base
             if (!String.IsNullOrEmpty(appsFromVariable))
                 toProcess.AddRange(appsFromVariable.Split(Separators, StringSplitOptions.RemoveEmptyEntries));
 
-            if (args.Length > 0)
+            if (argsList.Count > 0)
             {
                 int argIndex = 0;
                 do
                 {
                     argIndex = argsList.FindIndex(argIndex, arg => arg.Equals("--application", StringComparison.OrdinalIgnoreCase));
-                    if (argIndex != -1 && (argIndex + 1) < args.Length)
+                    if (argIndex != -1 && (argIndex + 1) < argsList.Count)
                     {
                         argIndex++;
                         toProcess.Add(argsList[argIndex]);

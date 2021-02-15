@@ -10,17 +10,17 @@ namespace Cubes.Core.Configuration
 {
     public class ConfigurationWriter : IConfigurationWriter
     {
-        private readonly ITypeResolver typeResolver;
-        private readonly ICubesEnvironment cubesEnvironment;
-        private readonly List<ISerializer> serializers;
+        private readonly ITypeResolver _typeResolver;
+        private readonly ICubesEnvironment _cubesEnvironment;
+        private readonly List<ISerializer> _serializers;
 
         public ConfigurationWriter(ITypeResolver typeResolver,
             ICubesEnvironment cubesEnvironment,
             IEnumerable<ISerializer> serializers)
         {
-            this.typeResolver     = typeResolver;
-            this.cubesEnvironment = cubesEnvironment;
-            this.serializers      = serializers.ToList();
+            _typeResolver     = typeResolver;
+            _cubesEnvironment = cubesEnvironment;
+            _serializers      = serializers.ToList();
         }
 
         public void Save(Type configType, object configInstance)
@@ -29,12 +29,12 @@ namespace Cubes.Core.Configuration
             if (storeAttribute == null)
                 throw new ArgumentException($"No configuration storage attribute for type '{configType.Name}'.");
 
-            var path = Path.Combine(cubesEnvironment.GetFolder(storeAttribute.CubesFolder), storeAttribute.FilePath);
+            var path = Path.Combine(_cubesEnvironment.GetFolder(storeAttribute.CubesFolder), storeAttribute.FilePath);
             var format = Path.GetExtension(path);
             if (format.StartsWith("."))
                 format = format.Substring(1);
 
-            var serializer = serializers.Find(s => s.Format.Equals(format, StringComparison.CurrentCultureIgnoreCase));
+            var serializer = _serializers.Find(s => s.Format.Equals(format, StringComparison.CurrentCultureIgnoreCase));
             if (serializer == null)
                 throw new ArgumentException($"No serializer defined for format '{format}'.");
 
@@ -47,7 +47,7 @@ namespace Cubes.Core.Configuration
 
         public void Save(string configTypeName, object configInstance)
         {
-            var configType = typeResolver.GetByName(configTypeName);
+            var configType = _typeResolver.GetByName(configTypeName);
             if (configTypeName == null)
                 throw new ArgumentException($"Could not resolve type '{configTypeName}'.");
 

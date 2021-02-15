@@ -7,8 +7,8 @@ namespace Cubes.Core.Configuration
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class ConfigurationStoreAttribute : Attribute
     {
-        public CubesFolderKind CubesFolder { get; set; }
-        public string FilePath { get; set; }
+        public CubesFolderKind CubesFolder { get; }
+        public string FilePath { get; }
 
         public ConfigurationStoreAttribute(CubesFolderKind cubesFolder, string filePath)
         {
