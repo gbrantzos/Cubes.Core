@@ -25,6 +25,7 @@ namespace Cubes.Core.DataAccess
                 {
                     Name = queryItem.Name,
                     Data = results,
+                    Metadata = query.Metadata
                 };
                 var firstRow = (IDictionary<string, object>)results.FirstOrDefault();
                 if (firstRow != null)
@@ -62,5 +63,7 @@ namespace Cubes.Core.DataAccess
             public string Name { get; set; }
             public Type ColumnType { get; set; }
         }
+
+        public QueryMetadata Metadata { get; set; }
     }
 }

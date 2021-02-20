@@ -145,18 +145,19 @@ namespace Cubes.Core.Scheduling
             if (_quartzScheduler.InStandbyMode)
                 result.SchedulerState = SchedulerStatus.State.StandBy;
 
-            var jobKeys = await _quartzScheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
+            var jobKeys = await _quartzScheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup(), cancellationToken);
             var lastExecutions = _historyManager.GetLastExecutions(_internalDetails.Select(i => i.Name)).ToList();
             foreach (var key in jobKeys)
             {
                 var jobDetail = await _quartzScheduler.GetJobDetail(key, cancellationToken);
+                if (jobDetail == null) continue;
+
                 var triggers  = await _quartzScheduler.GetTriggersOfJob(key, cancellationToken);
                 var trigger   = triggers.FirstOrDefault();
 
                 var internalDetail   = _internalDetails.First(dt => dt.JobKey.Equals(jobDetail.Key));
                 var executionDetails = lastExecutions.FirstOrDefault(d => d.JobName == internalDetail.Name);
 
-                var name           = internalDetail.Name;
                 var cronExpression = internalDetail.CronExpression;
 
                 var triggerActive = trigger != null &&
@@ -186,7 +187,7 @@ namespace Cubes.Core.Scheduling
 
                 result.Jobs.Add(jobStatus);
             }
-            result.Jobs.Sort((job1, job2) => job1.Name.CompareTo(job2.Name));
+            result.Jobs.Sort((job1, job2) => String.Compare(job1.Name, job2.Name, StringComparison.Ordinal));
 
             return result;
         }
@@ -197,7 +198,7 @@ namespace Cubes.Core.Scheduling
             if (internalDetail == null)
                 throw new ArgumentException($"Unknown job name: {name}");
 
-            var jobDetail = await _quartzScheduler.GetJobDetail(internalDetail.JobKey);
+            var jobDetail = await _quartzScheduler.GetJobDetail(internalDetail.JobKey, cancellationToken);
             var jobData = new JobDataMap();
             if (jobDetail.JobDataMap != null)
                 jobData = (JobDataMap)jobDetail.JobDataMap.Clone();
@@ -273,7 +274,7 @@ namespace Cubes.Core.Scheduling
             }
         }
 
-        internal void AddExecutionResults(IJobExecutionContext context, Exception exception, string message, bool logicalError = false)
+        private void AddExecutionResults(IJobExecutionContext context, Exception exception, string message, bool logicalError = false)
         {
             var internalDetail = _internalDetails.FirstOrDefault(dt => dt.JobKey.Equals(context.JobDetail.Key));
             if (internalDetail == null)
@@ -308,9 +309,9 @@ namespace Cubes.Core.Scheduling
 
         private class JobListener : IJobListener
         {
-            private readonly Scheduler scheduler;
+            private readonly Scheduler _scheduler;
 
-            public JobListener(Scheduler scheduler) => this.scheduler = scheduler;
+            public JobListener(Scheduler scheduler) => _scheduler = scheduler;
 
             public string Name => "Internal Job Listener [Cubes.Core]";
 
@@ -324,13 +325,13 @@ namespace Cubes.Core.Scheduling
             {
                 string message = context.SafeGet(Scheduler.MessageKey)?.ToString();
                 string tmp = context.SafeGet(Scheduler.ResultKey)?.ToString();
-                bool logicalError = String.IsNullOrEmpty(tmp)? false : tmp.Equals(Boolean.TrueString);
+                bool logicalError = String.IsNullOrEmpty(tmp) ? false : tmp.Equals(Boolean.TrueString);
 
                 if (String.IsNullOrEmpty(message) && context.Result != null)
                     message = context.Result?.ToString();
                 if (String.IsNullOrEmpty(message))
                     message = "Job executed successfully, but no details are available!";
-                scheduler.AddExecutionResults(context, jobException, message, logicalError);
+                _scheduler.AddExecutionResults(context, jobException, message, logicalError);
                 return Task.CompletedTask;
             }
         }

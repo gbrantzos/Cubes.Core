@@ -78,33 +78,36 @@ namespace Cubes.Core.Utilities
             ws.Style.Font.Bold     = formattingSettings.DefaultFont.IsBold;
             ws.Style.Font.Italic   = formattingSettings.DefaultFont.IsItalic;
 
-            int iColumn = 0;
+            int iColumn = 1;
+            int iRow = 1;
             // Add headers
             if (formattingSettings.HeaderSettings.AddHeaders)
             {
                 //Header font settings
-                ws.Row(1).Style.Font.FontName = formattingSettings.HeaderSettings.Font.Family;
-                ws.Row(1).Style.Font.FontSize = formattingSettings.HeaderSettings.Font.Size;
-                ws.Row(1).Style.Font.Bold     = formattingSettings.HeaderSettings.Font.IsBold;
-                ws.Row(1).Style.Font.Italic   = formattingSettings.HeaderSettings.Font.IsItalic;
+                ws.Row(iRow).Style.Font.FontName = formattingSettings.HeaderSettings.Font.Family;
+                ws.Row(iRow).Style.Font.FontSize = formattingSettings.HeaderSettings.Font.Size;
+                ws.Row(iRow).Style.Font.Bold     = formattingSettings.HeaderSettings.Font.IsBold;
+                ws.Row(iRow).Style.Font.Italic   = formattingSettings.HeaderSettings.Font.IsItalic;
 
                 foreach (var prop in props)
                 {
                     var columnSettings = prop.GetCustomAttribute<ColumnSettingsAttribute>();
-                    ws.Cell(1, ++iColumn).Value = columnSettings == null ? prop.Name : columnSettings.Header;
+                    ws.Cell(iRow, iColumn++).Value = columnSettings == null ? prop.Name : columnSettings.Header;
                 }
+
+                iRow++;
             }
 
             // Add data
-            int iRow = 2;
             foreach (var obj in data)
             {
-                iColumn = 0;
+                iColumn = 1;
                 for (int i = 0; i < props.Length; i++)
                 {
-                    ws.Cell(iRow, ++iColumn).Value = props[i].GetValue(obj);
-                    if (props[i].PropertyType.Equals(typeof(DateTime)))
+                    ws.Cell(iRow, iColumn).Value = props[i].GetValue(obj);
+                    if (props[i].PropertyType == typeof(DateTime))
                         ws.Cell(iRow, iColumn).Style.DateFormat.Format = formattingSettings.DateFormat;
+                    iColumn++;
                 }
                 iRow++;
             }
@@ -136,34 +139,63 @@ namespace Cubes.Core.Utilities
             ws.Style.Font.Bold     = formattingSettings.DefaultFont.IsBold;
             ws.Style.Font.Italic   = formattingSettings.DefaultFont.IsItalic;
 
-            int iColumn = 0;
+            int iColumn = 1;
+            int iRow = 1;
+            var columns = result.Columns.ToList();
+
             // Add headers
             if (formattingSettings.HeaderSettings.AddHeaders)
             {
                 //Header font settings
-                ws.Row(1).Style.Font.FontName = formattingSettings.HeaderSettings.Font.Family;
-                ws.Row(1).Style.Font.FontSize = formattingSettings.HeaderSettings.Font.Size;
-                ws.Row(1).Style.Font.Bold     = formattingSettings.HeaderSettings.Font.IsBold;
-                ws.Row(1).Style.Font.Italic   = formattingSettings.HeaderSettings.Font.IsItalic;
+                ws.Row(iRow).Style.Font.FontName = formattingSettings.HeaderSettings.Font.Family;
+                ws.Row(iRow).Style.Font.FontSize = formattingSettings.HeaderSettings.Font.Size;
+                ws.Row(iRow).Style.Font.Bold     = formattingSettings.HeaderSettings.Font.IsBold;
+                ws.Row(iRow).Style.Font.Italic   = formattingSettings.HeaderSettings.Font.IsItalic;
 
                 foreach (var column in result.Columns)
-                    ws.Cell(1, ++iColumn).Value = column.Name;
+                {
+                    var md = result.Metadata.Columns.FirstOrDefault(c => c.Name == column.Name);
+                    ws.Cell(iRow, iColumn++).Value = md?.Label ?? column.Name;
+                }
+
+                iRow++;
             }
 
             // Add data
-            int iRow = 2;
-            var columns = result.Columns.ToArray();
             foreach (IDictionary<string, object> obj in result.Data)
             {
-                iColumn = 0;
+                iColumn = 1;
                 for (int i = 0; i < length; i++)
                 {
-                    ws.Cell(iRow, ++iColumn).Value = obj[columns[i].Name];
+                    ws.Cell(iRow, iColumn).Value = obj[columns[i].Name];
                     if (columns[i].ColumnType?.Equals(typeof(DateTime)) == true)
                         ws.Cell(iRow, iColumn).Style.DateFormat.Format = formattingSettings.DateFormat;
+                    iColumn++;
                 }
                 iRow++;
             }
+
+            // Check for totals
+            if (result.Metadata.Columns.Any(c => c.HasTotals))
+            {
+                iRow++;
+                ws.Cell(iRow, 1).Value =  result.Metadata.TotalsLabel;
+
+                var totals = result.Metadata.Columns.Where(c => c.HasTotals);
+                foreach (var total in totals)
+                {
+                    var columnIndex = columns.FindIndex(c => c.Name == total.Name) + 1;
+                    var columnName  = (char)('A' - 1 + columnIndex);
+                    var startingRow = formattingSettings.HeaderSettings.AddHeaders ? 2 : 1;
+                    ws.Cell(iRow, columnIndex).FormulaA1 = $"=SUM({columnName}{startingRow}:{columnName}{iRow -2})";
+                }
+
+                ws.Row(iRow).Style.Font.Bold = true;
+            }
+
+            // Check for fixed rows
+            if (result.Metadata.FixedColumns > 0)
+                ws.SheetView.FreezeColumns(result.Metadata.FixedColumns);
 
             // Column widths
             if (formattingSettings.AutoFit)
@@ -173,7 +205,7 @@ namespace Cubes.Core.Utilities
             if (formattingSettings.HeaderSettings.AddHeaders)
             {
                 ws.RangeUsed().SetAutoFilter(true);
-                ws.SheetView.Freeze(1, 0);
+                ws.SheetView.FreezeRows(1);
             }
         }
 

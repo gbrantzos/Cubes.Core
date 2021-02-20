@@ -8,6 +8,7 @@ namespace Cubes.Core.DataAccess
         public string Comments { get; set; }
         public string QueryCommand { get; set; }
         public List<QueryParameter> Parameters { get; set; }
+        public QueryMetadata Metadata { get; set; } = new QueryMetadata();
     }
 
     public class QueryParameter
