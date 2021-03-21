@@ -45,7 +45,7 @@ namespace Cubes.Core.Base
                 };
             var swaggerFiles = cubes
                 .GetSwaggerXmlFiles()
-                .Select((f, i) => new KeyValuePair<string, string>($"{CubesConstants.Configuration_Section}:SwaggerXMLFiles:{i}", f))
+                .Select((f, i) => new KeyValuePair<string, string>($"{section}:SwaggerXMLFiles:{i}", f))
                 .ToList();
             foreach (var item in swaggerFiles)
                 cubesConfig.Add(item.Key, item.Value);

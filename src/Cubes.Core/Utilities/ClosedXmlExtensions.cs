@@ -184,7 +184,8 @@ namespace Cubes.Core.Utilities
                 var totals = result.Metadata.Columns.Where(c => c.HasTotals);
                 foreach (var total in totals)
                 {
-                    var columnIndex = columns.FindIndex(c => c.Name == total.Name) + 1;
+                    var columnIndex = columns
+                        .FindIndex(c => c.Name.Equals(total.Name, StringComparison.OrdinalIgnoreCase)) + 1;
                     var columnName  = (char)('A' - 1 + columnIndex);
                     var startingRow = formattingSettings.HeaderSettings.AddHeaders ? 2 : 1;
                     ws.Cell(iRow, columnIndex).FormulaA1 = $"=SUM({columnName}{startingRow}:{columnName}{iRow -2})";
@@ -209,18 +210,17 @@ namespace Cubes.Core.Utilities
             }
         }
 
-        public static byte[] GetAsByteArray(this XLWorkbook workbook)
+        private static byte[] GetAsByteArray(this XLWorkbook workbook)
         {
-            using (var memoryStream = new MemoryStream())
-            {
-                workbook.SaveAs(memoryStream);
-                return memoryStream.ToArray();
-            }
+            using var memoryStream = new MemoryStream();
+            workbook.SaveAs(memoryStream);
+
+            return memoryStream.ToArray();
         }
     }
 }
 
-// Most porbably not needed, but left here for future reference
+// Most probably not needed, but left here for future reference
 
 //public static byte[] ToExcelWorkbook<T>(this Dictionary<string, IEnumerable<T>> lists, ExcelFormattingSettings formattingSettings = null)
 //{
