@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 namespace Cubes.Core.Commands
 {
     public class RequestLoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
         private readonly ILogger<RequestLoggingBehaviour<TRequest, TResponse>> _logger;
         private readonly IMetrics _metrics;

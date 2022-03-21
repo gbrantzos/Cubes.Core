@@ -246,7 +246,7 @@ namespace Cubes.Core.Base
             #if DEBUG
             var thisAsm = typeof(CubesEnvironment).Assembly;
             loadedAssembliesNames.Add(thisAsm.GetName().Name);
-#endif
+            #endif
 
             var loadMessages = new List<string>();
             var applicationTypes = domainAssemblies
