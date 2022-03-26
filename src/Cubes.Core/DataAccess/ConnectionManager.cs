@@ -10,10 +10,10 @@ namespace Cubes.Core.DataAccess
     {
         public static Dictionary<string, string> RegisteredProviders { get; private set; }
 
-        private readonly DataAccessOptions options;
+        private readonly DataAccessOptions _options;
 
         public ConnectionManager(IOptionsSnapshot<DataAccessOptions> options)
-            => this.options = options.Value;
+            => _options = options.Value;
 
         public static void RegisterProviders()
         {
@@ -32,24 +32,26 @@ namespace Cubes.Core.DataAccess
         public DbConnection GetConnection(Connection connection)
         {
             var providerType = GetProviderType(connection.DbProvider);
-            var providerInst = Activator.CreateInstance(providerType, true);
-            var cnxFactory   = providerInst.GetType().GetMethod(nameof(DbProviderFactory.CreateConnection));
+            var providerInst = Activator.CreateInstance(providerType, true)
+                ?? throw new NullReferenceException("Provider instance");
+            var cnxFactory   = providerInst.GetType().GetMethod(nameof(DbProviderFactory.CreateConnection))
+                ?? throw new NullReferenceException("Connection factory");
+            var dbConnection = (DbConnection)cnxFactory.Invoke(providerInst, null)
+                ?? throw new NullReferenceException("Database connection");
 
-            var dbConnection = cnxFactory.Invoke(providerInst, null) as DbConnection;
             dbConnection.ConnectionString = connection.ConnectionString;
-
             return dbConnection;
         }
 
         public DbConnection GetConnection(string connectionName)
         {
-            var connectionInfo = options
+            var connectionInfo = _options
                 .Connections
                 .Find(i => i.Name.Equals(connectionName, StringComparison.CurrentCultureIgnoreCase));
-            if (connectionInfo != null)
-                return GetConnection(connectionInfo);
-            else
+            if (connectionInfo == null)
                 throw new ArgumentException($"Could not find connection: {connectionName}");
+
+            return GetConnection(connectionInfo);
         }
 
         // Get provider type
@@ -59,7 +61,7 @@ namespace Cubes.Core.DataAccess
                 .CurrentDomain
                 .GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .FirstOrDefault(t => t.FullName.Equals(providerName));
+                .FirstOrDefault(t => t.FullName != null && t.FullName.Equals(providerName));
             if (type == null)
                 throw new ArgumentException($"Could not create DbProvider type for '{providerName}'");
 

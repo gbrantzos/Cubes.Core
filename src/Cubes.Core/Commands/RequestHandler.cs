@@ -10,7 +10,7 @@ namespace Cubes.Core.Commands
     public abstract class RequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, Result<TResponse>>
         where TRequest : IRequest<Result<TResponse>>
     {
-        private bool failed;
+        private bool _failed;
 
         /// <summary>
         /// Set by the internal Handler if we need to define message for <see cref="Result{TResponse}"/>
@@ -30,10 +30,10 @@ namespace Cubes.Core.Commands
             var toReturn = new Result<TResponse>();
             try
             {
-                toReturn.Response = await this.HandleInternal(request, cancellationToken);
+                toReturn.Response = await HandleInternal(request, cancellationToken);
                 toReturn.Message = MessageToReturn.IfNullOrEmpty(toReturn.DefaultMessage());
 
-                if (failed)
+                if (_failed)
                 {
                     toReturn.Message = MessageToReturn.IfNullOrEmpty($"{typeof(TRequest).Name} execution failed!");
                     toReturn.HasErrors = true;
@@ -44,12 +44,12 @@ namespace Cubes.Core.Commands
                 toReturn.HasErrors = true;
                 toReturn.ExceptionThrown = x;
 
-                var allMesages = x
+                var allMessages = x
                     .FromHierarchy(x => x.InnerException)
                     .Select(x => x.Message)
                     .Distinct()
                     .ToList();
-                toReturn.Message = MessageToReturn.IfNullOrEmpty(String.Join(Environment.NewLine, allMesages));
+                toReturn.Message = MessageToReturn.IfNullOrEmpty(String.Join(Environment.NewLine, allMessages));
             }
             return toReturn;
         }
@@ -62,7 +62,7 @@ namespace Cubes.Core.Commands
         protected virtual TResponse FailedResponse(string message)
         {
             MessageToReturn = message;
-            this.failed = true;
+            _failed = true;
             return default;
         }
     }

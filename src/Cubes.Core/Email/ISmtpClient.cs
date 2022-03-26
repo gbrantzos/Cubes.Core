@@ -1,4 +1,3 @@
-using System;
 using MimeKit;
 
 namespace Cubes.Core.Email
