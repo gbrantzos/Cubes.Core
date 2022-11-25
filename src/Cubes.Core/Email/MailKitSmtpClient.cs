@@ -1,4 +1,6 @@
+using System.IO;
 using System.Security.Authentication;
+using Cubes.Core.Base;
 using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -8,9 +10,17 @@ namespace Cubes.Core.Email
 {
     public class MailKitSmtpClient : ISmtpClient
     {
+        private readonly ICubesEnvironment _environment;
+
+        public MailKitSmtpClient(ICubesEnvironment environment)
+        {
+            _environment = environment;
+        }
+
         public void Send(MimeMessage message, SmtpSettings smtpSettings)
         {
-            using var client = new SmtpClient(new ProtocolLogger("smtp.log", false));
+            var path = Path.Combine(_environment.GetFolder(CubesFolderKind.Logs), "smtp.log");
+            using var client = new SmtpClient(new ProtocolLogger(path, false));
             client.SslProtocols = SslProtocols.Tls12;
             client.Connect(smtpSettings.Host,
                 smtpSettings.Port,

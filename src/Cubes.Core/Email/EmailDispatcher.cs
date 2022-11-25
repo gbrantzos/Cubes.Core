@@ -27,8 +27,8 @@ namespace Cubes.Core.Email
             {
                 Subject = content.Subject
             };
-            mail.To.AddRange(content.ToAddresses.Select(adr => new MailboxAddress(adr)));
-            mail.From.Add(new MailboxAddress(smtpSettings.Sender));
+            mail.To.AddRange(content.ToAddresses.Select(adr => new MailboxAddress(adr, adr)));
+            mail.From.Add(new MailboxAddress(smtpSettings.Sender, smtpSettings.Sender));
 
             var bodyBuilder = new BodyBuilder { TextBody = content.Body };
             if (content.Attachments?.Count() > 0)

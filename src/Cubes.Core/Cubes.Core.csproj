@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
-    <AssemblyVersion>5.3.5</AssemblyVersion>
-    <FileVersion>5.3.5</FileVersion>
-    <InformationalVersion>5.3.5</InformationalVersion>
-    <Version>5.3.5</Version>
+    <AssemblyVersion>5.3.6</AssemblyVersion>
+    <FileVersion>5.3.6</FileVersion>
+    <InformationalVersion>5.3.6</InformationalVersion>
+    <Version>5.3.6</Version>
     <Authors>Giorgos Brantzos</Authors>
     <Company>GbWorks</Company>
     <Copyright>2019 - 2020</Copyright>
@@ -42,13 +42,13 @@
     <PackageReference Include="FluentValidation" Version="10.4.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="10.4.0" />
     <PackageReference Include="IPAddressRange" Version="4.2.0" />
+    <PackageReference Include="MailKit" Version="3.4.3" />
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.23" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.23" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.23" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.23" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.23" />
-    <PackageReference Include="NETCore.MailKit" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
