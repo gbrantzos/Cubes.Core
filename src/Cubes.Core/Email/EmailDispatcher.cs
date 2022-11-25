@@ -8,9 +8,9 @@ using Polly;
 
 namespace Cubes.Core.Email
 {
-    public class EmailDispatcher : IEmailDispatcher
+    public sealed class EmailDispatcher : IEmailDispatcher
     {
-        private readonly int _maxRetries = 5;
+        private const int MaxRetries = 1;
         private readonly ISmtpClient _client;
         private readonly ILogger<EmailDispatcher> _logger;
 
@@ -20,11 +20,13 @@ namespace Cubes.Core.Email
             _logger = logger;
         }
 
-        public virtual void DispatchEmail(EmailContent content, SmtpSettings smtpSettings)
+        public void DispatchEmail(EmailContent content, SmtpSettings smtpSettings)
         {
             var cleanup = new List<MemoryStream>();
-            var mail = new MimeMessage();
-            mail.Subject = content.Subject;
+            var mail = new MimeMessage
+            {
+                Subject = content.Subject
+            };
             mail.To.AddRange(content.ToAddresses.Select(adr => new MailboxAddress(adr)));
             mail.From.Add(new MailboxAddress(smtpSettings.Sender));
 
@@ -42,11 +44,11 @@ namespace Cubes.Core.Email
 
             var policy = Policy
                 .Handle<Exception>()
-                .WaitAndRetry(_maxRetries,
+                .WaitAndRetry(MaxRetries,
                     retry => TimeSpan.FromSeconds(Math.Pow(2, retry)),
                     onRetry: (ex, ts, retry, __) =>
                     {
-                        _logger.LogWarning($"Mail dispatch failed: {ex.Message}. Retrying after {ts.TotalSeconds} secs (retry {retry} of {_maxRetries})...");
+                        _logger.LogWarning($"Mail dispatch failed: {ex.Message}. Retrying after {ts.TotalSeconds} secs (retry {retry} of {MaxRetries})...");
                     });
             policy.Execute(() => _client.Send(mail, smtpSettings));
 
