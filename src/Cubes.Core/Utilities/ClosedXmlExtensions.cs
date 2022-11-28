@@ -210,7 +210,7 @@ namespace Cubes.Core.Utilities
             }
         }
 
-        private static byte[] GetAsByteArray(this XLWorkbook workbook)
+        public static byte[] GetAsByteArray(this XLWorkbook workbook)
         {
             using var memoryStream = new MemoryStream();
             workbook.SaveAs(memoryStream);
