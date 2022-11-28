@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
-    <AssemblyVersion>5.3.6</AssemblyVersion>
-    <FileVersion>5.3.6</FileVersion>
-    <InformationalVersion>5.3.6</InformationalVersion>
-    <Version>5.3.6</Version>
+    <AssemblyVersion>5.3.7</AssemblyVersion>
+    <FileVersion>5.3.7</FileVersion>
+    <InformationalVersion>5.3.7</InformationalVersion>
+    <Version>5.3.7</Version>
     <Authors>Giorgos Brantzos</Authors>
     <Company>GbWorks</Company>
     <Copyright>2019 - 2020</Copyright>
